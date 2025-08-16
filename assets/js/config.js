@@ -29,7 +29,7 @@ window.CONFIG = {
     enabled: true,
     enableHighAccuracy: true,
     waitMs: 40000,          // aguardar até 40s para melhor precisão
-    requiredPrecisionM: 15  // aceitar leituras até 15m; acima, pedir confirmação manual
+    requiredPrecisionM: 20  // aceitar leituras até 20m; acima, pedir confirmação manual
   },
 
   suggestions: {
