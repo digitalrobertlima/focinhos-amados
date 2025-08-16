@@ -1,6 +1,6 @@
-<!-- components/wizard.html (v1) — Wizard de Boas‑vindas (Passos 0–6)
-     Zero libs externas. Acessível. Injetado via main.js
+<!-- components/wizard.html (v2.2) — Wizard com Comanda (multi‑pet)
      Fluxo: 0 Objetivo → 1 Serviços → 2 Pet → 3 Quando → 4 Onde → 5 Contato → 6 Resumo
+     Novidades: chip “Comanda: N itens”, botões “Adicionar à comanda”, lista de itens no passo 6.
 -->
 
 <section id="wizard" class="wizard" aria-labelledby="wizard-title" hidden>
@@ -21,6 +21,12 @@
       </ol>
     </div>
     <p class="sr-only" aria-live="polite"><span data-bind="wizard.progress">Passo 1 de 7</span></p>
+
+    <!-- Chip da comanda (aparece apenas quando houver itens) -->
+    <div class="row row--between row--center" style="margin-top:8px">
+      <span class="badge" data-if="comanda.length">Comanda: <span data-bind="comanda.length">0</span> item(ns)</span>
+      <button class="btn btn--link" type="button" data-action="open-resumo">Ver Resumo</button>
+    </div>
   </header>
 
   <!-- Conteúdo dos passos -->
@@ -76,6 +82,14 @@
           <input type="checkbox" data-bind="servicos.add_taxi"> <span>Quero incluir Taxi Dog (decido ida/volta no próximo passo)</span>
         </label>
       </div>
+
+      <!-- Adicionar à comanda -->
+      <div class="row row--wrap gap" style="margin-top:8px">
+        <button class="btn" type="button" data-action="add-comanda">
+          <span>Adicionar à comanda</span>
+        </button>
+        <span class="muted">Dica: preencha o Pet no próximo passo se ainda não preencheu.</span>
+      </div>
     </section>
 
     <!-- Passo 2: Pet -->
@@ -104,6 +118,14 @@
       <div class="field">
         <label for="pet-obs">Observações</label>
         <textarea id="pet-obs" rows="3" placeholder="Alergias, comportamento, pedidos especiais" data-bind="pet.observacoes"></textarea>
+      </div>
+
+      <!-- Adicionar à comanda -->
+      <div class="row row--wrap gap" style="margin-top:8px">
+        <button class="btn" type="button" data-action="add-comanda">
+          <span>Adicionar à comanda</span>
+        </button>
+        <span class="muted">Requer: 1+ serviços e Nome + Porte do pet.</span>
       </div>
     </section>
 
@@ -209,8 +231,30 @@
     <!-- Passo 6: Resumo -->
     <section class="wizard__step" data-step="6" hidden>
       <h3 class="h4">Tudo pronto!</h3>
-      <p>Revise os detalhes e envie pelo WhatsApp.</p>
+      <p>Revise os detalhes, gerencie sua <strong>comanda</strong> e envie pelo WhatsApp.</p>
 
+      <!-- Lista da comanda (aparece se houver itens) -->
+      <div class="card card--flat" data-if="comanda.length">
+        <h4 class="h5">Itens da comanda</h4>
+        <ul class="list" id="comanda-list"></ul>
+        <p id="comanda-empty" class="muted" hidden>Nenhum item na comanda.</p>
+        <div class="row gap" style="margin-top:8px">
+          <button class="btn" type="button" data-action="add-more-comanda">Adicionar mais à comanda</button>
+        </div>
+      </div>
+
+      <!-- Template para cada item da comanda -->
+      <template id="tpl-comanda-row">
+        <li class="row row--between row--center">
+          <span class="comanda__desc">Thor (Médio) — Serviços: Banho, Tosa</span>
+          <span class="row">
+            <button class="btn btn--link" type="button" data-action="edit-comanda" data-idx="">Editar</button>
+            <button class="btn btn--link" type="button" data-action="remove-comanda" data-idx="">Remover</button>
+          </span>
+        </li>
+      </template>
+
+      <!-- Resumo clássico (fallback quando comanda vazia) -->
       <div class="card card--flat">
         <ul class="list">
           <li><strong>Cliente:</strong> <span data-bind="cliente.nome">—</span> · <span data-bind="cliente.telefone">—</span></li>
@@ -229,6 +273,9 @@
         <button class="btn" type="button" data-action="edit-from-resumo">
           <svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg>
           <span>Editar algo</span>
+        </button>
+        <button class="btn" type="button" data-action="add-more-comanda">
+          <span>Adicionar mais à comanda</span>
         </button>
       </div>
     </section>

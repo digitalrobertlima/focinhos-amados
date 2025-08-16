@@ -1,11 +1,10 @@
-/* main.js (v2.1)
-   Ajustes:
-   - Delivery: interpreta textarea (delivery.texto) ⇄ lista (delivery.itens)
-   - Binds extras: logistica.tipo_label, logistica.subtexto, logistica.endereco.full
-   - data-if: render condicional simples
-   ————————————————————————————————————————————————————————————————
-   Estado persistente (localStorage), autosave/restore, injeção de componentes,
-   wizard, resumo, upsell, LGPD, WhatsApp. Zero libs externas.
+/* main.js (v2.2)
+   Novidades:
+   - Suporte a COMANDA (multi‑pet/multi‑serviço): state.comanda[]
+   - Ações: addComandaFromDraft, editComanda(idx), removeComanda(idx)
+   - Render da comanda no Wizard (Passo 6) e no Modal de Resumo
+   - Gate do WhatsApp: exige LGPD + telefone + (comanda>0 OU rascunho válido)
+   - Mantém: Delivery textarea⇄itens, binds extras, data-if, autosave/restore
 */
 (function(){
   'use strict';
@@ -36,7 +35,8 @@
     agenda: { data: '', janela: '', observacoes: '' },
     logistica: { tipo:'', usar_geo:false, lat:null, lng:null, endereco:{ rua:'', numero:'', bairro:'', cidade:'', ref:'' } },
     delivery: { itens: [], texto: '' },
-    sugestoes: [], // títulos selecionados
+    comanda: [], // <—— NOVO
+    sugestoes: [],
     _meta: { updatedAt: 0 }
   };
 
@@ -68,11 +68,12 @@
       if(!data._meta || !data._meta.updatedAt || (Date.now()-data._meta.updatedAt)>TTL_MS){
         return clone(DEFAULT_STATE);
       }
-      // garante novas chaves (ex.: delivery.texto)
+      // migração + novas chaves
       const merged = Object.assign(clone(DEFAULT_STATE), data);
       if(!merged.delivery) merged.delivery = { itens: [], texto: '' };
       if(!Array.isArray(merged.delivery.itens)) merged.delivery.itens = [];
       if(typeof merged.delivery.texto !== 'string') merged.delivery.texto = stringifyDeliveryItems(merged.delivery.itens);
+      if(!Array.isArray(merged.comanda)) merged.comanda = []; // <—— NOVO
       return merged;
     }catch(e){ console.warn('loadState err',e); return clone(DEFAULT_STATE); }
   }
@@ -102,15 +103,105 @@
   // ————————————————————————————————————————————————————————————————
   function parseDeliveryText(text){
     if(!text) return [];
-    // separa por quebras de linha ou vírgulas/semicolon
     const parts = String(text).split(/\r?\n|,|;/g).map(s=>s.trim()).filter(Boolean);
-    // remove duplicatas mantendo ordem
-    const seen = new Set();
-    const out = [];
+    const seen = new Set(); const out = [];
     for(const p of parts){ const key = p.toLowerCase(); if(!seen.has(key)){ seen.add(key); out.push(p); } }
     return out;
   }
   function stringifyDeliveryItems(arr){ return (arr||[]).join('\n'); }
+
+  // ————————————————————————————————————————————————————————————————
+  // Comanda helpers
+  // ————————————————————————————————————————————————————————————————
+  function isDraftValid(){
+    const S = state.servicos || {}; const hasSvc = !!(S.banho||S.tosa||S.unhas||S.limpeza_ouvido||S.hidratacao||S.perfume||S.add_taxi);
+    const P = state.pet || {}; const hasPet = !!(P.nome && P.porte);
+    return hasSvc && hasPet;
+  }
+  function clearDraft(){ state.pet = { nome:'', porte:'', observacoes:'' }; state.servicos = { banho:false, tosa:false, unhas:false, limpeza_ouvido:false, hidratacao:false, perfume:false, add_taxi:false }; }
+  function addComandaFromDraft(){
+    if(!isDraftValid()){ toast('Preencha serviços e o pet (nome e porte)'); return false; }
+    const item = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      pet: clone(state.pet),
+      servicos: clone(state.servicos)
+    };
+    state.comanda = Array.isArray(state.comanda) ? state.comanda : [];
+    state.comanda.push(item);
+    clearDraft();
+    saveState();
+    renderAll();
+    toast('Item adicionado à comanda');
+    return true;
+  }
+  function editComanda(idx){
+    const i = Number(idx); if(!(state.comanda && state.comanda[i])) return;
+    const it = state.comanda[i];
+    state.pet = clone(it.pet||{});
+    state.servicos = clone(it.servicos||{});
+    state.comanda.splice(i,1);
+    saveState();
+    renderAll();
+    if(wizardEl) updateWizardStep(1); // volta para Serviços/Pet ajustar
+    toast('Item carregado para edição');
+  }
+  function removeComanda(idx){
+    const i = Number(idx); if(!(state.comanda && state.comanda[i])) return;
+    state.comanda.splice(i,1);
+    saveState();
+    renderAll();
+    toast('Item removido da comanda');
+  }
+
+  function renderComanda(){
+    const items = Array.isArray(state.comanda) ? state.comanda : [];
+    // Wizard (Passo 6)
+    const ulWiz = byId('comanda-list'); const emptyWiz = byId('comanda-empty');
+    if(ulWiz){ ulWiz.innerHTML=''; }
+    if(ulWiz){
+      if(items.length){ if(emptyWiz) emptyWiz.hidden = true; } else { if(emptyWiz) emptyWiz.hidden = false; }
+      items.forEach((it, idx)=>{
+        const tpl = byId('tpl-comanda-row');
+        const node = tpl ? tpl.content.firstElementChild.cloneNode(true) : document.createElement('li');
+        const desc = (window.CONFIG && window.CONFIG.__format && window.CONFIG.__format.formatComandaItem) ? window.CONFIG.__format.formatComandaItem(it) : `${it.pet?.nome||'Pet'} — serviços escolhidos`;
+        const descEl = qs('.comanda__desc', node) || node;
+        descEl.textContent = desc;
+        qsa('[data-action="edit-comanda"]', node).forEach(b=> b.setAttribute('data-idx', String(idx)));
+        qsa('[data-action="remove-comanda"]', node).forEach(b=> b.setAttribute('data-idx', String(idx)));
+        ulWiz.appendChild(node);
+      });
+      // Delegação de eventos (Wizard)
+      ulWiz.onclick = (e)=>{
+        const btn = e.target.closest('[data-action]'); if(!btn) return;
+        const a = btn.getAttribute('data-action'); const i = btn.getAttribute('data-idx');
+        if(a==='edit-comanda'){ editComanda(i); }
+        if(a==='remove-comanda'){ removeComanda(i); }
+      };
+    }
+
+    // Modal Resumo
+    const ulMd = byId('comanda-modal-list'); const emptyMd = byId('comanda-modal-empty');
+    if(ulMd){ ulMd.innerHTML=''; }
+    if(ulMd){
+      if(items.length){ if(emptyMd) emptyMd.hidden = true; } else { if(emptyMd) emptyMd.hidden = false; }
+      items.forEach((it, idx)=>{
+        const tpl = byId('tpl-comanda-row');
+        const node = tpl ? tpl.content.firstElementChild.cloneNode(true) : document.createElement('li');
+        const desc = (window.CONFIG && window.CONFIG.__format && window.CONFIG.__format.formatComandaItem) ? window.CONFIG.__format.formatComandaItem(it) : `${it.pet?.nome||'Pet'} — serviços escolhidos`;
+        const descEl = qs('.comanda__desc', node) || node;
+        descEl.textContent = desc;
+        qsa('[data-action="edit-comanda"]', node).forEach(b=> b.setAttribute('data-idx', String(idx)));
+        qsa('[data-action="remove-comanda"]', node).forEach(b=> b.setAttribute('data-idx', String(idx)));
+        ulMd.appendChild(node);
+      });
+      ulMd.onclick = (e)=>{
+        const btn = e.target.closest('[data-action]'); if(!btn) return;
+        const a = btn.getAttribute('data-action'); const i = btn.getAttribute('data-idx');
+        if(a==='edit-comanda'){ closeResumo(); editComanda(i); }
+        if(a==='remove-comanda'){ removeComanda(i); }
+      };
+    }
+  }
 
   // ————————————————————————————————————————————————————————————————
   // Data‑bind (inputs & spans)
@@ -125,33 +216,20 @@
       const isRadio = isInput && type==='radio';
       const isCheckbox = isInput && type==='checkbox';
 
-      // ——— Caso especial: delivery.texto (textarea ⇄ itens) ———
+      // delivery.texto (textarea ⇄ itens)
       if(isInput && path === 'delivery.texto'){
-        // Inicializa textarea a partir de state.delivery.texto OU itens
         const current = state?.delivery?.texto || stringifyDeliveryItems(state?.delivery?.itens||[]);
         el.value = current;
-        on(el, 'input', ()=>{
-          const val = el.value;
-          state.delivery.texto = val;
-          state.delivery.itens = parseDeliveryText(val);
-          saveState();
-        });
-        return; // não aplicar o restante da lógica padrão
+        on(el, 'input', ()=>{ const val = el.value; state.delivery.texto = val; state.delivery.itens = parseDeliveryText(val); saveState(); });
+        return;
       }
 
-      // Initialize value from state
       const curVal = deepGet(state, path);
-      if(isRadio){
-        const val = el.value; el.checked = (curVal === val);
-      } else if(isCheckbox){
-        el.checked = !!curVal;
-      } else if(isInput){
-        if(curVal!=null) el.value = curVal;
-      } else {
-        applyTextBind(el, path);
-      }
+      if(isRadio){ const val = el.value; el.checked = (curVal === val); }
+      else if(isCheckbox){ el.checked = !!curVal; }
+      else if(isInput){ if(curVal!=null) el.value = curVal; }
+      else { applyTextBind(el, path); }
 
-      // Attach listeners para inputs
       if(isInput){
         const ev = (tag==='select' || type==='date' || type==='radio' || type==='checkbox') ? 'change' : 'input';
         on(el, ev, ()=>{
@@ -165,51 +243,25 @@
   }
 
   function applyTextBind(el, path){
-    // computed binds
-    if(path === 'servicos._resumo'){
-      el.textContent = window.CONFIG.__format.servicesSummary(state); return;
-    }
-    if(path === 'logistica._resumo'){
-      el.textContent = window.CONFIG.__format.logisticaSummary(state); return;
-    }
+    if(path === 'servicos._resumo'){ el.textContent = window.CONFIG.__format.servicesSummary(state); return; }
+    if(path === 'logistica._resumo'){ el.textContent = window.CONFIG.__format.logisticaSummary(state); return; }
     if(path === 'agenda.obs_edit'){
-      if(el.tagName.toLowerCase()==='textarea'){
-        el.value = state?.agenda?.observacoes || '';
-        on(el,'input',()=>{ state.agenda.observacoes = el.value; saveState(); });
-      } else { el.textContent = state?.agenda?.observacoes || ''; }
+      if(el.tagName.toLowerCase()==='textarea'){ el.value = state?.agenda?.observacoes || ''; on(el,'input',()=>{ state.agenda.observacoes = el.value; saveState(); }); }
+      else { el.textContent = state?.agenda?.observacoes || ''; }
       return;
     }
-    if(path === 'logistica.tipo_label'){
-      el.textContent = window.CONFIG.__format.logisticaLabel(state?.logistica?.tipo); return;
-    }
-    if(path === 'logistica.subtexto'){
-      el.textContent = window.CONFIG.__format.logisticaSub(state?.logistica?.tipo); return;
-    }
-    if(path === 'logistica.endereco.full'){
-      el.textContent = window.CONFIG.__format.fullAddress(state?.logistica?.endereco); return;
-    }
-    // generic
-    const v = deepGet(state, path);
-    el.textContent = (v==null || v==='') ? '—' : v;
+    if(path === 'logistica.tipo_label'){ el.textContent = window.CONFIG.__format.logisticaLabel(state?.logistica?.tipo); return; }
+    if(path === 'logistica.subtexto'){ el.textContent = window.CONFIG.__format.logisticaSub(state?.logistica?.tipo); return; }
+    if(path === 'logistica.endereco.full'){ el.textContent = window.CONFIG.__format.fullAddress(state?.logistica?.endereco); return; }
+    const v = deepGet(state, path); el.textContent = (v==null || v==='') ? '—' : v;
   }
 
   function renderTextBinds(root=document){
-    qsa('[data-bind]', root).forEach(el=>{
-      const tag=el.tagName.toLowerCase(); const type=(el.getAttribute('type')||'').toLowerCase();
-      if(tag!=='input' && tag!=='textarea' && tag!=='select'){
-        applyTextBind(el, el.getAttribute('data-bind'));
-      }
-    });
+    qsa('[data-bind]', root).forEach(el=>{ const tag=el.tagName.toLowerCase(); const type=(el.getAttribute('type')||'').toLowerCase(); if(tag!=='input' && tag!=='textarea' && tag!=='select'){ applyTextBind(el, el.getAttribute('data-bind')); } });
   }
 
   function renderConditionals(root=document){
-    qsa('[data-if]', root).forEach(el=>{
-      try{
-        const path = el.getAttribute('data-if');
-        const val = !!deepGet(state, path);
-        el.hidden = !val;
-      }catch{ el.hidden = true; }
-    });
+    qsa('[data-if]', root).forEach(el=>{ try{ const path = el.getAttribute('data-if'); const val = !!deepGet(state, path); el.hidden = !val; }catch{ el.hidden = true; } });
   }
 
   // Mask phone (BR) — gentil
@@ -263,6 +315,10 @@
     qsa('[data-action="open-resumo"]', wizardEl).forEach(btn=> on(btn,'click', openResumo));
     qsa('[data-action="edit-from-resumo"]', wizardEl).forEach(btn=> on(btn,'click', ()=> updateWizardStep(1)));
 
+    // Novo: adicionar/mais à comanda
+    qsa('[data-action="add-comanda"]', wizardEl).forEach(btn=> on(btn,'click', addComandaFromDraft));
+    qsa('[data-action="add-more-comanda"]', wizardEl).forEach(btn=> on(btn,'click', ()=>{ clearDraft(); saveState(); updateWizardStep(1); }));
+
     const d = byId('ag-data'); if(d){ const today = new Date(); d.min = today.toISOString().slice(0,10); }
 
     bindInputs(wizardEl);
@@ -278,6 +334,8 @@
     const prog = qs('[data-bind="wizard.progress"]', wizardEl);
     if(prog) prog.textContent = `Passo ${currentStep+1} de ${stepsEls.length}`;
     if(!init) window.scrollTo({top:0, behavior:'smooth'});
+    // re-render lista da comanda quando entrar no passo 6
+    if(currentStep===6) renderComanda();
   }
 
   // ————————————————————————————————————————————————————————————————
@@ -324,15 +382,15 @@
 
     on(qs('[data-action="dismiss-upsell"]', resumoModal),'click', ()=>{ const until = Date.now() + 30*24*60*60*1000; try{ localStorage.setItem('fa_upsell_dismiss_until', String(until)); }catch{} renderUpsell(); });
 
+    // Delegação para Add Mais / Edit / Remove dentro do modal
+    const ulMd = byId('comanda-modal-list');
+    if(ulMd){ ulMd.onclick = (e)=>{ const btn = e.target.closest('[data-action]'); if(!btn) return; const a=btn.getAttribute('data-action'); const i=btn.getAttribute('data-idx'); if(a==='edit-comanda'){ closeResumo(); editComanda(i); } if(a==='remove-comanda'){ removeComanda(i); } }; }
+    qsa('[data-action="add-more-comanda"]', resumoModal).forEach(btn=> on(btn,'click', ()=>{ closeResumo(); clearDraft(); saveState(); if(wizardEl) updateWizardStep(1); }));
+
     bindInputs(resumoModal);
   }
 
-  function openResumo(){
-    if(!resumoModal) return;
-    resumoModal.hidden = false; document.body.style.overflow='hidden';
-    renderResumo(); gateWhatsApp();
-    const first = qs('[data-sentinel="start"]', resumoModal); first && first.focus();
-  }
+  function openResumo(){ if(!resumoModal) return; resumoModal.hidden = false; document.body.style.overflow='hidden'; renderResumo(); gateWhatsApp(); const first = qs('[data-sentinel="start"]', resumoModal); first && first.focus(); }
   function closeResumo(){ if(!resumoModal) return; resumoModal.hidden = true; document.body.style.overflow=''; }
 
   function renderResumo(){
@@ -347,6 +405,7 @@
     const raw = byId('resumo-text-raw'); if(raw){ raw.value = buildWhatsappMessage(); }
 
     renderUpsell();
+    renderComanda(); // <—— NOVO
     renderTextBinds(resumoModal);
     renderConditionals(resumoModal);
   }
@@ -394,7 +453,8 @@
   function gateWhatsApp(){
     const btnWA = byId('btn-wa-resumo'); if(!btnWA) return;
     const hasTel = (state?.cliente?.telefone||'').replace(/\D+/g,'').length >= 10;
-    const ok = !!state.lgpd && hasTel;
+    const hasComanda = Array.isArray(state.comanda) && state.comanda.length>0;
+    const ok = !!state.lgpd && hasTel && (hasComanda || isDraftValid());
     btnWA.toggleAttribute('disabled', !ok);
     if(!ok){ btnWA.removeAttribute('href'); }
   }
@@ -427,7 +487,9 @@
   function renderAll(){
     renderTextBinds(document);
     renderConditionals(document);
+    renderComanda();
     renderResumo();
+    gateWhatsApp();
   }
 
   // ————————————————————————————————————————————————————————————————

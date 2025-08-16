@@ -1,161 +1,129 @@
-<!-- components/resumo.html (v1) — Modal de Resumo Unificado + Upsell -->
-<!-- Zero libs externas. Acessível. Injetado via main.js -->
+<!-- components/resumo.html (v1.2)
+     Modal de Resumo unificado: comanda (multi‑pet), dados principais, delivery, LGPD, upsell e ações.
+-->
 
-<div id="resumo-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resumo-title" aria-describedby="resumo-desc" hidden>
-  <!-- Overlay fecha o modal ao clicar -->
-  <div class="modal__overlay" data-action="close" aria-hidden="true"></div>
-
+<div id="resumo-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resumo-title" hidden>
+  <div class="modal__overlay" data-action="close" tabindex="-1"></div>
   <div class="modal__dialog" role="document">
-    <span tabindex="0" data-sentinel="start"></span>
-
     <header class="modal__header">
-      <h2 id="resumo-title" class="h3">📄 Resumo do Pedido</h2>
-      <button class="btn btn--icon" type="button" data-action="close" aria-label="Fechar resumo" title="Fechar">
+      <h3 id="resumo-title" class="h4">Resumo do pedido</h3>
+      <button class="btn btn--icon" type="button" aria-label="Fechar" data-action="close">
         <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
       </button>
     </header>
 
-    <p id="resumo-desc" class="muted">Revise, ajuste e envie seu pedido pelo WhatsApp. Confirmamos valores no WhatsApp.</p>
+    <div class="modal__content gap">
+      <p class="muted" data-sentinel="start">Confira os dados, faça ajustes e envie pelo WhatsApp.</p>
 
-    <!-- Indicador de rascunho salvo -->
-    <div class="save-indicator" aria-live="polite" data-bind="saveIndicator">Rascunho salvo</div>
+      <!-- ————————————————————————— Comanda (multi‑pet) ————————————————————————— -->
+      <section class="card card--flat" data-if="comanda.length">
+        <header class="row row--between row--center">
+          <h4 class="h5">Itens da comanda</h4>
+          <span class="badge">Total: <span data-bind="comanda.length">0</span></span>
+        </header>
+        <ul class="list" id="comanda-modal-list"></ul>
+        <p id="comanda-modal-empty" class="muted" hidden>Nenhum item na comanda.</p>
+        <div class="row gap" style="margin-top:8px">
+          <button class="btn" type="button" data-action="add-more-comanda">Adicionar mais à comanda</button>
+        </div>
+      </section>
 
-    <section class="card card--flat gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Cliente</h3>
-        <button class="btn btn--link" type="button" data-edit="cliente">Editar</button>
-      </div>
-      <p><strong data-bind="cliente.nome">—</strong> · <span data-bind="cliente.telefone">—</span></p>
-    </section>
-
-    <section class="card card--flat gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Pet</h3>
-        <button class="btn btn--link" type="button" data-edit="pet">Editar</button>
-      </div>
-      <p>
-        <strong data-bind="pet.nome">—</strong>
-        <span class="muted">(
-          <span data-bind="pet.porte">—</span>
-        )</span>
-      </p>
-      <p class="muted" data-bind="pet.observacoes">—</p>
-    </section>
-
-    <section class="card card--flat gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Serviços</h3>
-        <button class="btn btn--link" type="button" data-edit="servicos">Editar</button>
-      </div>
-      <ul id="resumo-servicos-list" class="list list--checks" aria-live="polite">
-        <!-- main.js vai preencher com <li>Banho</li>, <li>Tosa</li> etc. -->
-      </ul>
-    </section>
-
-    <section class="card card--flat gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Quando</h3>
-        <button class="btn btn--link" type="button" data-edit="agenda">Editar</button>
-      </div>
-      <p>
-        <span data-bind="agenda.data">—</span>
-        <span class="muted"> · <span data-bind="agenda.janela">—</span></span>
-      </p>
-      <p class="muted" data-bind="agenda.observacoes">—</p>
-    </section>
-
-    <section class="card card--flat gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Onde / Logística</h3>
-        <button class="btn btn--link" type="button" data-edit="logistica">Editar</button>
-      </div>
-      <p>
-        <strong data-bind="logistica.tipo_label">—</strong>
-        <span class="muted" data-bind="logistica.subtexto"> </span>
-      </p>
-      <div class="grid grid--address">
-        <p><span class="muted">Endereço:</span> <span data-bind="logistica.endereco.full">—</span></p>
-        <p class="muted" data-if="logistica.usar_geo">
-          Geo: <span data-bind="logistica.lat">—</span>, <span data-bind="logistica.lng">—</span>
-        </p>
-      </div>
-    </section>
-
-    <section class="card card--flat gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Delivery (itens)</h3>
-        <button class="btn btn--link" type="button" data-edit="delivery">Editar</button>
-      </div>
-      <ul id="resumo-delivery-list" class="list" aria-live="polite">
-        <!-- main.js popula com itens (ex.: Ração X 10kg, Petisco dental...) -->
-      </ul>
-    </section>
-
-    <section class="card card--flat gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Observações</h3>
-      </div>
-      <label class="sr-only" for="resumo-observacoes">Observações do pedido</label>
-      <textarea id="resumo-observacoes" rows="3" placeholder="Algo importante que devemos saber?" data-bind="agenda.obs_edit"></textarea>
-    </section>
-
-    <!-- Upsell/Cross-sell -->
-    <section class="card card--shadow gap">
-      <div class="row row--between row--center">
-        <h3 class="h5">Aproveite e inclua</h3>
-        <button class="btn btn--link" type="button" data-action="dismiss-upsell">Não, obrigado</button>
-      </div>
-      <p class="muted">Sugestões rápidas, 1 toque. Confirmamos valores no WhatsApp.</p>
-
-      <div id="upsell-list" class="chip-list" role="list" aria-live="polite">
-        <!-- Chips de sugestão renderizados por main.js -->
-      </div>
-
-      <!-- Template de chip (toggle) -->
-      <template id="tpl-upsell-chip">
-        <button class="chip" type="button" role="checkbox" aria-checked="false" data-suggest-id="">
-          <span class="chip__title"></span>
-          <span class="chip__sub muted"></span>
-        </button>
+      <!-- Template de linha da comanda (preenchido pelo JS) -->
+      <template id="tpl-comanda-row">
+        <li class="row row--between row--center">
+          <span class="comanda__desc">Pet (Porte) — Serviços: …</span>
+          <span class="row">
+            <button class="btn btn--link" type="button" data-action="edit-comanda" data-idx="">Editar</button>
+            <button class="btn btn--link" type="button" data-action="remove-comanda" data-idx="">Remover</button>
+          </span>
+        </li>
       </template>
 
-      <p id="upsell-empty" class="muted" hidden>Nenhuma sugestão no momento.</p>
-    </section>
+      <!-- ———————————————————————— Fallback rascunho (quando comanda vazia) ———————————————————————— -->
+      <section class="card card--flat">
+        <h4 class="h5">Rascunho atual</h4>
+        <ul class="list">
+          <li><strong>Pet:</strong> <span data-bind="pet.nome">—</span> (<span data-bind="pet.porte">—</span>)</li>
+          <li><strong>Serviços:</strong> <span data-bind="servicos._resumo">—</span></li>
+        </ul>
+        <p class="muted">Dica: para vários pets, use “Adicionar à comanda” no Wizard.</p>
+      </section>
 
-    <!-- LGPD (mostrado se ainda não aceitou) -->
-    <section class="card card--flat" id="lgpd-section" hidden>
-      <label class="check">
-        <input id="lgpd-consent-resumo" type="checkbox" />
-        <span>Li e concordo com o uso dos meus dados para atendimento via WhatsApp.</span>
-      </label>
-      <p class="muted">Usamos seus dados apenas para realizar o atendimento combinado neste pedido.</p>
-    </section>
+      <!-- ————————————————————————— Dados principais ————————————————————————— -->
+      <section class="card card--flat">
+        <h4 class="h5">Dados principais</h4>
+        <ul class="list">
+          <li><strong>Cliente:</strong> <span data-bind="cliente.nome">—</span> · <span data-bind="cliente.telefone">—</span> <button class="btn btn--link" data-edit="cliente">Editar</button></li>
+          <li><strong>Quando:</strong> <span data-bind="agenda.data">—</span> · <span data-bind="agenda.janela">—</span> <button class="btn btn--link" data-edit="agenda">Editar</button></li>
+          <li><strong>Onde:</strong> <span data-bind="logistica._resumo">—</span> <button class="btn btn--link" data-edit="logistica">Editar</button></li>
+        </ul>
+      </section>
 
-    <!-- Ações finais -->
-    <section class="actions">
-      <div class="row row--wrap gap">
-        <button id="btn-wa-resumo" class="btn btn--primary" type="button" disabled>
+      <!-- ————————————————————————— Itens de Delivery ————————————————————————— -->
+      <section class="card card--flat">
+        <h4 class="h5">Delivery (itens)</h4>
+        <ul class="list" id="resumo-delivery-list"></ul>
+        <div class="row gap">
+          <button class="btn btn--link" type="button" data-edit="delivery">Adicionar/editar itens</button>
+        </div>
+      </section>
+
+      <!-- ————————————————————————— Upsell ————————————————————————— -->
+      <section class="card card--flat">
+        <h4 class="h5">Talvez te interesse</h4>
+        <div id="upsell-list" class="chip-list" role="listbox" aria-label="Sugestões"></div>
+        <p id="upsell-empty" class="muted">Sem sugestões no momento.</p>
+        <div class="row"><button class="btn btn--link" type="button" data-action="dismiss-upsell">Não mostrar por 30 dias</button></div>
+      </section>
+
+      <!-- ————————————————————————— LGPD ————————————————————————— -->
+      <section id="lgpd-section" class="card card--flat">
+        <label class="check">
+          <input id="lgpd-consent-resumo" type="checkbox"> <span>Aceito ser atendido pelo WhatsApp. <span class="muted">Usamos seus dados apenas para atendimento.</span></span>
+        </label>
+      </section>
+
+      <!-- ————————————————————————— Mensagem (texto bruto) ————————————————————————— -->
+      <details class="card card--flat">
+        <summary>Ver mensagem de WhatsApp (texto)</summary>
+        <textarea id="resumo-text-raw" rows="6" readonly></textarea>
+        <div class="row gap" style="margin-top:8px">
+          <button class="btn" type="button" id="btn-copy-resumo">
+            <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>
+            <span>Copiar</span>
+          </button>
+          <button class="btn btn--ghost" type="button" id="btn-clear-resumo">
+            <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+            <span>Limpar rascunho</span>
+          </button>
+        </div>
+      </details>
+    </div>
+
+    <footer class="modal__footer row row--between row--center">
+      <div class="row gap">
+        <button class="btn" type="button" data-action="close">Fechar</button>
+        <button class="btn" type="button" data-edit="servicos">Editar serviços</button>
+      </div>
+      <div class="row gap">
+        <button class="btn" type="button" data-action="open-resumo" hidden>Ver Resumo</button>
+        <button class="btn" type="button" id="btn-copy-resumo">
+          <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>
+          <span>Copiar</span>
+        </button>
+        <button class="btn btn--primary" type="button" id="btn-wa-resumo" disabled>
           <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
           <span>Enviar pelo WhatsApp</span>
         </button>
-        <button id="btn-copy-resumo" class="btn" type="button">
-          <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>
-          <span>Copiar resumo</span>
-        </button>
-        <button id="btn-clear-resumo" class="btn btn--ghost" type="button">
-          <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
-          <span>Limpar rascunho</span>
-        </button>
       </div>
-      <p class="muted">Ao enviar, abriremos o WhatsApp com a mensagem pronta. Valores e detalhes finais são combinados por lá.</p>
-    </section>
-
-    <!-- Área para debug/cópia -->
-    <textarea id="resumo-text-raw" class="sr-only" aria-hidden="true"></textarea>
-
-    <!-- Toast / mensagens de erro -->
-    <div id="resumo-toast" class="toast" role="status" aria-live="polite"></div>
-
-    <span tabindex="0" data-sentinel="end"></span>
+    </footer>
   </div>
 </div>
+
+<!-- Template de chip de upsell (reutilizado) -->
+<template id="tpl-upsell-chip">
+  <button class="chip" type="button" role="option" aria-checked="false" data-suggest-id="">
+    <span class="chip__title">Sugestão</span>
+    <span class="chip__sub muted"></span>
+  </button>
+</template>
