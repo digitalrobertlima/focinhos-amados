@@ -1,118 +1,150 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Delivery de Ração — Focinhos Amados (BH)</title>
-  <meta name="description" content="Monte seu pedido e receba em casa. Endereço e localização para entrega precisa.">
-  <meta name="theme-color" content="#029935">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <meta property="og:title" content="Delivery de Ração — Focinhos Amados (BH)">
-  <meta property="og:description" content="Monte seu pedido e receba em casa. Endereço e localização para entrega precisa.">
-  <meta property="og:image" content="assets/img/og.jpg">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="pt_BR">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delivery • Focinhos Amados</title>
+  <meta name="description" content="Peça ração e petiscos no Delivery. Confirmamos tudo pelo WhatsApp." />
+  <meta name="theme-color" content="#029935" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body data-page="delivery">
-  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
-  <header class="topbar" role="banner">
-    <div class="container topbar__inner">
-      <a class="brand" href="./">
-        <img class="brand__logo" src="assets/img/logo.svg" alt="" aria-hidden="true" width="32" height="32">
-        <span class="brand__text"><strong>Focinhos Amados</strong><small class="brand__city" data-bind="city">Belo Horizonte/MG</small></span>
-      </a>
-      <nav class="nav" aria-label="principal">
-        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
-        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
-          <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
-          <li role="none"><a role="menuitem" href="delivery.html" aria-current="page">Delivery</a></li>
-          <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
-          <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
-        </ul>
+<body>
+  <header class="site-header">
+    <div class="row row--between row--center" style="padding:12px 16px">
+      <a href="/" aria-label="Página inicial"><img src="assets/img/logo.svg" alt="Focinhos Amados" style="height:40px" /></a>
+      <nav class="row row--wrap" aria-label="Navegação principal">
+        <a class="btn btn--link" href="agendar.html">Agendar</a>
+        <a class="btn btn--link" href="taxi.html">Taxi Dog</a>
+        <a class="btn btn--link" href="delivery.html" aria-current="page">Delivery</a>
+        <button class="btn" type="button" data-action="open-resumo">
+          <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+          <span>Ver Resumo</span>
+        </button>
       </nav>
     </div>
   </header>
 
-  <main id="conteudo" class="container flow">
-    <h1>Montar pedido de Delivery</h1>
-    <p class="muted">Valores serão confirmados pela equipe no WhatsApp.</p>
+  <main style="display:grid;gap:16px;padding:16px">
 
-    <section class="card">
-      <h2 class="card__title">🛒 Produtos</h2>
-      <div class="grid grid--3">
-        <div class="field">
-          <label for="produto">Produto</label>
-          <input id="produto" list="lista-produtos" class="input" placeholder="Ex.: GOLDEN GATOS CASTRADOS 1kg">
-          <datalist id="lista-produtos"></datalist>
-        </div>
-        <div class="field">
-          <label for="variacao">Variação</label>
-          <input id="variacao" class="input" placeholder="Ex.: Frango, 1kg">
-        </div>
-        <div class="field">
-          <label for="qtd">Quantidade</label>
-          <input id="qtd" type="number" min="1" step="1" value="1" class="input">
-        </div>
-      </div>
-      <div class="actions">
-        <button id="btn-add-prod" class="btn btn--primary" type="button">➕ Adicionar produtos</button>
-      </div>
-      <ul id="carrinho" class="list list--items"></ul>
+    <section class="card card--shadow gap">
+      <header class="row row--between row--center">
+        <h1 class="h3">Delivery de Ração</h1>
+        <p class="save-indicator">Rascunho salvo</p>
+      </header>
+      <p class="muted">Inclua o que precisa e confirme pelo <strong>Resumo</strong>. Sem preços no site — combinamos valores no WhatsApp.</p>
     </section>
 
-    <section class="card">
-      <h2 class="card__title">📦 Endereço & contato</h2>
-      <div class="actions">
-        <button id="btn-use-geo" class="btn btn--ghost" type="button">📍 Usar minha localização</button>
-        <span id="geo-badge" class="badge" aria-live="polite"></span>
-      </div>
-      <div class="grid grid--3" style="margin-top:8px">
-        <div class="field">
-          <label for="recebedor">Nome do recebedor <span class="req">*</span></label>
-          <input id="recebedor" class="input" required autocomplete="name">
-          <small id="err-recebedor" class="help" hidden></small>
+    <!-- Itens desejados -->
+    <section class="card gap">
+      <h2 class="h4">Itens para entrega</h2>
+      <p class="muted">Dica: descreva marca e tamanho. Ex.: “Premier Raças Médias 10kg, Petisco dental”.</p>
+      <label class="sr-only" for="delivery-itens">Itens</label>
+      <textarea id="delivery-itens" rows="4" placeholder="Liste aqui o que deseja receber" data-bind="delivery.texto"></textarea>
+      <div class="hint hint--inline">
+        <p class="muted">Sugestões comuns:</p>
+        <div class="chip-list" id="delivery-sugestoes" role="list">
+          <button class="chip" type="button" data-item="Premier Raças Médias 10kg"><span class="chip__title">Premier 10kg</span><span class="chip__sub muted">Raças médias</span></button>
+          <button class="chip" type="button" data-item="Golden Seleção Natural 10kg"><span class="chip__title">Golden 10kg</span><span class="chip__sub muted">Seleção Natural</span></button>
+          <button class="chip" type="button" data-item="Special Dog Prime 12kg"><span class="chip__title">Special Dog 12kg</span><span class="chip__sub muted">Prime</span></button>
+          <button class="chip" type="button" data-item="GranPlus Menu 10kg"><span class="chip__title">GranPlus 10kg</span><span class="chip__sub muted">Menu</span></button>
+          <button class="chip" type="button" data-item="Petisco dental"><span class="chip__title">Petisco dental</span></button>
+          <button class="chip" type="button" data-item="Tapete higiênico"><span class="chip__title">Tapete higiênico</span></button>
         </div>
-        <div class="field">
-          <label for="tel">Telefone (WhatsApp) <span class="req">*</span></label>
-          <input id="tel" class="input" inputmode="tel" required autocomplete="tel">
-          <small id="err-tel" class="help" hidden></small>
-        </div>
-        <div class="field">
-          <label for="endereco">Endereço completo</label>
-          <input id="endereco" class="input" placeholder="Rua, número, bairro, complemento" autocomplete="street-address">
-        </div>
-      </div>
-      <div class="field">
-        <label for="obs">Observações</label>
-        <textarea id="obs" class="textarea" rows="3" placeholder="Portaria, bloco, substitutos…"></textarea>
       </div>
     </section>
 
-    <section class="card card--summary">
-      <h2 class="card__title">📄 Resumo</h2>
-      <pre id="delivery-resumo" class="note" aria-live="polite">Nada por aqui ainda. Adicione um produto para continuar.</pre>
-      <div class="actions">
-        <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
-        <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
-        <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+    <!-- Endereço (reuso da logística) -->
+    <section class="card gap">
+      <h2 class="h4">Endereço para entrega</h2>
+      <p class="muted">Usaremos o mesmo padrão do agendamento. Se preferir outro endereço, ajuste abaixo.</p>
+      <div class="grid grid--2">
+        <div class="field"><label for="end-rua">Rua</label><input id="end-rua" type="text" autocomplete="address-line1" data-bind="logistica.endereco.rua"></div>
+        <div class="field"><label for="end-num">Número</label><input id="end-num" type="text" autocomplete="address-line2" data-bind="logistica.endereco.numero"></div>
+        <div class="field"><label for="end-bairro">Bairro</label><input id="end-bairro" type="text" data-bind="logistica.endereco.bairro"></div>
+        <div class="field"><label for="end-cidade">Cidade</label><input id="end-cidade" type="text" data-bind="logistica.endereco.cidade"></div>
       </div>
-      <div id="delivery-err" class="toast" role="status" aria-live="polite"></div>
+      <div class="field"><label for="end-ref">Referência</label><input id="end-ref" type="text" placeholder="Ponto de referência" data-bind="logistica.endereco.ref"></div>
     </section>
+
+    <!-- Contato -->
+    <section class="card gap">
+      <h2 class="h4">Seus dados de contato</h2>
+      <div class="grid grid--2">
+        <div class="field"><label for="cli-nome">Seu nome</label><input id="cli-nome" type="text" autocomplete="name" data-bind="cliente.nome"></div>
+        <div class="field"><label for="cli-tel">Telefone (WhatsApp)</label><input id="cli-tel" type="tel" inputmode="tel" placeholder="(31) 9xxxx‑xxxx" data-bind="cliente.telefone"><small class="muted">Usaremos para confirmar pelo WhatsApp.</small></div>
+      </div>
+    </section>
+
+    <!-- Ações -->
+    <section class="card actions">
+      <button class="btn btn--primary" type="button" data-action="open-resumo">
+        <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+        <span>Ver Resumo e Enviar</span>
+      </button>
+      <button class="btn" type="button" id="btn-copy-page">
+        <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>
+        <span>Copiar dados</span>
+      </button>
+      <button class="btn btn--ghost" type="button" id="btn-clear-page">
+        <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+        <span>Limpar rascunho</span>
+      </button>
+      <p class="muted">LGPD: usamos seus dados apenas para atendimento via WhatsApp.</p>
+    </section>
+
   </main>
 
-  <footer class="footer">
-    <div class="container footer__inner">
-      <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span></p>
-      <a href="sobre.html">Sobre</a>
-    </div>
-  </footer>
-
+  <!-- Ícones inline (mínimo necessário) -->
   <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M9 9h9v9H9z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M6 6h9v9" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M8 7V5h8v2m-1 0v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7h10Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></symbol>
   </svg>
-  <script src="assets/js/config.js" defer></script>
-  <script src="assets/js/main.js" defer></script>
+
+  <script defer src="config.js"></script>
+  <script defer src="main.js"></script>
+  <script>
+    // Sugestões rápidas: insere no textarea (linha separada)
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const box = document.getElementById('delivery-itens');
+      const list = document.getElementById('delivery-sugestoes');
+      if(list && box){
+        list.addEventListener('click', (e)=>{
+          const btn = e.target.closest('[data-item]');
+          if(!btn) return;
+          const item = btn.getAttribute('data-item');
+          const cur = (box.value || '').trim();
+          const lines = cur ? cur.split(/\n+/) : [];
+          if(!lines.includes(item)) lines.push(item);
+          box.value = lines.join('\n');
+          box.dispatchEvent(new Event('input', { bubbles:true }));
+        });
+      }
+
+      // utilidades
+      const copyBtn = document.getElementById('btn-copy-page');
+      const clearBtn = document.getElementById('btn-clear-page');
+      if(copyBtn){ copyBtn.addEventListener('click', ()=>{
+        try{
+          const s = localStorage.getItem((window.CONFIG && window.CONFIG.STORAGE && window.CONFIG.STORAGE.KEY) || 'fa_state_v1');
+          navigator.clipboard.writeText(s || '').then(()=>{
+            const t = document.createElement('div'); t.className='toast is-visible'; t.textContent='Dados copiados'; document.body.appendChild(t); setTimeout(()=>t.remove(), 1500);
+          });
+        }catch{}
+      });}
+      if(clearBtn){ clearBtn.addEventListener('click', ()=>{
+        try{
+          localStorage.removeItem((window.CONFIG && window.CONFIG.STORAGE && window.CONFIG.STORAGE.KEY) || 'fa_state_v1');
+          location.reload();
+        }catch{}
+      });}
+    });
+
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+    }
+  </script>
 </body>
 </html>

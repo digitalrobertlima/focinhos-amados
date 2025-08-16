@@ -1,77 +1,111 @@
-/* Focinhos Amados — Service Worker (cache-first para estáticos, network-first para HTML) */
-const SW_VERSION = 'fa-1.0.0';
-const STATIC_CACHE = `fa-static-${SW_VERSION}`;
-const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './assets/css/style.css',
-  './assets/js/config.js',
-  './assets/js/main.js',
-  './assets/img/logo.svg',
-  './assets/img/pwa-192.png',
-  './assets/img/pwa-512.png',
-  './manifest.webmanifest'
+/* sw.js (v2) — PWA Service Worker
+   Estratégia: 
+   - Precache de assets críticos
+   - Network-first para navegação (HTML), com fallback para cache/offline
+   - Cache-first para estáticos (CSS/JS/IMG)
+   - Limpeza automática de caches antigos por versão
+*/
+
+const SW_VERSION = 'fa-2025-08-16.v2';
+const CACHE_NAME = `fa-cache-${SW_VERSION}`;
+const CORE_ASSETS = [
+  '/',
+  '/index.html',
+  '/style.css',
+  '/config.js',
+  '/main.js',
+  '/agendar.html',
+  '/taxi.html',
+  '/delivery.html',
+  '/sobre.html',
+  '/404.html',
+  '/components/resumo.html',
+  '/components/wizard.html',
+  '/manifest.webmanifest',
+  '/assets/img/logo.svg'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil((async () => {
-    const cache = await caches.open(STATIC_CACHE);
-    await cache.addAll(STATIC_ASSETS);
-    await self.skipWaiting();
+self.addEventListener('install', (event) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(CORE_ASSETS);
+    self.skipWaiting();
   })());
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil((async () => {
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k.startsWith('fa-static-') && k !== STATIC_CACHE).map(k => caches.delete(k)));
+    await Promise.all(
+      keys.filter(k => k.startsWith('fa-cache-') && k !== CACHE_NAME)
+          .map(k => caches.delete(k))
+    );
     await self.clients.claim();
   })());
 });
 
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
+self.addEventListener('message', (event) => {
+  if(event.data === 'SKIP_WAITING') self.skipWaiting();
+});
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if(req.method !== 'GET') return; // só cacheia GET
+
   const url = new URL(req.url);
 
-  // Só GET
-  if (req.method !== 'GET') return;
-
-  // HTML -> network-first
-  if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
-    e.respondWith((async () => {
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(STATIC_CACHE);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch {
-        const cache = await caches.match(req);
-        if (cache) return cache;
-        // Fallback offline HTML simples
-        return new Response(
-          `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>Offline • Focinhos Amados</title>
-          <style>body{font:16px/1.5 system-ui;margin:0;background:#FFFCFE;color:#030302;display:grid;place-items:center;height:100vh;padding:24px}
-          .card{max-width:640px;background:#fff;border:1px solid #E6E6E6;border-radius:16px;padding:20px;box-shadow:0 8px 28px rgba(0,0,0,.08)}</style>
-          <div class="card"><h1>Você está offline</h1><p>Tente novamente quando a conexão voltar. Os recursos estáticos ficam disponíveis offline após a primeira visita.</p></div>`,
-          { headers: { 'Content-Type': 'text/html; charset=utf-8' }, status: 200 }
-        );
-      }
-    })());
+  // Navegações/HTML → network-first
+  const isHTML = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');
+  if(isHTML){
+    event.respondWith(networkFirst(req));
     return;
   }
 
-  // Estáticos -> cache-first
-  e.respondWith((async () => {
-    const cached = await caches.match(req);
-    if (cached) return cached;
-    try {
-      const fresh = await fetch(req);
-      const cache = await caches.open(STATIC_CACHE);
-      cache.put(req, fresh.clone());
-      return fresh;
-    } catch {
-      return new Response('', { status: 504 });
-    }
-  })());
+  // Estáticos comuns → cache-first
+  const isStatic = [
+    'style', 'script', 'image', 'font'
+  ].includes(req.destination);
+  if(isStatic){
+    event.respondWith(cacheFirst(req));
+    return;
+  }
+
+  // Default → tenta cache, cai para rede
+  event.respondWith(cacheFirst(req));
 });
+
+async function networkFirst(request){
+  const cache = await caches.open(CACHE_NAME);
+  try{
+    const fresh = await fetch(request);
+    if(fresh && (fresh.status === 200 || fresh.type === 'opaqueredirect')){
+      cache.put(request, fresh.clone());
+    }
+    return fresh;
+  }catch(err){
+    const cached = await cache.match(request);
+    if(cached) return cached;
+    // fallback para a home ou 404 offline
+    return cache.match('/404.html') || cache.match('/index.html');
+  }
+}
+
+async function cacheFirst(request){
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  if(cached) return cached;
+  try{
+    const fresh = await fetch(request);
+    if(fresh && fresh.status === 200){
+      cache.put(request, fresh.clone());
+    }
+    return fresh;
+  }catch(err){
+    // Falha de rede sem cache: tenta um fallback genérico
+    if(request.destination === 'image'){
+      // poderia retornar um SVG inline de placeholder aqui
+      return new Response('', { status: 204 });
+    }
+    return new Response('Offline', { status: 503, statusText: 'Offline' });
+  }
+}

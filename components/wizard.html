@@ -1,0 +1,252 @@
+<!-- components/wizard.html (v1) — Wizard de Boas‑vindas (Passos 0–6)
+     Zero libs externas. Acessível. Injetado via main.js
+     Fluxo: 0 Objetivo → 1 Serviços → 2 Pet → 3 Quando → 4 Onde → 5 Contato → 6 Resumo
+-->
+
+<section id="wizard" class="wizard" aria-labelledby="wizard-title" hidden>
+  <header class="wizard__header">
+    <h2 id="wizard-title" class="h3">Bem‑vindo(a) ao Focinhos Amados</h2>
+    <p class="muted">Monte seu pedido em poucos passos. Você pode voltar a qualquer momento.</p>
+
+    <!-- Indicador de progresso -->
+    <div class="wizard__progress" aria-hidden="true">
+      <ol class="wizard__steps">
+        <li data-step-index="0" class="is-current">Objetivo</li>
+        <li data-step-index="1">Serviços</li>
+        <li data-step-index="2">Pet</li>
+        <li data-step-index="3">Quando</li>
+        <li data-step-index="4">Onde</li>
+        <li data-step-index="5">Contato</li>
+        <li data-step-index="6">Resumo</li>
+      </ol>
+    </div>
+    <p class="sr-only" aria-live="polite"><span data-bind="wizard.progress">Passo 1 de 7</span></p>
+  </header>
+
+  <!-- Conteúdo dos passos -->
+  <div class="wizard__content">
+
+    <!-- Passo 0: Objetivo -->
+    <section class="wizard__step" data-step="0">
+      <h3 class="h4">O que você quer fazer hoje?</h3>
+      <div class="grid grid--3">
+        <button class="card card--select" type="button" data-goal="agendar">
+          <span class="card__title">Agendar Banho & Tosa</span>
+          <span class="card__sub muted">Rápido e com carinho</span>
+        </button>
+        <button class="card card--select" type="button" data-goal="taxi">
+          <span class="card__title">Taxi Dog</span>
+          <span class="card__sub muted">Buscar e/ou levar em casa</span>
+        </button>
+        <button class="card card--select" type="button" data-goal="delivery">
+          <span class="card__title">Delivery de Ração</span>
+          <span class="card__sub muted">Deixamos na sua porta</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Passo 1: Serviços -->
+    <section class="wizard__step" data-step="1" hidden>
+      <h3 class="h4">Escolha os serviços</h3>
+      <fieldset class="grid grid--2">
+        <label class="check">
+          <input type="checkbox" data-bind="servicos.banho"> <span>Banho</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" data-bind="servicos.tosa"> <span>Tosa</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" data-bind="servicos.unhas"> <span>Corte de unhas</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" data-bind="servicos.limpeza_ouvido"> <span>Limpeza de ouvido</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" data-bind="servicos.hidratacao"> <span>Hidratação</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" data-bind="servicos.perfume"> <span>Perfume hipoalergênico</span>
+        </label>
+      </fieldset>
+      <p class="muted">Valores combinados pelo WhatsApp.</p>
+
+      <!-- sugestão rápida de Taxi como add-on (pode ser ligada/desligada no Resumo) -->
+      <div class="hint hint--inline">
+        <label class="check">
+          <input type="checkbox" data-bind="servicos.add_taxi"> <span>Quero incluir Taxi Dog (decido ida/volta no próximo passo)</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Passo 2: Pet -->
+    <section class="wizard__step" data-step="2" hidden>
+      <h3 class="h4">Sobre o seu pet</h3>
+      <div class="grid grid--2">
+        <div class="field">
+          <label for="pet-nome">Nome do pet</label>
+          <input id="pet-nome" type="text" placeholder="Ex.: Thor" autocomplete="name" data-bind="pet.nome">
+        </div>
+        <div class="field">
+          <span class="label">Porte</span>
+          <div class="chip-list" role="group" aria-label="Porte do pet">
+            <label class="chip">
+              <input type="radio" name="pet-porte" value="pequeno" data-bind="pet.porte"> <span>Pequeno</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="pet-porte" value="medio" data-bind="pet.porte"> <span>Médio</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="pet-porte" value="grande" data-bind="pet.porte"> <span>Grande</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="pet-obs">Observações</label>
+        <textarea id="pet-obs" rows="3" placeholder="Alergias, comportamento, pedidos especiais" data-bind="pet.observacoes"></textarea>
+      </div>
+    </section>
+
+    <!-- Passo 3: Quando -->
+    <section class="wizard__step" data-step="3" hidden>
+      <h3 class="h4">Quando?</h3>
+      <div class="grid grid--3">
+        <div class="field">
+          <label for="ag-data">Data</label>
+          <input id="ag-data" type="date" data-bind="agenda.data" aria-describedby="ag-data-help">
+          <small id="ag-data-help" class="muted">Data mínima: hoje</small>
+        </div>
+        <div class="field">
+          <span class="label">Preferência de horário</span>
+          <div class="chip-list" role="group" aria-label="Janela de horário">
+            <label class="chip">
+              <input type="radio" name="ag-janela" value="manha" data-bind="agenda.janela"> <span>Manhã</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="ag-janela" value="tarde" data-bind="agenda.janela"> <span>Tarde</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="ag-janela" value="noite" data-bind="agenda.janela"> <span>Noite</span>
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="ag-obs">Observações</label>
+          <input id="ag-obs" type="text" placeholder="Janela de chegada, preferências" data-bind="agenda.observacoes">
+        </div>
+      </div>
+    </section>
+
+    <!-- Passo 4: Onde / Logística -->
+    <section class="wizard__step" data-step="4" hidden>
+      <h3 class="h4">Onde / Logística</h3>
+      <fieldset class="grid grid--2" role="group" aria-label="Opções de logística">
+        <label class="chip">
+          <input type="radio" name="logistica-tipo" value="loja" data-bind="logistica.tipo"> <span>Vou levar na loja</span>
+        </label>
+        <label class="chip">
+          <input type="radio" name="logistica-tipo" value="ida" data-bind="logistica.tipo"> <span>Buscar em casa (ida)</span>
+        </label>
+        <label class="chip">
+          <input type="radio" name="logistica-tipo" value="volta" data-bind="logistica.tipo"> <span>Levar de volta (volta)</span>
+        </label>
+        <label class="chip">
+          <input type="radio" name="logistica-tipo" value="ida_e_volta" data-bind="logistica.tipo"> <span>Buscar e levar (ida e volta)</span>
+        </label>
+      </fieldset>
+
+      <div class="grid grid--2">
+        <div class="field">
+          <label for="end-rua">Rua</label>
+          <input id="end-rua" type="text" autocomplete="address-line1" data-bind="logistica.endereco.rua">
+        </div>
+        <div class="field">
+          <label for="end-num">Número</label>
+          <input id="end-num" type="text" autocomplete="address-line2" data-bind="logistica.endereco.numero">
+        </div>
+        <div class="field">
+          <label for="end-bairro">Bairro</label>
+          <input id="end-bairro" type="text" data-bind="logistica.endereco.bairro">
+        </div>
+        <div class="field">
+          <label for="end-cidade">Cidade</label>
+          <input id="end-cidade" type="text" data-bind="logistica.endereco.cidade">
+        </div>
+      </div>
+      <div class="field">
+        <label for="end-ref">Referência</label>
+        <input id="end-ref" type="text" placeholder="Ponto de referência" data-bind="logistica.endereco.ref">
+      </div>
+
+      <div class="row row--wrap gap">
+        <button class="btn" type="button" data-action="geolocate">
+          <svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg>
+          <span>Usar minha localização</span>
+        </button>
+        <p class="muted" aria-live="polite">
+          <span>Geo:</span>
+          <span data-bind="logistica.lat">—</span>, <span data-bind="logistica.lng">—</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- Passo 5: Contato -->
+    <section class="wizard__step" data-step="5" hidden>
+      <h3 class="h4">Seus dados de contato</h3>
+      <div class="grid grid--2">
+        <div class="field">
+          <label for="cli-nome">Seu nome</label>
+          <input id="cli-nome" type="text" autocomplete="name" data-bind="cliente.nome">
+        </div>
+        <div class="field">
+          <label for="cli-tel">Telefone (WhatsApp)</label>
+          <input id="cli-tel" type="tel" inputmode="tel" placeholder="(31) 9xxxx‑xxxx" data-bind="cliente.telefone">
+          <small class="muted">Usaremos para confirmar pelo WhatsApp.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Passo 6: Resumo -->
+    <section class="wizard__step" data-step="6" hidden>
+      <h3 class="h4">Tudo pronto!</h3>
+      <p>Revise os detalhes e envie pelo WhatsApp.</p>
+
+      <div class="card card--flat">
+        <ul class="list">
+          <li><strong>Cliente:</strong> <span data-bind="cliente.nome">—</span> · <span data-bind="cliente.telefone">—</span></li>
+          <li><strong>Pet:</strong> <span data-bind="pet.nome">—</span> (<span data-bind="pet.porte">—</span>)</li>
+          <li><strong>Serviços:</strong> <span data-bind="servicos._resumo">—</span></li>
+          <li><strong>Quando:</strong> <span data-bind="agenda.data">—</span> · <span data-bind="agenda.janela">—</span></li>
+          <li><strong>Onde:</strong> <span data-bind="logistica._resumo">—</span></li>
+        </ul>
+      </div>
+
+      <div class="row gap">
+        <button class="btn btn--primary" type="button" data-action="open-resumo">
+          <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+          <span>Ver Resumo e Enviar</span>
+        </button>
+        <button class="btn" type="button" data-action="edit-from-resumo">
+          <svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg>
+          <span>Editar algo</span>
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Barra de navegação do wizard -->
+  <footer class="wizard__nav">
+    <div class="row row--between row--center">
+      <button class="btn" type="button" data-action="back">
+        <svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>
+        <span>Voltar</span>
+      </button>
+      <button class="btn btn--primary" type="button" data-action="next">
+        <span>Continuar</span>
+        <svg class="icon" aria-hidden="true"><use href="#i-next"/></svg>
+      </button>
+    </div>
+    <p class="muted" data-bind="saveIndicator" aria-live="polite">Rascunho salvo</p>
+  </footer>
+</section>

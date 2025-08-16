@@ -1,13 +1,196 @@
-{
-  "name": "Focinhos Amados",
-  "short_name": "Focinhos",
-  "start_url": "index.html",
-  "scope": "./",
-  "display": "standalone",
-  "theme_color": "#029935",
-  "background_color": "#FFFCFE",
-  "icons": [
-    { "src": "assets/img/pwa-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "assets/img/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ]
-}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendar • Focinhos Amados</title>
+  <meta name="description" content="Agende banho & tosa com logística opcional (Taxi Dog). Confirme tudo pelo WhatsApp." />
+  <meta name="theme-color" content="#029935" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="row row--between row--center" style="padding:12px 16px">
+      <a href="/" aria-label="Página inicial"><img src="assets/img/logo.svg" alt="Focinhos Amados" style="height:40px" /></a>
+      <nav class="row row--wrap" aria-label="Navegação principal">
+        <a class="btn btn--link" href="agendar.html" aria-current="page">Agendar</a>
+        <a class="btn btn--link" href="taxi.html">Taxi Dog</a>
+        <a class="btn btn--link" href="delivery.html">Delivery</a>
+        <button class="btn" type="button" data-action="open-resumo">
+          <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+          <span>Ver Resumo</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main style="display:grid;gap:16px;padding:16px">
+
+    <section class="card card--shadow gap">
+      <header class="row row--between row--center">
+        <h1 class="h3">Agendar Banho & Tosa</h1>
+        <p class="save-indicator">Rascunho salvo</p>
+      </header>
+      <p class="muted">Preencha os dados abaixo. Você pode revisar no <strong>Resumo</strong> antes de enviar pelo WhatsApp.</p>
+    </section>
+
+    <!-- Serviços -->
+    <section class="card gap">
+      <h2 class="h4">Serviços</h2>
+      <fieldset class="grid grid--2" aria-label="Escolha os serviços">
+        <label class="check"><input type="checkbox" data-bind="servicos.banho"> <span>Banho</span></label>
+        <label class="check"><input type="checkbox" data-bind="servicos.tosa"> <span>Tosa</span></label>
+        <label class="check"><input type="checkbox" data-bind="servicos.unhas"> <span>Corte de unhas</span></label>
+        <label class="check"><input type="checkbox" data-bind="servicos.limpeza_ouvido"> <span>Limpeza de ouvido</span></label>
+        <label class="check"><input type="checkbox" data-bind="servicos.hidratacao"> <span>Hidratação</span></label>
+        <label class="check"><input type="checkbox" data-bind="servicos.perfume"> <span>Perfume hipoalergênico</span></label>
+      </fieldset>
+      <div class="hint hint--inline">
+        <label class="check"><input type="checkbox" data-bind="servicos.add_taxi"> <span>Quero incluir <strong>Taxi Dog</strong> (decido ida/volta abaixo)</span></label>
+      </div>
+      <p class="muted">Valores combinados pelo WhatsApp.</p>
+    </section>
+
+    <!-- Pet -->
+    <section class="card gap">
+      <h2 class="h4">Sobre o Pet</h2>
+      <div class="grid grid--2">
+        <div class="field">
+          <label for="pet-nome">Nome do pet</label>
+          <input id="pet-nome" type="text" placeholder="Ex.: Thor" autocomplete="name" data-bind="pet.nome">
+        </div>
+        <div class="field">
+          <span class="label">Porte</span>
+          <div class="chip-list" role="group" aria-label="Porte do pet">
+            <label class="chip"><input type="radio" name="pet-porte" value="pequeno" data-bind="pet.porte"> <span>Pequeno</span></label>
+            <label class="chip"><input type="radio" name="pet-porte" value="medio" data-bind="pet.porte"> <span>Médio</span></label>
+            <label class="chip"><input type="radio" name="pet-porte" value="grande" data-bind="pet.porte"> <span>Grande</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label for="pet-obs">Observações</label>
+        <textarea id="pet-obs" rows="3" placeholder="Alergias, comportamento, pedidos especiais" data-bind="pet.observacoes"></textarea>
+      </div>
+    </section>
+
+    <!-- Quando -->
+    <section class="card gap">
+      <h2 class="h4">Quando?</h2>
+      <div class="grid grid--3">
+        <div class="field">
+          <label for="ag-data">Data</label>
+          <input id="ag-data" type="date" data-bind="agenda.data" aria-describedby="ag-data-help">
+          <small id="ag-data-help" class="muted">Data mínima: hoje</small>
+        </div>
+        <div class="field">
+          <span class="label">Preferência de horário</span>
+          <div class="chip-list" role="group" aria-label="Janela de horário">
+            <label class="chip"><input type="radio" name="ag-janela" value="manha" data-bind="agenda.janela"> <span>Manhã</span></label>
+            <label class="chip"><input type="radio" name="ag-janela" value="tarde" data-bind="agenda.janela"> <span>Tarde</span></label>
+            <label class="chip"><input type="radio" name="ag-janela" value="noite" data-bind="agenda.janela"> <span>Noite</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="ag-obs">Observações</label>
+          <input id="ag-obs" type="text" placeholder="Janela de chegada, preferências" data-bind="agenda.observacoes">
+        </div>
+      </div>
+    </section>
+
+    <!-- Onde / Logística -->
+    <section class="card gap">
+      <h2 class="h4">Onde / Logística</h2>
+      <fieldset class="grid grid--2" role="group" aria-label="Opções de logística">
+        <label class="chip"><input type="radio" name="logistica-tipo" value="loja" data-bind="logistica.tipo"> <span>Vou levar na loja</span></label>
+        <label class="chip"><input type="radio" name="logistica-tipo" value="ida" data-bind="logistica.tipo"> <span>Buscar em casa (ida)</span></label>
+        <label class="chip"><input type="radio" name="logistica-tipo" value="volta" data-bind="logistica.tipo"> <span>Levar de volta (volta)</span></label>
+        <label class="chip"><input type="radio" name="logistica-tipo" value="ida_e_volta" data-bind="logistica.tipo"> <span>Buscar e levar (ida e volta)</span></label>
+      </fieldset>
+
+      <div class="grid grid--2">
+        <div class="field"><label for="end-rua">Rua</label><input id="end-rua" type="text" autocomplete="address-line1" data-bind="logistica.endereco.rua"></div>
+        <div class="field"><label for="end-num">Número</label><input id="end-num" type="text" autocomplete="address-line2" data-bind="logistica.endereco.numero"></div>
+        <div class="field"><label for="end-bairro">Bairro</label><input id="end-bairro" type="text" data-bind="logistica.endereco.bairro"></div>
+        <div class="field"><label for="end-cidade">Cidade</label><input id="end-cidade" type="text" data-bind="logistica.endereco.cidade"></div>
+      </div>
+      <div class="field"><label for="end-ref">Referência</label><input id="end-ref" type="text" placeholder="Ponto de referência" data-bind="logistica.endereco.ref"></div>
+
+      <div class="row row--wrap gap">
+        <button class="btn" type="button" data-action="geolocate">
+          <svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg>
+          <span>Usar minha localização</span>
+        </button>
+        <p class="muted" aria-live="polite"><span>Geo:</span> <span data-bind="logistica.lat">—</span>, <span data-bind="logistica.lng">—</span></p>
+      </div>
+
+      <p class="muted">Se preferir, você pode pular este passo e combinar a logística pelo WhatsApp.</p>
+    </section>
+
+    <!-- Contato -->
+    <section class="card gap">
+      <h2 class="h4">Seus dados de contato</h2>
+      <div class="grid grid--2">
+        <div class="field"><label for="cli-nome">Seu nome</label><input id="cli-nome" type="text" autocomplete="name" data-bind="cliente.nome"></div>
+        <div class="field"><label for="cli-tel">Telefone (WhatsApp)</label><input id="cli-tel" type="tel" inputmode="tel" placeholder="(31) 9xxxx‑xxxx" data-bind="cliente.telefone"><small class="muted">Usaremos para confirmar pelo WhatsApp.</small></div>
+      </div>
+    </section>
+
+    <!-- Ações -->
+    <section class="card actions">
+      <button class="btn btn--primary" type="button" data-action="open-resumo">
+        <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+        <span>Ver Resumo e Enviar</span>
+      </button>
+      <button class="btn" type="button" id="btn-copy-page">
+        <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>
+        <span>Copiar dados</span>
+      </button>
+      <button class="btn btn--ghost" type="button" id="btn-clear-page">
+        <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+        <span>Limpar rascunho</span>
+      </button>
+      <p class="muted">LGPD: usamos seus dados apenas para atendimento via WhatsApp.</p>
+    </section>
+
+  </main>
+
+  <!-- Ícones inline (mínimo necessário) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+    <symbol id="i-locate" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M9 9h9v9H9z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M6 6h9v9" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M8 7V5h8v2m-1 0v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7h10Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <script defer src="config.js"></script>
+  <script defer src="main.js"></script>
+  <script>
+    // Utilidades rápidas da página
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const copyBtn = document.getElementById('btn-copy-page');
+      const clearBtn = document.getElementById('btn-clear-page');
+      if(copyBtn){ copyBtn.addEventListener('click', ()=>{
+        try{
+          const s = localStorage.getItem((window.CONFIG && window.CONFIG.STORAGE && window.CONFIG.STORAGE.KEY) || 'fa_state_v1');
+          navigator.clipboard.writeText(s || '').then(()=>{
+            const t = document.createElement('div'); t.className='toast is-visible'; t.textContent='Dados copiados'; document.body.appendChild(t); setTimeout(()=>t.remove(), 1500);
+          });
+        }catch{}
+      });}
+      if(clearBtn){ clearBtn.addEventListener('click', ()=>{
+        try{
+          localStorage.removeItem((window.CONFIG && window.CONFIG.STORAGE && window.CONFIG.STORAGE.KEY) || 'fa_state_v1');
+          location.reload();
+        }catch{}
+      });}
+    });
+
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+    }
+  </script>
+</body>
+</html>

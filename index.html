@@ -2,169 +2,130 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Focinhos Amados • Pet Shop em Belo Horizonte (BH)</title>
-  <meta name="description" content="Banho & tosa, delivery de ração e Táxi Dog. Comece pelo site e finalize no WhatsApp." />
-  <meta name="theme-color" content="#029935">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/css/style.css" as="style">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <meta property="og:title" content="Focinhos Amados • Pet Shop em Belo Horizonte (BH)">
-  <meta property="og:description" content="Banho & tosa, delivery de ração e Táxi Dog. Comece pelo site e finalize no WhatsApp.">
-  <meta property="og:image" content="assets/img/og.jpg">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="pt_BR">
-  <link rel="canonical" href="./index.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Focinhos Amados • Pet Shop em Contagem/MG</title>
+  <meta name="description" content="Banho & tosa com carinho, Delivery de ração e Taxi Dog. Atendimento rápido no WhatsApp. A partir de R$ 55." />
+  <meta name="theme-color" content="#029935" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+  <meta property="og:title" content="Focinhos Amados — Banho & Tosa, Delivery e Taxi Dog" />
+  <meta property="og:description" content="Marque online em poucos passos. Confirmamos tudo pelo WhatsApp." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
 </head>
-<body data-page="home">
-  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
-  <header class="topbar" role="banner">
-    <div class="container topbar__inner">
-      <a class="brand" href="./">
-        <img class="brand__logo" src="assets/img/logo.svg" alt="Logotipo Focinhos Amados" width="36" height="36">
-        <span class="brand__text">
-          <strong>Focinhos Amados</strong>
-          <small class="brand__city" data-bind="city">Belo Horizonte/MG</small>
-        </span>
+<body>
+  <header class="site-header">
+    <div class="row row--between row--center" style="padding:12px 16px">
+      <a href="/" aria-label="Página inicial">
+        <img src="assets/img/logo.svg" alt="Focinhos Amados" style="height:40px" />
       </a>
-
-      <nav class="nav" aria-label="principal">
-        <button class="nav__btn" aria-expanded="false" aria-controls="drawer">
-          <svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg>
-          <span>Menu</span>
+      <nav class="row row--wrap" aria-label="Navegação principal">
+        <a class="btn btn--link" href="agendar.html">Agendar</a>
+        <a class="btn btn--link" href="taxi.html">Taxi Dog</a>
+        <a class="btn btn--link" href="delivery.html">Delivery</a>
+        <button class="btn" type="button" data-action="open-resumo">
+          <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+          <span>Ver Resumo</span>
         </button>
-        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
-          <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
-          <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
-          <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
-          <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
-        </ul>
       </nav>
     </div>
   </header>
 
-  <main id="conteudo">
-    <section class="hero container">
-      <h1 class="hero__title">Amor e cuidado para o seu pet.</h1>
-      <p class="hero__sub">
-        Banho & tosa, delivery de ração e Táxi Dog. Comece pelo site, finalize no WhatsApp.
-      </p>
-      <div class="hero__actions">
-        <a class="btn btn--primary" href="agendar.html">🛁 Começar agendamento</a>
-        <a class="btn btn--ghost" href="delivery.html">🛒 Montar pedido de delivery</a>
-        <a class="btn btn--ghost" href="taxi.html">🚕 Solicitar Táxi Dog</a>
-      </div>
+  <main>
+    <!-- O Wizard será injetado aqui como primeiro filho pela main.js -->
+
+    <section class="hero card card--shadow" style="margin:16px">
+      <h1 class="h2">Banho & Tosa com carinho. Delivery de ração. Taxi Dog.</h1>
+      <p class="muted">Atendimento rápido pelo WhatsApp. Marque em poucos passos.</p>
       <p class="hero__hint">
-        <svg aria-hidden="true" class="icon"><use href="#i-clock"/></svg>
-        <span data-bind="hoursLabel">Seg–Sáb 10:00–20:00 • Dom 10:00–13:00</span>
+        <svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>
+        <span>Seg–Sáb 10:00–20:00 • Dom 10:00–13:00</span>
+        <span id="open-badge" class="badge" style="margin-left:8px"></span>
       </p>
-    </section>
-
-    <section class="container grid grid--services">
-      <article class="card card--service">
-        <h2 class="card__title">Banho</h2>
-        <p class="card__desc">Higiene completa e secagem segura. Personalize sua experiência.</p>
-        <a class="btn btn--primary" href="agendar.html">Agendar</a>
-      </article>
-      <article class="card card--service">
-        <h2 class="card__title">Banho + Tosa</h2>
-        <p class="card__desc">Corte higiênico/estético conforme o seu gosto.</p>
-        <a class="btn btn--primary" href="agendar.html">Agendar</a>
-      </article>
-      <article class="card card--service">
-        <h2 class="card__title">Delivery</h2>
-        <p class="card__desc">Ração e essenciais na porta. Você escolhe, a gente entrega.</p>
-        <a class="btn btn--primary" href="delivery.html">Montar pedido</a>
-      </article>
-      <article class="card card--service">
-        <h2 class="card__title">Táxi Dog</h2>
-        <p class="card__desc">Busca e entrega com segurança. Combine os trajetos.</p>
-        <a class="btn btn--primary" href="taxi.html">Solicitar</a>
-      </article>
-    </section>
-
-    <section class="container">
-      <h2 class="section__title">Galeria</h2>
-      <div class="gallery" aria-label="Galeria de fotos de pets atendidos">
-        <img class="gallery__img" src="assets/img/placeholder-1.webp" width="360" height="360" alt="Pet após banho" loading="lazy" decoding="async">
-        <img class="gallery__img" src="assets/img/placeholder-2.webp" width="360" height="360" alt="Equipe em atendimento" loading="lazy" decoding="async">
-        <img class="gallery__img" src="assets/img/placeholder-3.webp" width="360" height="360" alt="Área de tosa" loading="lazy" decoding="async">
-        <img class="gallery__img" src="assets/img/placeholder-4.webp" width="360" height="360" alt="Rações e acessórios" loading="lazy" decoding="async">
-        <img class="gallery__img" src="assets/img/placeholder-5.webp" width="360" height="360" alt="Pet estiloso com gravata" loading="lazy" decoding="async">
-        <img class="gallery__img" src="assets/img/placeholder-6.webp" width="360" height="360" alt="Transporte seguro no Táxi Dog" loading="lazy" decoding="async">
-      </div>
-    </section>
-
-    <section class="container">
-      <h2 class="section__title">Depoimentos</h2>
-      <blockquote class="quote card"><p>Atendimento carinhoso e pontual. Meu cãozinho ama!</p><footer>— A. Silva</footer></blockquote>
-      <blockquote class="quote card"><p>Delivery rápido e confiável. Recomendo muito.</p><footer>— R. Costa</footer></blockquote>
-    </section>
-
-    <section class="container call-location">
-      <div class="card">
-        <h2 class="card__title">📍 Use sua localização para agilizar</h2>
-        <p class="card__desc">Nos fluxos de agendamento e delivery você pode compartilhar a localização para precisão no atendimento.</p>
-        <a id="route-link" class="btn btn--ghost" href="#" rel="noopener" target="_blank">
-          🗺️ Ver rota no Google Maps
+      <div class="actions" style="margin-top:8px">
+        <a class="btn btn--primary" href="#wizard">
+          <span>Começar agora</span>
+          <svg class="icon" aria-hidden="true"><use href="#i-next"/></svg>
         </a>
+        <button class="btn" type="button" data-action="open-resumo">
+          <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+          <span>Ver Resumo</span>
+        </button>
       </div>
     </section>
+
+    <section class="card" style="margin:16px">
+      <h2 class="h4">Como funciona</h2>
+      <ol class="list">
+        <li>Escolha o serviço (banho, tosa, taxi, delivery).</li>
+        <li>Informe sobre o seu pet e quando deseja.</li>
+        <li>Defina <strong>onde</strong> (levar na loja, buscar, levar de volta).</li>
+        <li>Revise no <strong>Resumo</strong> e envie pelo WhatsApp. Simples assim.</li>
+      </ol>
+      <p class="muted">Valores são combinados pelo WhatsApp. LGPD: usamos seus dados apenas para atendimento.</p>
+    </section>
+
   </main>
 
-  <footer class="footer">
-    <div class="container footer__inner">
+  <footer class="site-footer" style="padding:24px 16px">
+    <div class="row row--wrap row--between">
       <p>
-        <strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span>
-        • <a id="route-link-foot" href="#" rel="noopener" target="_blank">🗺️ Ver rota no Google Maps</a>
+        <strong>Focinhos Amados</strong><br />
+        Contagem, MG — Atendimento: Seg–Sáb 10:00–20:00; Dom 10:00–13:00
       </p>
-      <nav class="footer__nav" aria-label="rodapé">
-        <a href="sobre.html#priv">Privacidade</a>
-        <a href="sobre.html#termos">Termos</a>
-        <a href="sobre.html#contato">Contato</a>
-      </nav>
+      <p>
+        <a class="btn btn--primary" href="https://wa.me/5531982339672" target="_blank" rel="noopener">
+          <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
+          <span>Chamar no WhatsApp</span>
+        </a>
+      </p>
     </div>
   </footer>
 
-  <!-- SVG Sprite (ícones essenciais) -->
+  <!-- Sprite de ícones (inline, sem libs) -->
   <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-    <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.66 15.06L2 22l5.12-1.29A10 10 0 1 0 12 2Zm0 2a8 8 0 0 1 6.86 12.21l.37.64-2.7.68-.56-.33A8 8 0 1 1 12 4Zm4.44 9.48c-.24-.12-1.38-.68-1.6-.76s-.37-.12-.53.12-.6.76-.74.92-.27.18-.5.06a6.54 6.54 0 0 1-1.93-1.19 7.25 7.25 0 0 1-1.34-1.65c-.14-.24 0-.37.1-.49s.24-.28.36-.44a1.63 1.63 0 0 0 .24-.45.49.49 0 0 0 0-.47c0-.12-.53-1.28-.73-1.76s-.38-.41-.53-.42h-.45a.86.86 0 0 0-.62.3 2.63 2.63 0 0 0-.82 1.95 4.6 4.6 0 0 0 1 2.45 10.54 10.54 0 0 0 3.9 3.58 13.5 13.5 0 0 0 1.35.5 3.26 3.26 0 0 0 1.49.09 2.43 2.43 0 0 0 1.6-1.12 2 2 0 0 0 .14-1.12c-.06-.08-.22-.14-.46-.26Z"/></symbol>
-    <symbol id="i-map" viewBox="0 0 24 24"><path fill="currentColor" d="M15 4l-6 3-6-3v16l6 3 6-3 6 3V7z"/></symbol>
-    <symbol id="i-pin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/></symbol>
-    <symbol id="i-dog" viewBox="0 0 24 24"><path fill="currentColor" d="M4 10c0-4 3-7 8-7s8 3 8 7v6a3 3 0 0 1-3 3h-1v-4H8v4H7a3 3 0 0 1-3-3v-6Z"/></symbol>
-    <symbol id="i-cart" viewBox="0 0 24 24"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM3 4h2l3.6 7.59-1.35 2.44A2 2 0 0 0 9 17h9v-2H9.42a.25.25 0 0 1-.22-.37L10 13h6a2 2 0 0 0 1.8-1.1l3.58-6.48A1 1 0 0 0 20.5 4H6"/></symbol>
-    <symbol id="i-plus" viewBox="0 0 24 24"><path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></symbol>
-    <symbol id="i-clock" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 11h6v-2h-5V5h-2v7z"/></symbol>
-    <symbol id="i-error" viewBox="0 0 24 24"><path fill="currentColor" d="M1 21h22L12 2zm12-3h-2v-2h2zm0-4h-2V9h2z"/></symbol>
-    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M20 11.5A8.5 8.5 0 1 1 11.5 3a8.5 8.5 0 0 1 8.5 8.5Z" fill="currentColor" opacity=".15"/><path d="M7 19l1.2-3.6A6.8 6.8 0 1 1 18.3 7.7a6.8 6.8 0 0 1-9.7 9.7L7 19Zm3-9.8c0-.3.2-.5.5-.6h.6c.2 0 .4 0 .5.2l.4.8c.1.3 0 .5-.1.6l-.3.3c-.2.2-.2.4-.1.6.4.8 1 1.5 1.8 2 .2.1.4.1.6-.1l.3-.3c.2-.2.5-.2.7-.1l.8.4c.3.1.4.3.4.5v.6c0 .3-.2.5-.4.6-.6.3-1.3.2-1.9-.1-1.1-.6-2.1-1.5-2.8-2.6-.5-.8-.8-1.6-.7-2.5Z" fill="currentColor"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 7v5l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16v4Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5m6-7-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-locate" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M9 9h9v9H9z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M6 6h9v9" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M8 7V5h8v2m-1 0v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7h10Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></symbol>
   </svg>
 
-  <script src="assets/js/config.js" defer></script>
-  <script src="assets/js/main.js" defer></script>
-
-  <!-- JSON-LD LocalBusiness -->
+  <!-- Schema.org LocalBusiness (Pet Store) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
     "@type":"PetStore",
     "name":"Focinhos Amados",
-    "image":"./assets/img/og.jpg",
-    "address":{
-      "@type":"PostalAddress",
-      "streetAddress":"Av. Padre José Maurício, 572",
-      "addressLocality":"Belo Horizonte",
-      "addressRegion":"MG",
-      "postalCode":"30510-370",
-      "addressCountry":"BR"
-    },
-    "telephone":"+55 31 3322-3070",
-    "areaServed":"Belo Horizonte",
-    "openingHours":["Mo-Sa 10:00-20:00","Su 10:00-13:00"],
-    "url":"./",
-    "sameAs":["https://instagram.com/petshopfocinhos"]
+    "address":{ "@type":"PostalAddress", "addressLocality":"Contagem", "addressRegion":"MG", "addressCountry":"BR" },
+    "areaServed":"Contagem e região",
+    "telephone":"+55 31 98233-9672",
+    "openingHoursSpecification":[
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"10:00","closes":"20:00"},
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Sunday"],"opens":"10:00","closes":"13:00"}
+    ]
   }
+  </script>
+
+  <noscript>
+    <div class="card" style="margin:16px">Para usar este site, ative o JavaScript no seu navegador. Você também pode falar conosco no WhatsApp: <a href="https://wa.me/5531982339672" target="_blank" rel="noopener">clicando aqui</a>.</div>
+  </noscript>
+
+  <script defer src="config.js"></script>
+  <script defer src="main.js"></script>
+  <script>
+    // Registro do Service Worker (PWA)
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', ()=>{
+        navigator.serviceWorker.register('sw.js').catch(()=>{});
+      });
+    }
   </script>
 </body>
 </html>

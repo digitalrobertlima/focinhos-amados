@@ -1,0 +1,161 @@
+<!-- components/resumo.html (v1) — Modal de Resumo Unificado + Upsell -->
+<!-- Zero libs externas. Acessível. Injetado via main.js -->
+
+<div id="resumo-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resumo-title" aria-describedby="resumo-desc" hidden>
+  <!-- Overlay fecha o modal ao clicar -->
+  <div class="modal__overlay" data-action="close" aria-hidden="true"></div>
+
+  <div class="modal__dialog" role="document">
+    <span tabindex="0" data-sentinel="start"></span>
+
+    <header class="modal__header">
+      <h2 id="resumo-title" class="h3">📄 Resumo do Pedido</h2>
+      <button class="btn btn--icon" type="button" data-action="close" aria-label="Fechar resumo" title="Fechar">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </header>
+
+    <p id="resumo-desc" class="muted">Revise, ajuste e envie seu pedido pelo WhatsApp. Confirmamos valores no WhatsApp.</p>
+
+    <!-- Indicador de rascunho salvo -->
+    <div class="save-indicator" aria-live="polite" data-bind="saveIndicator">Rascunho salvo</div>
+
+    <section class="card card--flat gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Cliente</h3>
+        <button class="btn btn--link" type="button" data-edit="cliente">Editar</button>
+      </div>
+      <p><strong data-bind="cliente.nome">—</strong> · <span data-bind="cliente.telefone">—</span></p>
+    </section>
+
+    <section class="card card--flat gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Pet</h3>
+        <button class="btn btn--link" type="button" data-edit="pet">Editar</button>
+      </div>
+      <p>
+        <strong data-bind="pet.nome">—</strong>
+        <span class="muted">(
+          <span data-bind="pet.porte">—</span>
+        )</span>
+      </p>
+      <p class="muted" data-bind="pet.observacoes">—</p>
+    </section>
+
+    <section class="card card--flat gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Serviços</h3>
+        <button class="btn btn--link" type="button" data-edit="servicos">Editar</button>
+      </div>
+      <ul id="resumo-servicos-list" class="list list--checks" aria-live="polite">
+        <!-- main.js vai preencher com <li>Banho</li>, <li>Tosa</li> etc. -->
+      </ul>
+    </section>
+
+    <section class="card card--flat gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Quando</h3>
+        <button class="btn btn--link" type="button" data-edit="agenda">Editar</button>
+      </div>
+      <p>
+        <span data-bind="agenda.data">—</span>
+        <span class="muted"> · <span data-bind="agenda.janela">—</span></span>
+      </p>
+      <p class="muted" data-bind="agenda.observacoes">—</p>
+    </section>
+
+    <section class="card card--flat gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Onde / Logística</h3>
+        <button class="btn btn--link" type="button" data-edit="logistica">Editar</button>
+      </div>
+      <p>
+        <strong data-bind="logistica.tipo_label">—</strong>
+        <span class="muted" data-bind="logistica.subtexto"> </span>
+      </p>
+      <div class="grid grid--address">
+        <p><span class="muted">Endereço:</span> <span data-bind="logistica.endereco.full">—</span></p>
+        <p class="muted" data-if="logistica.usar_geo">
+          Geo: <span data-bind="logistica.lat">—</span>, <span data-bind="logistica.lng">—</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="card card--flat gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Delivery (itens)</h3>
+        <button class="btn btn--link" type="button" data-edit="delivery">Editar</button>
+      </div>
+      <ul id="resumo-delivery-list" class="list" aria-live="polite">
+        <!-- main.js popula com itens (ex.: Ração X 10kg, Petisco dental...) -->
+      </ul>
+    </section>
+
+    <section class="card card--flat gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Observações</h3>
+      </div>
+      <label class="sr-only" for="resumo-observacoes">Observações do pedido</label>
+      <textarea id="resumo-observacoes" rows="3" placeholder="Algo importante que devemos saber?" data-bind="agenda.obs_edit"></textarea>
+    </section>
+
+    <!-- Upsell/Cross-sell -->
+    <section class="card card--shadow gap">
+      <div class="row row--between row--center">
+        <h3 class="h5">Aproveite e inclua</h3>
+        <button class="btn btn--link" type="button" data-action="dismiss-upsell">Não, obrigado</button>
+      </div>
+      <p class="muted">Sugestões rápidas, 1 toque. Confirmamos valores no WhatsApp.</p>
+
+      <div id="upsell-list" class="chip-list" role="list" aria-live="polite">
+        <!-- Chips de sugestão renderizados por main.js -->
+      </div>
+
+      <!-- Template de chip (toggle) -->
+      <template id="tpl-upsell-chip">
+        <button class="chip" type="button" role="checkbox" aria-checked="false" data-suggest-id="">
+          <span class="chip__title"></span>
+          <span class="chip__sub muted"></span>
+        </button>
+      </template>
+
+      <p id="upsell-empty" class="muted" hidden>Nenhuma sugestão no momento.</p>
+    </section>
+
+    <!-- LGPD (mostrado se ainda não aceitou) -->
+    <section class="card card--flat" id="lgpd-section" hidden>
+      <label class="check">
+        <input id="lgpd-consent-resumo" type="checkbox" />
+        <span>Li e concordo com o uso dos meus dados para atendimento via WhatsApp.</span>
+      </label>
+      <p class="muted">Usamos seus dados apenas para realizar o atendimento combinado neste pedido.</p>
+    </section>
+
+    <!-- Ações finais -->
+    <section class="actions">
+      <div class="row row--wrap gap">
+        <button id="btn-wa-resumo" class="btn btn--primary" type="button" disabled>
+          <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
+          <span>Enviar pelo WhatsApp</span>
+        </button>
+        <button id="btn-copy-resumo" class="btn" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>
+          <span>Copiar resumo</span>
+        </button>
+        <button id="btn-clear-resumo" class="btn btn--ghost" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+          <span>Limpar rascunho</span>
+        </button>
+      </div>
+      <p class="muted">Ao enviar, abriremos o WhatsApp com a mensagem pronta. Valores e detalhes finais são combinados por lá.</p>
+    </section>
+
+    <!-- Área para debug/cópia -->
+    <textarea id="resumo-text-raw" class="sr-only" aria-hidden="true"></textarea>
+
+    <!-- Toast / mensagens de erro -->
+    <div id="resumo-toast" class="toast" role="status" aria-live="polite"></div>
+
+    <span tabindex="0" data-sentinel="end"></span>
+  </div>
+</div>
