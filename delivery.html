@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Delivery de Ração — Focinhos Amados (BH)</title>
+  <meta name="description" content="Monte seu pedido e receba em casa. Endereço e localização para entrega precisa.">
+  <meta name="theme-color" content="#029935">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <meta property="og:title" content="Delivery de Ração — Focinhos Amados (BH)">
+  <meta property="og:description" content="Monte seu pedido e receba em casa. Endereço e localização para entrega precisa.">
+  <meta property="og:image" content="assets/img/og.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+</head>
+<body data-page="delivery">
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="./">
+        <img class="brand__logo" src="assets/img/logo.svg" alt="" aria-hidden="true" width="32" height="32">
+        <span class="brand__text"><strong>Focinhos Amados</strong><small class="brand__city" data-bind="city">Belo Horizonte/MG</small></span>
+      </a>
+      <nav class="nav" aria-label="principal">
+        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
+        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
+          <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
+          <li role="none"><a role="menuitem" href="delivery.html" aria-current="page">Delivery</a></li>
+          <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
+          <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo" class="container flow">
+    <h1>Montar pedido de Delivery</h1>
+    <p class="muted">Valores serão confirmados pela equipe no WhatsApp.</p>
+
+    <section class="card">
+      <h2 class="card__title">🛒 Produtos</h2>
+      <div class="grid grid--3">
+        <div class="field">
+          <label for="produto">Produto</label>
+          <input id="produto" list="lista-produtos" class="input" placeholder="Ex.: GOLDEN GATOS CASTRADOS 1kg">
+          <datalist id="lista-produtos"></datalist>
+        </div>
+        <div class="field">
+          <label for="variacao">Variação</label>
+          <input id="variacao" class="input" placeholder="Ex.: Frango, 1kg">
+        </div>
+        <div class="field">
+          <label for="qtd">Quantidade</label>
+          <input id="qtd" type="number" min="1" step="1" value="1" class="input">
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btn-add-prod" class="btn btn--primary" type="button">➕ Adicionar produtos</button>
+      </div>
+      <ul id="carrinho" class="list list--items"></ul>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">📦 Endereço & contato</h2>
+      <div class="actions">
+        <button id="btn-use-geo" class="btn btn--ghost" type="button">📍 Usar minha localização</button>
+        <span id="geo-badge" class="badge" aria-live="polite"></span>
+      </div>
+      <div class="grid grid--3" style="margin-top:8px">
+        <div class="field">
+          <label for="recebedor">Nome do recebedor <span class="req">*</span></label>
+          <input id="recebedor" class="input" required autocomplete="name">
+          <small id="err-recebedor" class="help" hidden></small>
+        </div>
+        <div class="field">
+          <label for="tel">Telefone (WhatsApp) <span class="req">*</span></label>
+          <input id="tel" class="input" inputmode="tel" required autocomplete="tel">
+          <small id="err-tel" class="help" hidden></small>
+        </div>
+        <div class="field">
+          <label for="endereco">Endereço completo</label>
+          <input id="endereco" class="input" placeholder="Rua, número, bairro, complemento" autocomplete="street-address">
+        </div>
+      </div>
+      <div class="field">
+        <label for="obs">Observações</label>
+        <textarea id="obs" class="textarea" rows="3" placeholder="Portaria, bloco, substitutos…"></textarea>
+      </div>
+    </section>
+
+    <section class="card card--summary">
+      <h2 class="card__title">📄 Resumo</h2>
+      <pre id="delivery-resumo" class="note" aria-live="polite">Nada por aqui ainda. Adicione um produto para continuar.</pre>
+      <div class="actions">
+        <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
+        <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
+        <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+      </div>
+      <div id="delivery-err" class="toast" role="status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span></p>
+      <a href="sobre.html">Sobre</a>
+    </div>
+  </footer>
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+  </svg>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
