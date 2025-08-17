@@ -37,6 +37,11 @@ a:hover{text-decoration:underline}
 .hero__actions{display:flex;flex-wrap:wrap;gap:8px}
 .hero__hint{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:var(--fs-400);margin-top:8px}
 
+/* Destaque visual do hero para apresentação de venda */
+.hero{background:linear-gradient(180deg, rgba(2,153,53,0.06), transparent);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)}
+.hero__promo{display:inline-block;background:linear-gradient(90deg,#ffda7a,#ffb347);color:#723a00;padding:6px 10px;border-radius:999px;font-weight:700;margin-bottom:8px}
+.hero__price{display:block;font-size:20px;color:var(--brand-700);font-weight:800;margin-top:6px}
+
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:var(--radius-300);border:1px solid var(--border);background:#fff;color:var(--text);font-weight:500;line-height:1.1;min-height:44px;cursor:pointer}
 .btn--primary{background:var(--brand);border-color:var(--brand);color:#fff}
 .btn--primary:hover{background:var(--brand-600)}
@@ -54,9 +59,15 @@ a:hover{text-decoration:underline}
 
 .section__title{font-size:var(--fs-800);margin:12px 0}
 
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:stretch}
 @media(min-width:760px){.gallery{grid-template-columns:repeat(6,1fr)}}
-.gallery__img{border-radius:12px;border:1px solid var(--border);background:#f6f6f6}
+.gallery__img{border-radius:12px;border:0;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.04));box-shadow:0 6px 20px rgba(0,0,0,0.08);padding:8px}
+.gallery__img text{font-weight:700}
+
+/* Estilo para cada pet no formulário (destaque visual) */
+.pet{border:1px dashed rgba(2,153,53,0.12);padding:12px;border-radius:12px;margin-top:8px;background:linear-gradient(180deg,rgba(2,153,53,0.02),transparent)}
+.pet:first-child{margin-top:0}
+.pet .field{margin-bottom:6px}
 
 .footer{margin-top:24px;border-top:1px solid var(--border);background:#fff}
 .footer__inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
