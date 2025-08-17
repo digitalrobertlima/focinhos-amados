@@ -42,55 +42,119 @@
     <form id="form-agendar" novalidate>
       <section class="card">
         <h2 class="card__title">🐾 Pet & Tutor</h2>
-        <div class="grid grid--2">
-          <div class="field">
-            <label for="petNome">Nome do pet <span class="req">*</span></label>
-            <input id="petNome" name="petNome" class="input" required autocomplete="off">
-            <small id="err-petNome" class="help" hidden></small>
-          </div>
-          <div class="field">
-            <label for="especie">Espécie <span class="req">*</span></label>
-            <select id="especie" name="especie" class="select" required>
-              <option value="">Selecione…</option>
-              <option>Cão</option>
-              <option>Gato</option>
-              <option>Outro</option>
-            </select>
-            <small id="err-especie" class="help" hidden></small>
-          </div>
-          <div class="field">
-            <label for="porte">Porte <span class="req">*</span></label>
-            <select id="porte" name="porte" class="select" required>
-              <option value="">Selecione…</option>
-              <option>Pequeno</option>
-              <option>Médio</option>
-              <option>Grande</option>
-            </select>
-            <small id="err-porte" class="help" hidden></small>
-          </div>
-          <div class="field">
-            <label for="pelagem">Pelagem</label>
-            <select id="pelagem" class="select">
-              <option value="">Selecione…</option>
-              <option>Curta</option>
-              <option>Média</option>
-              <option>Longa</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="temperamento">Temperamento</label>
-            <select id="temperamento" class="select">
-              <option value="">Selecione…</option>
-              <option>Calmo</option>
-              <option>Ativo</option>
-              <option>Reativo</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="observacoes">Condições de saúde / observações</label>
-            <textarea id="observacoes" class="textarea" rows="3"></textarea>
+        <!-- Contêiner de pets: o primeiro pet está no HTML para compatibilidade; novos pets são adicionados dinamicamente -->
+        <div id="pets">
+          <div class="pet" data-pet-index="0">
+            <div class="grid grid--2">
+              <div class="field">
+                <label for="petNome">Nome do pet <span class="req">*</span></label>
+                <input id="petNome" name="petNome" class="input" required autocomplete="off">
+                <small id="err-petNome" class="help" hidden></small>
+              </div>
+              <div class="field">
+                <label for="especie">Espécie <span class="req">*</span></label>
+                <select id="especie" name="especie" class="select" required>
+                  <option value="">Selecione…</option>
+                  <option>Cão</option>
+                  <option>Gato</option>
+                  <option>Outro</option>
+                </select>
+                <small id="err-especie" class="help" hidden></small>
+              </div>
+              <div class="field">
+                <label for="porte">Porte <span class="req">*</span></label>
+                <select id="porte" name="porte" class="select" required>
+                  <option value="">Selecione…</option>
+                  <option>Pequeno</option>
+                  <option>Médio</option>
+                  <option>Grande</option>
+                </select>
+                <small id="err-porte" class="help" hidden></small>
+              </div>
+              <div class="field">
+                <label for="pelagem">Pelagem</label>
+                <select id="pelagem" class="select">
+                  <option value="">Selecione…</option>
+                  <option>Curta</option>
+                  <option>Média</option>
+                  <option>Longa</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="temperamento">Temperamento</label>
+                <select id="temperamento" class="select">
+                  <option value="">Selecione…</option>
+                  <option>Calmo</option>
+                  <option>Ativo</option>
+                  <option>Reativo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="observacoes">Condições de saúde / observações</label>
+                <textarea id="observacoes" class="textarea" rows="3"></textarea>
+              </div>
+            </div>
           </div>
         </div>
+        <div style="margin-top:10px">
+          <button id="btn-add-pet" class="btn btn--ghost" type="button">+ Adicionar outro pet</button>
+        </div>
+
+        <!-- Template para novos pets (clonável) -->
+        <template id="tpl-pet">
+          <div class="pet" data-pet-index="__IDX__">
+            <div class="grid grid--2" style="margin-top:8px">
+              <div class="field">
+                <label>Nome do pet <span class="req">*</span></label>
+                <input class="input" data-role="petNome" autocomplete="off">
+                <small class="help" data-role="err-petNome" hidden></small>
+              </div>
+              <div class="field">
+                <label>Espécie <span class="req">*</span></label>
+                <select class="select" data-role="especie">
+                  <option value="">Selecione…</option>
+                  <option>Cão</option>
+                  <option>Gato</option>
+                  <option>Outro</option>
+                </select>
+                <small class="help" data-role="err-especie" hidden></small>
+              </div>
+              <div class="field">
+                <label>Porte <span class="req">*</span></label>
+                <select class="select" data-role="porte">
+                  <option value="">Selecione…</option>
+                  <option>Pequeno</option>
+                  <option>Médio</option>
+                  <option>Grande</option>
+                </select>
+                <small class="help" data-role="err-porte" hidden></small>
+              </div>
+              <div class="field">
+                <label>Pelagem</label>
+                <select class="select" data-role="pelagem">
+                  <option value="">Selecione…</option>
+                  <option>Curta</option>
+                  <option>Média</option>
+                  <option>Longa</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Temperamento</label>
+                <select class="select" data-role="temperamento">
+                  <option value="">Selecione…</option>
+                  <option>Calmo</option>
+                  <option>Ativo</option>
+                  <option>Reativo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Condições de saúde / observações</label>
+                <textarea class="textarea" data-role="observacoes" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+        </template>
+
         <div class="grid grid--2">
           <div class="field">
             <label for="tutorNome">Nome do tutor <span class="req">*</span></label>
@@ -169,14 +233,42 @@
 
       <section class="card">
         <h2 class="card__title">📍 Onde</h2>
-        <div class="actions">
-          <button id="btn-use-geo" class="btn btn--ghost" type="button">📍 Usar minha localização</button>
+        <div class="field">
+          <label>Localização:</label>
+          <div role="radiogroup" aria-label="Opções de localização">
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="loja" checked> <span>Vou levar o pet na loja</span></label>
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="taxi-both"> <span>Quero Táxi Dog (Buscar e Levar)</span></label>
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="taxi-pickup"> <span>Quero Táxi Dog (Somente Buscar)</span></label>
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="taxi-dropoff"> <span>Quero Táxi Dog (Somente Levar)</span></label>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:8px">
+          <button id="btn-use-geo" class="btn btn--ghost" type="button" data-geo="default">📍 Usar minha localização</button>
           <span class="badge" id="geo-badge" aria-live="polite"></span>
         </div>
-        <div class="grid grid--2" style="margin-top:8px">
-          <div class="field">
-            <label for="endereco">Endereço completo</label>
-            <input id="endereco" class="input" placeholder="Rua, número, bairro, complemento">
+
+        <div id="localizacao-fields" style="margin-top:8px">
+          <div id="field-origem" class="grid grid--2 hide">
+            <div class="field">
+              <label for="origem">Endereço de Origem</label>
+              <input id="origem" class="input" placeholder="Rua, número, bairro, complemento">
+            </div>
+            <div class="field" style="align-self:end">
+              <button type="button" class="btn btn--ghost" data-geo="origem">📍 Usar minha localização</button>
+              <span class="badge" id="geo-origem" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <div id="field-destino" class="grid grid--2 hide">
+            <div class="field">
+              <label for="destino">Endereço de Destino</label>
+              <input id="destino" class="input" placeholder="Rua, número, bairro, complemento">
+            </div>
+            <div class="field" style="align-self:end">
+              <button type="button" class="btn btn--ghost" data-geo="destino">📍 Usar minha localização</button>
+              <span class="badge" id="geo-destino" aria-live="polite"></span>
+            </div>
           </div>
         </div>
       </section>

@@ -50,16 +50,19 @@ window.CONFIG = {
 
   waTemplates: {
     agendar:
-`AGENDAMENTO — FOCINHOS AMADOS (BH)
-Pet: {petNome} • Espécie: {especie} • Porte: {porte} • Pelagem: {pelagem}
-Serviços: {servicosLista} 
-Preferências: Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
-Quando: {dataPreferida} • Janela: {janela}
-Tutor: {tutorNome} • Tel: {tutorTelefone}
-Endereço: {enderecoCompleto}
-Geo: {lat},{lng} (precisão {accuracy}m @ {timestamp})
-Observações: {observacoes}
-Obs preço: valores personalizados serão confirmados pela equipe.`,
+  `AGENDAMENTO — FOCINHOS AMADOS (BH)
+  Pets:
+  {petsLista}
+  Serviços: {servicosLista}
+  Preferências: Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
+  Quando: {dataPreferida} • Janela: {janela}
+  Tutor: {tutorNome} • Tel: {tutorTelefone}
+  Modalidade de localização: {modalidade}
+  Loja (end): {enderecoLoja}
+  Origem: {origemEndereco} • Geo: {origemLat},{origemLng} (precisão {origemAccuracy}m @ {origemTimestamp})
+  Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng} (precisão {destinoAccuracy}m @ {destinoTimestamp})
+  Observações gerais: {observacoes}
+  Obs preço: valores personalizados serão confirmados pela equipe.`,
 
     delivery:
 `DELIVERY — FOCINHOS AMADOS (BH)

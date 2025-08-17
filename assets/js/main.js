@@ -142,22 +142,87 @@
   // ====== Fluxo: AGENDAR ======
   function initAgendar(){
     if(document.body.dataset.page !== 'agendar') return;
+    // Elementos estáticos
     const f = {
-      petNome: byId('petNome'), especie: byId('especie'), porte: byId('porte'), pelagem: byId('pelagem'),
-      temperamento: byId('temperamento'), observacoes: byId('observacoes'), tutorNome: byId('tutorNome'), tutorTelefone: byId('tutorTelefone'),
+      tutorNome: byId('tutorNome'), tutorTelefone: byId('tutorTelefone'),
       srvBanho: byId('srv-banho'), srvTosa: byId('srv-tosa'), tosaTipo: byId('tosaTipo'),
       perfume: byId('perfume'), acessorio: byId('acessorio'), escovacao: byId('escovacao'),
-      dataPreferida: byId('dataPreferida'), janela: byId('janela'), endereco: byId('endereco')
+      dataPreferida: byId('dataPreferida'), janela: byId('janela')
     };
     const btnGeo = byId('btn-use-geo');
     const badge = byId('geo-badge');
     const btnResumo = byId('btn-ver-resumo');
     const preResumo = byId('agendar-resumo');
     const btnWA = byId('btn-wa');
+    const petsContainer = byId('pets');
+    const tplPet = byId('tpl-pet');
+    const btnAddPet = byId('btn-add-pet');
+    const modalidadeEls = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']"));
+    const fieldOrigem = byId('field-origem');
+    const fieldDestino = byId('field-destino');
+
+    // Controle de pets: cria um array de pets com base no DOM; suportar múltiplos pets dinâmicos
+    let petIndexCounter = petsContainer.querySelectorAll('.pet').length - 1;
+    function readPetsFromDOM(){
+      const pets = [];
+      petsContainer.querySelectorAll('.pet').forEach((el, idx)=>{
+        // Primeiro pet usa ids; outros usam data-role
+        if(idx===0){
+          pets.push({
+            nome: (byId('petNome')?.value||'').trim(),
+            especie: (byId('especie')?.value||'').trim(),
+            porte: (byId('porte')?.value||'').trim(),
+            pelagem: (byId('pelagem')?.value||'').trim() || '-',
+            temperamento: (byId('temperamento')?.value||'').trim() || '-',
+            observacoes: (byId('observacoes')?.value||'').trim() || '-'
+          });
+        } else {
+          const get = (sel)=> el.querySelector(sel)?.value || '';
+          pets.push({
+            nome: (el.querySelector('[data-role="petNome"]')?.value||'').trim(),
+            especie: (el.querySelector('[data-role="especie"]')?.value||'').trim(),
+            porte: (el.querySelector('[data-role="porte"]')?.value||'').trim(),
+            pelagem: (el.querySelector('[data-role="pelagem"]')?.value||'').trim() || '-',
+            temperamento: (el.querySelector('[data-role="temperamento"]')?.value||'').trim() || '-',
+            observacoes: (el.querySelector('[data-role="observacoes"]')?.value||'').trim() || '-'
+          });
+        }
+      });
+      return pets;
+    }
+
+    // Adicionar novo pet
+    function addPet(){
+      petIndexCounter++;
+      const html = tplPet.innerHTML.replace(/__IDX__/g, String(petIndexCounter));
+      const frag = document.createRange().createContextualFragment(html);
+      petsContainer.appendChild(frag);
+      // scroll to new pet
+      const newPet = petsContainer.querySelector(`.pet[data-pet-index="${petIndexCounter}"]`);
+      if(newPet) newPet.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+    on(btnAddPet,'click', addPet);
 
     on(btnGeo,'click', ()=> Geo.start('default', badge));
+    // Geo buttons for origem/destino
+    $$('button[data-geo]').forEach(btn=>{
+      on(btn,'click', ()=>{
+        const key = btn.getAttribute('data-geo');
+        const badgeEl = byId('geo-'+key) || badge;
+        Geo.start(key, badgeEl);
+      });
+    });
 
-    function getServicosLista(){
+    // Toggle localizacao fields
+    function updateLocalizacaoFields(){
+      const sel = document.querySelector("input[name='modalidadeLocalizacao']:checked").value;
+      fieldOrigem.classList.toggle('hide', !(sel==='taxi-both' || sel==='taxi-pickup'));
+      fieldDestino.classList.toggle('hide', !(sel==='taxi-both' || sel==='taxi-dropoff'));
+    }
+    modalidadeEls.forEach(r=> on(r,'change', updateLocalizacaoFields));
+    updateLocalizacaoFields();
+
+  function getServicosLista(){
       const list = [];
       if(f.srvBanho.checked) list.push('Banho');
       if(f.srvTosa.checked){ list.push('Tosa' + (f.tosaTipo.value? ` (${f.tosaTipo.value})` : '')); }
@@ -168,12 +233,19 @@
     }
 
     function resumoTexto(){
-      const geo = Geo.get('default');
+      const geoDefault = Geo.get('default');
+      const pets = readPetsFromDOM();
+      // formatar lista de pets
+      const petsTxt = pets.map((p, i)=> `Pet ${i+1}: ${p.nome || '-'} • Espécie: ${p.especie || '-'} • Porte: ${p.porte || '-'} • Pelagem: ${p.pelagem || '-'} • Temperamento: ${p.temperamento || '-'} • Observações: ${p.observacoes || '-'} `).join('\n');
+      // Localização
+      const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
+      const geoO = Geo.get('origem');
+      const geoD = Geo.get('destino');
+      const origemAddr = byId('origem')?.value.trim() || '-';
+      const destinoAddr = byId('destino')?.value.trim() || '-';
+
       const map = {
-        petNome: f.petNome.value.trim(),
-        especie: f.especie.value,
-        porte: f.porte.value,
-        pelagem: f.pelagem.value || '-',
+        petsLista: petsTxt,
         servicosLista: getServicosLista() || '-',
         perfume: f.perfume.value,
         acessorio: f.acessorio.value,
@@ -182,12 +254,19 @@
         janela: f.janela.value,
         tutorNome: f.tutorNome.value.trim(),
         tutorTelefone: f.tutorTelefone.value.trim(),
-        enderecoCompleto: f.endereco.value.trim(),
-        lat: geo? geo.lat.toFixed(6) : '-',
-        lng: geo? geo.lng.toFixed(6) : '-',
-        accuracy: geo? fmtAcc(geo.accuracy) : '-',
-        timestamp: geo? fmtDT(geo.timestamp) : '-',
-        observacoes: f.observacoes.value.trim() || '-'
+        modalidade: modalidade,
+        enderecoLoja: window.CONFIG?.business?.addressLine || '-',
+        origemEndereco: origemAddr,
+        destinoEndereco: destinoAddr,
+        origemLat: geoO? geoO.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : '-'),
+        origemLng: geoO? geoO.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : '-'),
+        destinoLat: geoD? geoD.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : '-'),
+        destinoLng: geoD? geoD.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : '-'),
+        origemAccuracy: geoO? fmtAcc(geoO.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : '-'),
+        destinoAccuracy: geoD? fmtAcc(geoD.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : '-'),
+        origemTimestamp: geoO? fmtDT(geoO.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : '-'),
+        destinoTimestamp: geoD? fmtDT(geoD.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : '-'),
+        observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || '-'
       };
       const tpl = window.CONFIG.waTemplates.agendar;
       return interpolate(tpl, map);
@@ -195,9 +274,14 @@
 
     function validar(){
       let ok = true;
-      ok &= required(f.petNome,'Preencha o nome do seu pet.');
-      ok &= required(f.especie,'Selecione a espécie.');
-      ok &= required(f.porte,'Selecione o porte.');
+      const pets = readPetsFromDOM();
+      if(pets.length===0){ const t = byId('agendar-err'); t.classList.add('error'); t.textContent='Adicione ao menos um pet.'; ok=false; }
+      // verificar campos obrigatórios em cada pet
+      pets.forEach((p,idx)=>{
+        if(!p.nome){ ok=false; const el = petsContainer.querySelectorAll('.pet')[idx]; const err = el.querySelector('[data-role="err-petNome"]') || byId('err-petNome'); if(err){ err.textContent = 'Preencha o nome do pet.'; err.hidden = false; }}
+        if(!p.especie){ ok=false; const el = petsContainer.querySelectorAll('.pet')[idx]; const err = el.querySelector('[data-role="err-especie"]') || byId('err-especie'); if(err){ err.textContent = 'Selecione a espécie.'; err.hidden = false; }}
+        if(!p.porte){ ok=false; const el = petsContainer.querySelectorAll('.pet')[idx]; const err = el.querySelector('[data-role="err-porte"]') || byId('err-porte'); if(err){ err.textContent = 'Selecione o porte.'; err.hidden = false; }}
+      });
       ok &= required(f.tutorNome,'Informe seu nome.');
       ok &= required(f.tutorTelefone,'Informe um telefone válido.');
       if(ok && !isTelBR(f.tutorTelefone.value)) { setErr(f.tutorTelefone,'Informe um telefone válido.'); ok=false; }
@@ -210,11 +294,21 @@
         toast.textContent = 'Selecione pelo menos um serviço (Banho e/ou Tosa).';
         ok = false;
       } else { byId('agendar-err').textContent=''; byId('agendar-err').classList.remove('error'); }
-      // Se geoloc ausente, endereço deve vir
-      if(!Geo.get('default') && !f.endereco.value.trim()){
-        setErr(f.endereco,'Informe um endereço ou compartilhe sua localização.');
-        ok=false;
-      } else clearErr(f.endereco);
+
+      // Validação por modalidade de localização
+      const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
+      const geoO = Geo.get('origem');
+      const geoD = Geo.get('destino');
+      if(modalidade==='taxi-both'){
+        // exigir origem e destino (ou geolocalização)
+        if(!geoO && !(byId('origem')?.value||'').trim()){ setErr(byId('origem'),'Informe o endereço de origem ou compartilhe a localização.'); ok=false; } else clearErr(byId('origem'));
+        if(!geoD && !(byId('destino')?.value||'').trim()){ setErr(byId('destino'),'Informe o endereço de destino ou compartilhe a localização.'); ok=false; } else clearErr(byId('destino'));
+      } else if(modalidade==='taxi-pickup'){
+        if(!geoO && !(byId('origem')?.value||'').trim()){ setErr(byId('origem'),'Informe o endereço de origem ou compartilhe a localização.'); ok=false; } else clearErr(byId('origem'));
+      } else if(modalidade==='taxi-dropoff'){
+        if(!geoD && !(byId('destino')?.value||'').trim()){ setErr(byId('destino'),'Informe o endereço de destino ou compartilhe a localização.'); ok=false; } else clearErr(byId('destino'));
+      }
+      // Se loja, não requer endereço
       return !!ok;
     }
 
