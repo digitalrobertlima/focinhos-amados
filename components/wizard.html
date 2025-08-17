@@ -115,10 +115,10 @@
           </div>
         </div>
       </div>
-      <div class="field">
-        <label for="pet-obs">Observações</label>
-        <textarea id="pet-obs" rows="3" placeholder="Alergias, comportamento, pedidos especiais" data-bind="pet.observacoes"></textarea>
-      </div>
+        <div class="field">
+          <label for="wiz-pet-obs">Observações</label>
+          <textarea id="wiz-pet-obs" rows="3" placeholder="Alergias, comportamento, pedidos especiais" data-bind="pet.observacoes"></textarea>
+        </div>
 
       <!-- Adicionar à comanda -->
       <div class="row row--wrap gap" style="margin-top:8px">
@@ -138,6 +138,11 @@
           <input id="ag-data" type="date" data-bind="agenda.data" aria-describedby="ag-data-help">
           <small id="ag-data-help" class="muted">Data mínima: hoje</small>
         </div>
+          <div class="field">
+            <label for="wiz-ag-data">Data</label>
+            <input id="wiz-ag-data" type="date" data-bind="agenda.data" aria-describedby="wiz-ag-data-help">
+            <small id="wiz-ag-data-help" class="muted">Data mínima: hoje</small>
+          </div>
         <div class="field">
           <span class="label">Preferência de horário</span>
           <div class="chip-list" role="group" aria-label="Janela de horário">
@@ -156,6 +161,10 @@
           <label for="ag-obs">Observações</label>
           <input id="ag-obs" type="text" placeholder="Janela de chegada, preferências" data-bind="agenda.observacoes">
         </div>
+          <div class="field">
+            <label for="wiz-ag-obs">Observações</label>
+            <input id="wiz-ag-obs" type="text" placeholder="Janela de chegada, preferências" data-bind="agenda.observacoes">
+          </div>
       </div>
     </section>
 
@@ -195,6 +204,12 @@
           <input id="end-cidade" type="text" data-bind="logistica.endereco.cidade">
         </div>
       </div>
+        <div class="grid grid--2">
+          <div class="field"><label for="wiz-end-rua">Rua</label><input id="wiz-end-rua" type="text" autocomplete="address-line1" data-bind="logistica.endereco.rua"></div>
+          <div class="field"><label for="wiz-end-num">Número</label><input id="wiz-end-num" type="text" autocomplete="address-line2" data-bind="logistica.endereco.numero"></div>
+          <div class="field"><label for="wiz-end-bairro">Bairro</label><input id="wiz-end-bairro" type="text" data-bind="logistica.endereco.bairro"></div>
+          <div class="field"><label for="wiz-end-cidade">Cidade</label><input id="wiz-end-cidade" type="text" data-bind="logistica.endereco.cidade"></div>
+        </div>
       <div class="field">
         <label for="end-ref">Referência</label>
         <input id="end-ref" type="text" placeholder="Ponto de referência" data-bind="logistica.endereco.ref">
@@ -226,6 +241,17 @@
           <small class="muted">Usaremos para confirmar pelo WhatsApp.</small>
         </div>
       </div>
+        <div class="grid grid--2">
+          <div class="field">
+            <label for="wiz-cli-nome">Seu nome</label>
+            <input id="wiz-cli-nome" type="text" autocomplete="name" data-bind="cliente.nome">
+          </div>
+          <div class="field">
+            <label for="wiz-cli-tel">Telefone (WhatsApp)</label>
+            <input id="wiz-cli-tel" type="tel" inputmode="tel" placeholder="(31) 9xxxx‑xxxx" data-bind="cliente.telefone">
+            <small class="muted">Usaremos para confirmar pelo WhatsApp.</small>
+          </div>
+        </div>
     </section>
 
     <!-- Passo 6: Resumo -->
