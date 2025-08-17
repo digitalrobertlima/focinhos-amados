@@ -1,42 +1,13 @@
 {
   "name": "Focinhos Amados",
   "short_name": "Focinhos",
-  "id": ".",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#FFFCFE",
   "theme_color": "#029935",
-  "description": "Pet shop — banho & tosa com carinho, delivery de ração e Táxi Dog.",
+  "background_color": "#FFFCFE",
   "icons": [
-    {
-      "src": "assets/img/pwa-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/img/pwa-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Agendar",
-      "url": "agendar.html",
-      "icons": [
-        {
-          "src": "icons/shortcut-agendar.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
-  "categories": [
-    "shopping",
-    "pets"
-  ],
-  "prefer_related_applications": false
+    { "src": "assets/img/pwa-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/img/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }
