@@ -1,131 +1,148 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Focinhos Amados • Pet Shop em Contagem/MG</title>
-  <meta name="description" content="Banho & tosa com carinho, Delivery de ração e Taxi Dog. Atendimento rápido no WhatsApp. A partir de R$ 55." />
-  <meta name="theme-color" content="#029935" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css" />
-  <meta property="og:title" content="Focinhos Amados — Banho & Tosa, Delivery e Taxi Dog" />
-  <meta property="og:description" content="Marque online em poucos passos. Confirmamos tudo pelo WhatsApp." />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="pt_BR" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Focinhos Amados — Banho & Tosa, Delivery e Taxi Dog</title>
+  <meta name="theme-color" content="#029935">
+  <meta name="description" content="Agende banho & tosa, peça delivery de ração e chame Taxi Dog. Atendimento rápido pelo WhatsApp.">
+
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/assets/img/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/img/pwa-192.png">
+
+  <link rel="stylesheet" href="/style.css">
+  <style>noscript p{margin:.75rem 1rem; padding:.75rem 1rem; border:1px solid #eee; border-radius:10px; background:#fff7f7;}</style>
 </head>
 <body>
+  <!-- Sprite de ícones mínimos (para evitar <use> quebrado) -->
+  <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false">
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-locate" viewBox="0 0 24 24"><path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.36 6.36l-1.42-1.42M8.05 8.05L6.64 6.64m10.72 0l-1.41 1.41M8.05 15.95l-1.41 1.41M12 8a4 4 0 100 8a4 4 0 000-8z" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12zm11 3a3 3 0 110-6 3 3 0 010 6z" fill="currentColor"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M8 5l8 7-8 7V5z" fill="currentColor"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M16 5l-8 7 8 7V5z" fill="currentColor"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 00-2 2v12h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z" fill="currentColor"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m-1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M20 3.9a9.9 9.9 0 00-16.8 7c0 1.7.4 3.3 1.3 4.8L3 22l6.5-1.7a9.8 9.8 0 004.9 1.3h0a9.9 9.9 0 000-19.8zM9.9 7.5c-.2-.6-.6-.6-.9-.6h-.8c-.3 0-.7.1-1.1.6s-1.1 1.1-1.1 2.6s1.1 3 1.3 3.2 2.1 3.4 5.1 4.6c2.5 1 3 1 4.1.9s2-.9 2.3-1.8.3-1.6.2-1.8-.3-.3-.6-.4-1.9-.9-2.2-1-.5-.1-.8.3-1 1.1-1.2 1.3-.5.3-.9.1-1.8-.7-3.4-2.1c-1.3-1.1-2.1-2.4-2.3-2.8s0-.6.2-.8.3-.5.4-.6.2-.3.3-.5c.1-.2.1-.4 0-.6z" fill="currentColor"/></symbol>
+  </svg>
+
   <header class="site-header">
-    <div class="row row--between row--center" style="padding:12px 16px">
-      <a href="/" aria-label="Página inicial">
-        <img src="assets/img/logo.svg" alt="Focinhos Amados" style="height:40px" />
-      </a>
-      <nav class="row row--wrap" aria-label="Navegação principal">
-        <a class="btn btn--link" href="agendar.html">Agendar</a>
-        <a class="btn btn--link" href="taxi.html">Taxi Dog</a>
-        <a class="btn btn--link" href="delivery.html">Delivery</a>
-        <button class="btn" type="button" data-action="open-resumo">
-          <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
-          <span>Ver Resumo</span>
-        </button>
-      </nav>
-    </div>
-  </header>
-
-  <main>
-    <!-- O Wizard será injetado aqui como primeiro filho pela main.js -->
-
-    <section class="hero card card--shadow" style="margin:16px">
-      <h1 class="h2">Banho & Tosa com carinho. Delivery de ração. Taxi Dog.</h1>
-      <p class="muted">Atendimento rápido pelo WhatsApp. Marque em poucos passos.</p>
-      <p class="hero__hint">
-        <svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>
-        <span>Seg–Sáb 10:00–20:00 • Dom 10:00–13:00</span>
-        <span id="open-badge" class="badge" style="margin-left:8px"></span>
-      </p>
-      <div class="actions" style="margin-top:8px">
-        <a class="btn btn--primary" href="#wizard">
-          <span>Começar agora</span>
+    <div class="row row--between row--center" style="padding:10px 14px">
+      <div class="row row--center" style="gap:.6rem">
+        <img src="/assets/img/logo.svg" alt="Focinhos Amados" style="width:40px;height:40px">
+        <strong>Focinhos Amados</strong>
+        <span id="open-badge" class="badge">Carregando…</span>
+      </div>
+      <div class="actions">
+        <button id="btn-install-app" class="btn btn--ghost" type="button" hidden>
           <svg class="icon" aria-hidden="true"><use href="#i-next"/></svg>
-        </a>
-        <button class="btn" type="button" data-action="open-resumo">
+          <span>Instalar app</span>
+        </button>
+        <button class="btn btn--link" type="button" data-action="open-resumo">
           <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
           <span>Ver Resumo</span>
         </button>
       </div>
+    </div>
+  </header>
+
+  <main style="padding:16px">
+    <section class="hero card card--shadow">
+      <div class="gap">
+        <h1 class="h2">Banho & Tosa, Delivery e Taxi Dog</h1>
+        <p class="muted">Monte seu pedido e confirme tudo pelo WhatsApp. Você pode incluir vários pets na sua comanda.</p>
+        <div class="row gap">
+          <a class="btn btn--primary" href="#wizard" onclick="scrollToWizard(event)">
+            <svg class="icon" aria-hidden="true"><use href="#i-next"/></svg>
+            <span>Começar agora</span>
+          </a>
+          <button class="btn" type="button" data-action="open-resumo">
+            <svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>
+            <span>Ver Resumo</span>
+          </button>
+        </div>
+      </div>
     </section>
 
-    <section class="card" style="margin:16px">
-      <h2 class="h4">Como funciona</h2>
-      <ol class="list">
-        <li>Escolha o serviço (banho, tosa, taxi, delivery).</li>
-        <li>Informe sobre o seu pet e quando deseja.</li>
-        <li>Defina <strong>onde</strong> (levar na loja, buscar, levar de volta).</li>
-        <li>Revise no <strong>Resumo</strong> e envie pelo WhatsApp. Simples assim.</li>
-      </ol>
-      <p class="muted">Valores são combinados pelo WhatsApp. LGPD: usamos seus dados apenas para atendimento.</p>
-    </section>
-
+    <!-- O Wizard e o Resumo são injetados por main.js a partir de /components/ -->
   </main>
 
-  <footer class="site-footer" style="padding:24px 16px">
-    <div class="row row--wrap row--between">
-      <p>
-        <strong>Focinhos Amados</strong><br />
-        Contagem, MG — Atendimento: Seg–Sáb 10:00–20:00; Dom 10:00–13:00
-      </p>
-      <p>
-        <a class="btn btn--primary" href="https://wa.me/5531982339672" target="_blank" rel="noopener">
-          <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
-          <span>Chamar no WhatsApp</span>
-        </a>
-      </p>
-    </div>
+  <footer class="site-footer" style="padding:12px 16px">
+    <small class="muted">© <span id="year"></span> Focinhos Amados — Contagem, MG</small>
   </footer>
 
-  <!-- Sprite de ícones (inline, sem libs) -->
-  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-    <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M20 11.5A8.5 8.5 0 1 1 11.5 3a8.5 8.5 0 0 1 8.5 8.5Z" fill="currentColor" opacity=".15"/><path d="M7 19l1.2-3.6A6.8 6.8 0 1 1 18.3 7.7a6.8 6.8 0 0 1-9.7 9.7L7 19Zm3-9.8c0-.3.2-.5.5-.6h.6c.2 0 .4 0 .5.2l.4.8c.1.3 0 .5-.1.6l-.3.3c-.2.2-.2.4-.1.6.4.8 1 1.5 1.8 2 .2.1.4.1.6-.1l.3-.3c.2-.2.5-.2.7-.1l.8.4c.3.1.4.3.4.5v.6c0 .3-.2.5-.4.6-.6.3-1.3.2-1.9-.1-1.1-.6-2.1-1.5-2.8-2.6-.5-.8-.8-1.6-.7-2.5Z" fill="currentColor"/></symbol>
-    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 7v5l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
-    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16v4Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></symbol>
-    <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5m6-7-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-locate" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><path d="M9 9h9v9H9z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M6 6h9v9" stroke="currentColor" stroke-width="2" fill="none"/></symbol>
-    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M8 7V5h8v2m-1 0v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7h10Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></symbol>
-  </svg>
-
-  <!-- Schema.org LocalBusiness (Pet Store) -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"PetStore",
-    "name":"Focinhos Amados",
-    "address":{ "@type":"PostalAddress", "addressLocality":"Contagem", "addressRegion":"MG", "addressCountry":"BR" },
-    "areaServed":"Contagem e região",
-    "telephone":"+55 31 98233-9672",
-    "openingHoursSpecification":[
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"10:00","closes":"20:00"},
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Sunday"],"opens":"10:00","closes":"13:00"}
-    ]
-  }
-  </script>
-
   <noscript>
-    <div class="card" style="margin:16px">Para usar este site, ative o JavaScript no seu navegador. Você também pode falar conosco no WhatsApp: <a href="https://wa.me/5531982339672" target="_blank" rel="noopener">clicando aqui</a>.</div>
+    <p>Este app precisa de JavaScript para funcionar (salvar rascunho, WhatsApp, PWA). Ative o JavaScript no seu navegador.</p>
   </noscript>
 
-  <script defer src="config.js"></script>
-  <script defer src="main.js"></script>
   <script>
-    // Registro do Service Worker (PWA)
+    // Aux: rolar até o wizard quando for carregado
+    function scrollToWizard(e){ e && e.preventDefault && e.preventDefault(); const go=()=>{ const w=document.getElementById('wizard'); if(w){ w.scrollIntoView({behavior:'smooth'}); return true;} return false;}; if(!go()){ const iv=setInterval(()=>{ if(go()) clearInterval(iv); },150); }
+    }
+  </script>
+
+  <script src="/config.js" defer></script>
+  <script src="/main.js" defer></script>
+  <script>
+    // Registro do Service Worker
     if('serviceWorker' in navigator){
-      window.addEventListener('load', ()=>{
-        navigator.serviceWorker.register('sw.js').catch(()=>{});
+      window.addEventListener('load', async ()=>{
+        try{
+          const reg = await navigator.serviceWorker.register('/sw.js');
+          // Atualização simples ao detectar novo SW instalado
+          reg.addEventListener('updatefound', ()=>{
+            const nw = reg.installing; if(!nw) return;
+            nw.addEventListener('statechange', ()=>{
+              if(nw.state === 'installed' && navigator.serviceWorker.controller){
+                // opcional: avisar usuário; aqui atualizamos silenciosamente no próximo reload
+                console.log('Novo conteúdo disponível. Atualize para ver as novidades.');
+              }
+            });
+          });
+        }catch(e){ console.warn('SW register fail', e); }
       });
     }
+
+    // Botão "Instalar app"
+    (function(){
+      let deferredPrompt = null;
+      const btn = document.getElementById('btn-install-app');
+      const installedFlag = localStorage.getItem('fa_app_installed') === '1';
+
+      // Se já está instalado, não mostra o botão
+      if(installedFlag){ btn && btn.remove(); return; }
+
+      window.addEventListener('beforeinstallprompt', (e)=>{
+        e.preventDefault();
+        deferredPrompt = e;
+        if(btn) btn.hidden = false;
+      });
+
+      window.addEventListener('appinstalled', ()=>{
+        deferredPrompt = null;
+        try{ localStorage.setItem('fa_app_installed','1'); }catch{}
+        btn && btn.remove();
+      });
+
+      btn && btn.addEventListener('click', async ()=>{
+        if(!deferredPrompt) return;
+        btn.disabled = true;
+        try{
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log('PWA install outcome:', outcome);
+        }finally{
+          deferredPrompt = null;
+          btn.hidden = true;
+          btn.disabled = false;
+        }
+      });
+    })();
+
+    // Ano no rodapé
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
