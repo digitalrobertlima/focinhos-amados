@@ -1,0 +1,40 @@
+== Diagnóstico Inicial ==
+Arquivos no projeto:
+[DIR]  focinhos-amados-testv01/
+[FILE] focinhos-amados-testv01/.gitattributes (66 B)
+[FILE] focinhos-amados-testv01/404.html (854 B)
+[FILE] focinhos-amados-testv01/LICENSE (1068 B)
+[FILE] focinhos-amados-testv01/README.md (6621 B)
+[FILE] focinhos-amados-testv01/agendar.html (9615 B)
+[DIR]  focinhos-amados-testv01/assets/
+[DIR]  focinhos-amados-testv01/assets/css/
+[FILE] focinhos-amados-testv01/assets/css/style.css (6363 B)
+[DIR]  focinhos-amados-testv01/assets/img/
+[FILE] focinhos-amados-testv01/assets/img/logo.svg (656 B)
+[FILE] focinhos-amados-testv01/assets/img/og.jpg (0 B)
+[FILE] focinhos-amados-testv01/assets/img/pwa-192.png (0 B)
+[FILE] focinhos-amados-testv01/assets/img/pwa-512.png (0 B)
+[DIR]  focinhos-amados-testv01/assets/js/
+[FILE] focinhos-amados-testv01/assets/js/config.js (3566 B)
+[FILE] focinhos-amados-testv01/assets/js/main.js (16909 B)
+[FILE] focinhos-amados-testv01/delivery.html (5760 B)
+[FILE] focinhos-amados-testv01/index.html (9621 B)
+[FILE] focinhos-amados-testv01/manifest.webmanifest (402 B)
+[FILE] focinhos-amados-testv01/robots.txt (189 B)
+[FILE] focinhos-amados-testv01/sitemap.xml (464 B)
+[FILE] focinhos-amados-testv01/sobre.html (4604 B)
+[FILE] focinhos-amados-testv01/sw.js (2698 B)
+[FILE] focinhos-amados-testv01/taxi.html (7685 B)
+
+Manifest(s): ['focinhos-amados-testv01/manifest.webmanifest']
+Service Worker(s): ['focinhos-amados-testv01/sw.js']
+Index HTML(s): ['focinhos-amados-testv01/index.html']
+
+Manifest existente utilizado e normalizado: focinhos-amados-testv01/manifest.webmanifest
+Manifest gravado/atualizado: manifest.webmanifest
+offline.html atualizado/criado.
+_pwa/healthcheck.html criado.
+register-sw.js criado/atualizado.
+service-worker.js criado/atualizado.
+404.html criado (SPA/GitHub Pages helper).
+index.html atualizado: focinhos-amados-testv01/index.html

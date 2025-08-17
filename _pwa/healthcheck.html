@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PWA Healthcheck</title>
+  <style>
+    body{font:14px/1.4 system-ui,Segoe UI,Roboto,Arial,sans-serif;padding:24px;max-width:900px;margin:auto}
+    h1{margin:0 0 16px}
+    .ok{color:#0a7d26}.warn{color:#a56d00}.err{color:#b00020}
+    .card{border:1px solid #ddd;border-radius:12px;padding:16px;margin:12px 0}
+    code{background:#f6f6f6;padding:2px 6px;border-radius:6px}
+    button{padding:8px 12px;border-radius:8px;border:1px solid #ccc;cursor:pointer}
+    .grid{display:grid;gap:12px}
+  </style>
+</head>
+<body>
+<h1>✅ PWA Healthcheck</h1>
+<div class="grid">
+  <div class="card" id="env"></div>
+  <div class="card" id="manifest"></div>
+  <div class="card" id="sw"></div>
+  <div class="card" id="storage"></div>
+</div>
+<p>
+  Ações rápidas:
+  <button id="btn-update">Forçar verificação de atualização</button>
+  <button id="btn-clear">Limpar caches & desregistrar SW</button>
+</p>
+<script>
+(async () => {
+  const q = (id) => document.getElementById(id);
+  const log = (el, status, msg) => el.insertAdjacentHTML('beforeend', `<div class="${status}">• ${msg}</div>`);
+
+  // Ambiente
+  const env = q('env');
+  env.innerHTML = '<h2>Ambiente</h2>';
+  log(env, location.protocol === 'https:' ? 'ok' : 'warn', `Protocolo: ${location.protocol}`);
+  log(env, 'ok', `Secure Context: ${window.isSecureContext}`);
+  log(env, 'ok', `User Agent: ${navigator.userAgent}`);
+  log(env, 'ok', `Online: ${navigator.onLine}`);
+
+  // Manifest
+  const man = q('manifest');
+  man.innerHTML = '<h2>Manifest</h2>';
+  const link = document.querySelector('link[rel="manifest"]');
+  if (!link) { log(man, 'err', 'Manifest não encontrado no <head>.'); }
+  else {
+    try {
+      const res = await fetch(link.href, {cache: 'no-cache'});
+      const json = await res.json();
+      log(man, 'ok', `Manifest carregado: ${link.href}`);
+      ['name','short_name','start_url','scope','display','theme_color','background_color']
+        .forEach(k => log(man, json[k] ? 'ok' : 'warn', `${k}: ${json[k] ?? 'ausente'}`));
+      const icons = (json.icons||[]).map(i=>i.sizes).join(', ');
+      log(man, icons ? 'ok' : 'warn', `Ícones: ${icons||'nenhum'}`);
+    } catch (e) { log(man, 'err', 'Erro ao ler manifest: '+e.message); }
+  }
+
+  // Service Worker
+  const sw = q('sw');
+  sw.innerHTML = '<h2>Service Worker</h2>';
+  if (!('serviceWorker' in navigator)) { log(sw, 'err', 'ServiceWorker não suportado.'); }
+  else {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    if (!regs.length) log(sw, 'warn', 'Nenhum SW registrado.');
+    regs.forEach(r => {
+      log(sw, 'ok', `SW escopo: ${r.scope}`);
+      log(sw, 'ok', `updateViaCache: ${r.updateViaCache}`);
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', () => location.reload());
+    document.getElementById('btn-update').onclick = () => regs.forEach(r => r.update());
+    document.getElementById('btn-clear').onclick = async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+      await Promise.all(regs.map(r => r.unregister()));
+      alert('Caches limpos e SW desregistrado. Recarregue.');
+    };
+  }
+
+  // Storage
+  const st = q('storage');
+  st.innerHTML = '<h2>Armazenamento</h2>';
+  try { localStorage.setItem('pwa_test','1'); localStorage.removeItem('pwa_test'); log(st,'ok','localStorage OK'); } catch(e){ log(st,'warn','localStorage bloqueado'); }
+  try { const req = indexedDB.open('pwa_test'); log(st,'ok','IndexedDB OK'); } catch(e){ log(st,'warn','IndexedDB indisponível'); }
+})();
+</script>
+</body>
+</html>

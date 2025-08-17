@@ -6,6 +6,7 @@
    - Fluxos: agendar, delivery, taxi (resumo + WhatsApp)
    - SW register */
 (function(){
+  function getCliente(){ try{return window.Cliente?.get?.()||{};}catch{return {};}}
   const $ = (s,sc=document)=>sc.querySelector(s);
   const $$ = (s,sc=document)=>Array.from(sc.querySelectorAll(s));
   const on = (el,ev,fn)=>el&&el.addEventListener(ev,fn);
@@ -75,6 +76,7 @@
 
   // ===== Geolocalização (watch melhor precisão) =====
   const Geo = (function(){
+  function getCliente(){ try{return window.Cliente?.get?.()||{};}catch{return {};}}
     const state = { watches:{}, best:{} };
     const cfg = window.CONFIG?.geoloc || { enabled:true, enableHighAccuracy:true, waitMs:30000, requiredPrecisionM:50 };
     function start(key, badge){
@@ -180,9 +182,9 @@
         escovacao: f.escovacao.checked ? 'Sim' : 'Não',
         dataPreferida: fmtDate(f.dataPreferida.value),
         janela: f.janela.value,
-        tutorNome: f.tutorNome.value.trim(),
-        tutorTelefone: f.tutorTelefone.value.trim(),
-        enderecoCompleto: f.endereco.value.trim(),
+        tutorNome: (f.tutorNome.value.trim() || getCliente().nome || ''),
+        tutorTelefone: (f.tutorTelefone.value.trim() || getCliente().telefone || ''),
+        enderecoCompleto: (f.endereco.value.trim() || getCliente().endereco || ''),
         lat: geo? geo.lat.toFixed(6) : '-',
         lng: geo? geo.lng.toFixed(6) : '-',
         accuracy: geo? fmtAcc(geo.accuracy) : '-',

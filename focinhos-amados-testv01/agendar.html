@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Agendar Banho & Tosa — Focinhos Amados (BH)</title>
+  <meta name="description" content="Personalize seu agendamento e confirme no WhatsApp. Opções de perfume, acessórios e tratamentos.">
+  <meta name="theme-color" content="#029935">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <meta property="og:title" content="Agendar Banho & Tosa — Focinhos Amados (BH)">
+  <meta property="og:description" content="Personalize seu agendamento e confirme no WhatsApp. Opções de perfume, acessórios e tratamentos.">
+  <meta property="og:image" content="assets/img/og.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+</head>
+<body data-page="agendar">
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="./">
+        <img class="brand__logo" src="assets/img/logo.svg" alt="" width="32" height="32" aria-hidden="true">
+        <span class="brand__text"><strong>Focinhos Amados</strong><small class="brand__city" data-bind="city">Belo Horizonte/MG</small></span>
+      </a>
+      <nav class="nav" aria-label="principal">
+        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
+        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
+          <li role="none"><a role="menuitem" href="agendar.html" aria-current="page">Agendar</a></li>
+          <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
+          <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
+          <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo" class="container flow">
+    <h1>Agendar Banho & Tosa</h1>
+    <p class="muted">Valores são personalizados conforme as escolhas e serão confirmados pela equipe no WhatsApp.</p>
+
+    <form id="form-agendar" novalidate>
+      <section class="card">
+        <h2 class="card__title">🐾 Pet & Tutor</h2>
+        <div class="grid grid--2">
+          <div class="field">
+            <label for="petNome">Nome do pet <span class="req">*</span></label>
+            <input id="petNome" name="petNome" class="input" required autocomplete="off">
+            <small id="err-petNome" class="help" hidden></small>
+          </div>
+          <div class="field">
+            <label for="especie">Espécie <span class="req">*</span></label>
+            <select id="especie" name="especie" class="select" required>
+              <option value="">Selecione…</option>
+              <option>Cão</option>
+              <option>Gato</option>
+              <option>Outro</option>
+            </select>
+            <small id="err-especie" class="help" hidden></small>
+          </div>
+          <div class="field">
+            <label for="porte">Porte <span class="req">*</span></label>
+            <select id="porte" name="porte" class="select" required>
+              <option value="">Selecione…</option>
+              <option>Pequeno</option>
+              <option>Médio</option>
+              <option>Grande</option>
+            </select>
+            <small id="err-porte" class="help" hidden></small>
+          </div>
+          <div class="field">
+            <label for="pelagem">Pelagem</label>
+            <select id="pelagem" class="select">
+              <option value="">Selecione…</option>
+              <option>Curta</option>
+              <option>Média</option>
+              <option>Longa</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="temperamento">Temperamento</label>
+            <select id="temperamento" class="select">
+              <option value="">Selecione…</option>
+              <option>Calmo</option>
+              <option>Ativo</option>
+              <option>Reativo</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="observacoes">Condições de saúde / observações</label>
+            <textarea id="observacoes" class="textarea" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="grid grid--2">
+          <div class="field">
+            <label for="tutorNome">Nome do tutor <span class="req">*</span></label>
+            <input id="tutorNome" class="input" required autocomplete="name">
+            <small id="err-tutorNome" class="help" hidden></small>
+          </div>
+          <div class="field">
+            <label for="tutorTelefone">Telefone (WhatsApp) <span class="req">*</span></label>
+            <input id="tutorTelefone" class="input" inputmode="tel" required autocomplete="tel">
+            <small id="err-tutorTelefone" class="help" hidden></small>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">🧼 Serviços</h2>
+        <div class="grid grid--3">
+          <label class="check"><input type="checkbox" id="srv-banho"> <span>Banho</span></label>
+          <label class="check"><input type="checkbox" id="srv-tosa"> <span>Tosa</span></label>
+          <div class="field">
+            <label for="tosaTipo">Tosa (opcional)</label>
+            <select id="tosaTipo" class="select">
+              <option value="">Selecione…</option>
+              <option>Higiênica</option>
+              <option>Estética</option>
+              <option>Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="field">
+            <label for="perfume">Perfume</label>
+            <select id="perfume" class="select">
+              <option>Sem perfume</option>
+              <option>Perfume marcante</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="acessorio">Acessório</label>
+            <select id="acessorio" class="select">
+              <option>Sem</option>
+              <option>Laço</option>
+              <option>Gravata</option>
+            </select>
+          </div>
+          <label class="check"><input type="checkbox" id="escovacao"> <span>Escovação de dentes (espuma)</span></label>
+        </div>
+
+        <details class="upsell">
+          <summary>➕ Adicionar serviços</summary>
+          <div class="chips" id="upsell-services"></div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">🗓️ Quando</h2>
+        <div class="grid grid--3">
+          <div class="field">
+            <label for="dataPreferida">Data preferida <span class="req">*</span></label>
+            <input id="dataPreferida" type="date" class="input" required>
+            <small id="err-dataPreferida" class="help" hidden></small>
+          </div>
+          <div class="field">
+            <label for="janela">Janela de horário <span class="req">*</span></label>
+            <select id="janela" class="select" required>
+              <option value="">Selecione…</option>
+              <option>Manhã</option>
+              <option>Tarde</option>
+              <option>Outro</option>
+            </select>
+            <small id="err-janela" class="help" hidden></small>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">📍 Onde</h2>
+        <div class="actions">
+          <button id="btn-use-geo" class="btn btn--ghost" type="button">📍 Usar minha localização</button>
+          <span class="badge" id="geo-badge" aria-live="polite"></span>
+        </div>
+        <div class="grid grid--2" style="margin-top:8px">
+          <div class="field">
+            <label for="endereco">Endereço completo</label>
+            <input id="endereco" class="input" placeholder="Rua, número, bairro, complemento">
+          </div>
+        </div>
+      </section>
+
+      <section class="card card--summary">
+        <h2 class="card__title">📄 Resumo</h2>
+        <pre id="agendar-resumo" class="note" aria-live="polite">Nada por aqui ainda. Adicione um serviço para continuar.</pre>
+        <div class="actions">
+          <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
+          <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
+          <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+        </div>
+        <p class="muted">LGPD: Usamos seus dados apenas para atender seu pedido e combinar detalhes pelo WhatsApp.</p>
+        <div id="agendar-err" class="toast" role="status" aria-live="polite"></div>
+      </section>
+    </form>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span></p>
+      <a href="sobre.html">Sobre</a>
+    </div>
+  </footer>
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+  </svg>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/cliente.js"></script>
+  <script defer src="assets/js/main.js" defer></script>
+</body>
+</html>
