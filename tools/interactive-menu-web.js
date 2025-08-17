@@ -10,14 +10,14 @@
   }
 
   const files = {
-    'assets/img/logo.svg': `<?xml version="1.0" encoding="utf-8"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"120\" viewBox=\"0 0 400 120\">\n  <rect width=\"100%\" height=\"100%\" fill=\"#fff0\"/>\n  <text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\" font-size=\"28\" fill=\"#c33\">Focinhos Amados</text>\n</svg>` ,
+    'assets/img/logo.png': `<?xml version="1.0" encoding="utf-8"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"120\" viewBox=\"0 0 400 120\">\n  <rect width=\"100%\" height=\"100%\" fill=\"#fff0\"/>\n  <text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-family=\"Segoe UI, Arial\" font-size=\"28\" fill=\"#c33\">Focinhos Amados</text>\n</svg>` ,
 
     'assets/js/config-shopcoords.js': `// Replace or merge into assets/js/config.js\nwindow.CONFIG = window.CONFIG || {};
 window.CONFIG.shopCoords = { lat: -19.9520894, lng: -43.9926409 };\n// End of snippet\n` ,
 
     'sw-add-sprite-snippet.txt': `/* Snippet: add '/assets/img/sprite.svg' to STATIC_ASSETS and ensure SW_VERSION constant exists */\n// Find the STATIC_ASSETS array and add '\'/assets/img/sprite.svg\','\n// Also ensure there is a line like: const SW_VERSION = "2"; (increment as needed)\n` ,
 
-    'refs-replace-instructions.txt': `Replace references in your HTML/JS files: search for 'logo_heart.svg' and 'escultura_unique.png' and replace with '/assets/img/logo.svg' or '/assets/img/escultura_unique.png' as desired.\nExample sed (Git Bash):\nsed -i "s/logo_heart.svg/\/assets\/img\/logo.svg/g" $(git ls-files '*.html' '*.js' '*.css')\n` ,
+    'refs-replace-instructions.txt': `Replace references in your HTML/JS files: search for 'logo.png' and 'escultura_unique.png' and replace with '/assets/img/logo.png' or '/assets/img/escultura_unique.png' as desired.\nExample sed (Git Bash):\nsed -i "s/logo.png/\/assets\/img\/logo.png/g" $(git ls-files '*.html' '*.js' '*.css')\n` ,
 
     'at2-placeholders-instructions.txt': `Create @2x placeholders by copying existing gallery files: e.g. copy gallery-pet-1.webp -> gallery-pet-1@2x.webp.\nYou can use PowerShell:\nCopy-Item assets\\img\\gallery-pet-1.webp assets\\img\\gallery-pet-1@2x.webp\n` 
   };
@@ -26,9 +26,9 @@ window.CONFIG.shopCoords = { lat: -19.9520894, lng: -43.9926409 };\n// End of sn
     btn.addEventListener('click', () => {
       const opt = btn.getAttribute('data-opt');
       if (opt === '1') {
-        write(`Problemas detectados (resumo):\n\n- Arquivos referenciados no SW ou HTML que não existem: favicon.svg, logo_heart.svg, alguns @2x.webp.\n- shopCoords deve ser preenchido em assets/js/config.js (use o snippet gerado).\n- sprite.svg deve ser adicionado ao array STATIC_ASSETS em sw.js para cache.\n- Arquivos gerados/checks.json foram removidos; confirme se precisa restaurar algo.\n`);
+        write(`Problemas detectados (resumo):\n\n- Arquivos referenciados no SW ou HTML que não existem: favicon.svg, logo.png, alguns @2x.webp.\n- shopCoords deve ser preenchido em assets/js/config.js (use o snippet gerado).\n- sprite.svg deve ser adicionado ao array STATIC_ASSETS em sw.js para cache.\n- Arquivos gerados/checks.json foram removidos; confirme se precisa restaurar algo.\n`);
       } else if (opt === '2') {
-        const filename = 'assets/img/logo.svg';
+        const filename = 'assets/img/logo.png';
         const content = files[filename];
         write('Gerado: ' + filename + '\n\nClique para baixar abaixo:');
         out.innerHTML += '<div style="margin-top:8px">' + makeDownload(filename, content) + '</div>';
