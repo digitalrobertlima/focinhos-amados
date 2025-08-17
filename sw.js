@@ -7,15 +7,12 @@ const STATIC_ASSETS = [
   '/assets/css/style.css',
   '/assets/js/config.js',
   '/assets/js/main.js',
-  '/assets/img/generic-placeholder.svg',
   '/assets/img/pwa-192.png',
   '/assets/img/pwa-512.png',
   '/assets/img/gallery-pet-1.webp',
-  '/assets/img/gallery-pet-1@2x.webp',
   '/assets/img/gallery-pet-2.webp',
-  '/assets/img/gallery-pet-2@2x.webp',
   '/assets/img/gallery-pet-4.webp',
-  '/assets/img/gallery-pet-4@2x.webp',
+  '/assets/img/sprite.svg',
   '/manifest.webmanifest'
 ];
 

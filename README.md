@@ -16,15 +16,16 @@
 ├─ sw.js
 ├─ robots.txt
 ├─ sitemap.xml
-└─ assets/
-   ├─ css/style.css
-   ├─ js/config.js
-   ├─ js/main.js
-   └─ img/
-      ├─ logo.svg
-      ├─ og.jpg           ← adicione (1200×630, ≤200KB)
-      ├─ pwa-192.png      ← adicione (192×192)
-      └─ pwa-512.png      ← adicione (512×512, maskable)
+  └─ assets/
+  ├─ css/style.css
+  ├─ js/config.js
+  ├─ js/main.js
+  └─ img/
+    ├─ escultura_unique.png
+    ├─ og.jpg
+    ├─ pwa-192.png
+    ├─ pwa-512.png
+    └─ sprite.svg
 ```
 
 ## 🛠️ O que editar primeiro (CONFIG)
@@ -60,9 +61,10 @@ window.CONFIG = {
 
 ## 🖼️ Ícones e imagens
 
-* **`assets/img/og.jpg`**: imagem 1200×630 (≤200KB). Usada em Open Graph.
-* **`assets/img/pwa-192.png`** e **`assets/img/pwa-512.png`**: ícones PWA. O 512 deve ser **maskable** (fundo estendido).
-* **`assets/img/logo.svg`**: logo monocromática (pode substituir).
+* **`assets/img/og.jpg`**: imagem 1200×630 (≤200KB). Usada em Open Graph (já presente).
+* **`assets/img/pwa-192.png`** e **`assets/img/pwa-512.png`**: ícones PWA (já presentes). O 512 deve ser **maskable**.
+* **`assets/img/escultura_unique.png`**: arquivo do logotipo usado atualmente; opcionalmente substitua por `logo.svg` para melhor escala.
+* **`assets/img/sprite.svg`**: sprite SVG com ícones (usado nas seções de serviço).
 * (Opcional) Adicione imagens reais para a galeria em `assets/img/placeholder-*.webp` ou ajuste o HTML.
 
 ## 🌐 SEO / Social
@@ -162,3 +164,16 @@ python -m http.server 8080
 ---
 
 Feito com 💚 para **Focinhos Amados (BH)** — publicação sem dor de cabeça, manutenção simples. Boa divulgação!
+
+## Changes made (quick cleanup)
+
+- Removed empty file `assets/js/images.js` (unused).
+- Removed generated reports `checks.json` and `download_report.json` from the repo.
+- Updated `sw.js` to remove a reference to `assets/img/generic-placeholder.svg` which didn't exist (prevents SW install failures).
+
+## Next steps (recommended)
+
+1. (Optional) Add high-density `@2x` variants for gallery images if you want better Retina quality.
+2. (Optional) Replace `escultura_unique.png` with a vector `logo.svg` for sharper scaling.
+3. `business.shopCoords` already filled; verify coordinates on maps if needed.
+4. Review `sw.js` asset list if you add/remove static files and increment `SW_VERSION` when you want clients to refresh.
