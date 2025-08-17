@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Menu Interativo — Focinhos Amados (web)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:18px;color:#111}
+    h1{font-size:20px;margin-bottom:6px}
+    p{margin-top:0;color:#333}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;margin:12px 0}
+    button{padding:10px;border-radius:6px;border:1px solid #ddd;background:#fff;cursor:pointer}
+    button.primary{background:#0b6df2;color:#fff;border:0}
+    pre{background:#f7f7f8;border:1px solid #e6e6e8;padding:10px;white-space:pre-wrap}
+    .out{margin-top:12px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    small.grey{color:#666}
+    code{background:#f3f4f6;padding:2px 4px;border-radius:4px}
+  </style>
+</head>
+<body>
+  <h1>Menu Interativo (sem Node)</h1>
+  <p>Use os botões abaixo para gerar os arquivos/snippets que substituem as ações do script Node.<br/>Após gerar, baixe o(s) arquivo(s) e substitua manualmente no seu repositório local.</p>
+
+  <div class="grid">
+    <button data-opt="1">1 — Listar problemas detectados (descrição)</button>
+    <button data-opt="2">2 — Gerar <code>assets/img/logo.svg</code> (placeholder)</button>
+    <button data-opt="3">3 — Gerar snippet para atualizar referências (texto)</button>
+    <button data-opt="4">4 — Gerar snippet <code>assets/js/config-shopcoords.js</code></button>
+    <button data-opt="5">5 — Gerar snippet para <code>sw.js</code> (adicionar sprite / SW_VERSION)</button>
+    <button data-opt="6" class="primary">6 — Gerar todos os arquivos/snippets</button>
+    <button data-opt="7">7 — Instruções: como aplicar manualmente</button>
+    <button data-opt="9">9 — Limpar saída</button>
+  </div>
+
+  <div id="output" class="out"><pre>Escolha uma opção acima.</pre></div>
+
+  <script src="interactive-menu-web.js"></script>
+</body>
+</html>
