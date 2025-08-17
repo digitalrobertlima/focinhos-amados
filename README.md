@@ -177,3 +177,12 @@ Feito com 💚 para **Focinhos Amados (BH)** — publicação sem dor de cabeça
 2. (Optional) Replace `escultura_unique.png` with a vector `logo.svg` for sharper scaling.
 3. `business.shopCoords` already filled; verify coordinates on maps if needed.
 4. Review `sw.js` asset list if you add/remove static files and increment `SW_VERSION` when you want clients to refresh.
+
+## Developer tools
+
+Small helper UI to generate patches/snippets without Node:
+
+- `tools/interactive-menu-web.html` — abra no navegador para gerar e baixar arquivos/snippets (logo.svg, config-shopcoords snippet, sw.js snippet, instruções de substituição).
+- `tools/interactive-menu.js` — script Node (opcional) caso prefira rodar localmente com Node.js.
+
+Use the web menu to produce files and then copie-os manualmente para os caminhos correspondentes do repositório.
