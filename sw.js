@@ -7,7 +7,7 @@ const STATIC_ASSETS = [
   './assets/css/style.css',
   './assets/js/config.js',
   './assets/js/main.js',
-  './assets/img/logo.svg',
+  './assets/img/generic-placeholder.svg',
   './assets/img/pwa-192.png',
   './assets/img/pwa-512.png',
   './manifest.webmanifest'
