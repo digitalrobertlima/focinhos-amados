@@ -220,7 +220,13 @@
         console.debug('[agendar] addPet -> added index', idx, 'petsNow', petsContainer.querySelectorAll('.pet').length);
       }catch(err){ console.error('[agendar] addPet error', err); }
     }
-    if(btnAddPet){ on(btnAddPet,'click', addPet); } else { console.warn('[agendar] btn-add-pet not found'); }
+    // attach pointerdown to handle cases where browser autofill overlay steals the first click
+    let _lastAddPetAt = 0;
+    function invokeAddPetOnce(){ const t = Date.now(); if(t - _lastAddPetAt > 500){ _lastAddPetAt = t; addPet(); } }
+    if(btnAddPet){
+      on(btnAddPet,'pointerdown', (e)=>{ try{ invokeAddPetOnce(); }catch(e){ console.error(e); } });
+      on(btnAddPet,'click', addPet);
+    } else { console.warn('[agendar] btn-add-pet not found'); }
 
     on(btnGeo,'click', ()=> Geo.start('default', badge));
     // Geo buttons for origem/destino
@@ -355,7 +361,27 @@
       on(el,'focus', ()=> console.debug('[agendar] field focus', id));
       on(el,'blur', ()=> console.debug('[agendar] field blur', id, 'value', el.value));
       on(el,'change', ()=> console.debug('[agendar] field change', id, 'value', el.value));
+      // input event to catch autofill that may not fire change
+      on(el,'input', ()=> console.debug('[agendar] field input', id, 'value', el.value));
     });
+
+    // Observe attribute/value changes in the first pet block to detect autofill
+    if(petsContainer){
+      const firstPet = petsContainer.querySelector('.pet');
+      if(firstPet){
+        const mo = new MutationObserver((mut)=>{
+          mut.forEach(m=>{
+            if(m.type === 'attributes' && (m.attributeName === 'value' || m.attributeName === 'class')){
+              console.debug('[agendar] mutation observed on first pet', m.target, m.attributeName);
+            }
+            if(m.type === 'childList'){
+              console.debug('[agendar] childList mutation on first pet', m);
+            }
+          });
+        });
+        try{ mo.observe(firstPet, { attributes: true, childList: true, subtree: true }); }catch(e){ console.warn('mo observe failed', e); }
+      }
+    }
   }
 
   // ====== Fluxo: DELIVERY ======
