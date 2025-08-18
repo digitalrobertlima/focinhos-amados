@@ -30,6 +30,12 @@
     return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
   }
   window.waLink = waLink; // expõe globalmente conforme SPEC
+  // Dev helper: log quando em localhost para depuração rápida
+  try{
+    if(location && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')){
+      console.debug('[dev] waLink ready ->', waLink('teste-de-conexao'));
+    }
+  }catch(e){}
 
   // ===== Navegação mobile =====
   function initNav(){
@@ -467,7 +473,9 @@
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }
     on(R.btnResumo,'click', ()=> R.resumo.textContent = resumo());
-    on(R.btnWA,'click', (e)=>{ R.btnWA.href = waLink(resumo()); });
+    on(R.btnWA,'click', (e)=>{ R.btnWA.href = waLink(resumo());
+      try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa href set ->', R.btnWA.href); }catch(e){}
+    });
   }
 
   // ===== SW Register =====
