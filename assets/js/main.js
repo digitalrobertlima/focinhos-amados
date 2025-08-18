@@ -796,29 +796,15 @@
       try{ btnWA.href = url; }catch(e){}
     });
 
-  // Add 'Adicionar delivery a este agendamento' button to summary actions
-  // Derive the actions container from the parent of the WhatsApp button
+  // Show delivery guidance note under actions (no add-delivery button)
   const summaryActions = (btnWA && btnWA.parentNode) || null;
-  if(summaryActions && !byId('btn-add-delivery')){
-      const b = document.createElement('button');
-      b.type = 'button'; b.id = 'btn-add-delivery'; b.className = 'btn btn--primary'; b.textContent = '➕ Adicionar delivery a este agendamento';
-      b.addEventListener('click', ()=>{
-        try{
-          const geo = Geo.get('default');
-          const draft = {
-            itensLista: '',
-            recebedor: (f.tutorNome.value||'').trim(),
-            tel: (f.tutorTelefone.value||'').trim(),
-            endereco: (byId('origem')?.value||'').trim() || (geo && geo.address && geo.address.display) || '',
-            numero: (byId('origem-numero')?.value||'').trim() || '',
-            observacoes: (byId('observacoes')?.value||'').trim() || ''
-          };
-          localStorage.setItem('focinhos:delivery:draft', JSON.stringify(draft));
-          // navigate to delivery to finish flow
-          window.location.href = 'delivery.html';
-        }catch(e){ console.warn('add delivery from agendar failed', e); }
-      });
-      summaryActions.appendChild(b);
+  if(summaryActions && !byId('__agendar-delivery-note')){
+      const note = document.createElement('p');
+      note.id = '__agendar-delivery-note';
+      note.className = 'muted';
+      note.style.marginTop = '6px';
+      note.textContent = 'Se precisar de delivery, conclua este agendamento e depois volte ao site para combinar pelo Delivery.';
+      summaryActions.appendChild(note);
     }
 
   try{ attachCopyButton(btnWA && btnWA.parentNode || document.body, 'btn-copy-msg-agendar', resumoTexto); }catch(e){ console.warn('attach copy (agendar) failed', e); }
