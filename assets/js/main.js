@@ -488,7 +488,7 @@
   function initSW(){
     if('serviceWorker' in navigator){
       window.addEventListener('load', ()=>{
-  navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((err)=>{ console.warn('ServiceWorker register failed:', err); });
+  navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((err)=>{ console.warn('ServiceWorker register failed:', err); });
       });
     }
   }
