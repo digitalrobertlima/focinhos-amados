@@ -24,6 +24,23 @@
     return template.replace(/\{(.*?)\}/g, (_,k)=> String(map[k] ?? '').trim());
   }
 
+  // Remove linhas vazias e seções órfãs para evitar mensagens com blocos vazios
+  function tidyMessage(raw){
+    if(!raw) return '';
+    // split lines, trim, remove lines that are only separators or '-' or empty
+    const lines = raw.split(/\r?\n/).map(l=> l.replace(/\s+$/,'')).map(l=> l.replace(/^\s+/,'')).filter(l=>{
+      if(!l) return false; // drop empty
+      // drop common placeholder markers or lines that are just punctuation
+      if(/^[-•\*\s]+$/.test(l)) return false;
+      // drop lines that are '—' or just a dash
+      if(/^[-–—]{1,3}$/.test(l)) return false;
+      return true;
+    });
+    // collapse multiple blank-ish separators into a single blank line between sections
+    // join with single newline
+    return lines.join('\n').replace(/\n{2,}/g,'\n\n').trim();
+  }
+
   // ===== Persistência de formulários (localStorage) =====
   function debounce(fn, wait=300){ let t; return function(...a){ clearTimeout(t); t = setTimeout(()=> fn.apply(this,a), wait); }; }
   const storageKey = (page)=> `focinhos:${page}`;
@@ -393,7 +410,7 @@
     }
 
     function resumoTexto(){
-  console.debug('[agendar] resumoTexto start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
+    console.debug('[agendar] resumoTexto start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
       const geoDefault = Geo.get('default');
       const pets = readPetsFromDOM();
       // formatar lista de pets
@@ -405,33 +422,35 @@
       const origemAddr = byId('origem')?.value.trim() || '-';
       const destinoAddr = byId('destino')?.value.trim() || '-';
 
+      // Use empty strings as fallback so tidyMessage can remove empty sections
       const map = {
         petsLista: petsTxt,
-        servicosLista: getServicosLista() || '-',
-        perfume: f.perfume.value,
-        acessorio: f.acessorio.value,
-        escovacao: f.escovacao.checked ? 'Sim' : 'Não',
-        dataPreferida: fmtDate(f.dataPreferida.value),
-        janela: f.janela.value,
-        tutorNome: f.tutorNome.value.trim(),
-        tutorTelefone: f.tutorTelefone.value.trim(),
-        modalidade: modalidade,
-        enderecoLoja: window.CONFIG?.business?.addressLine || '-',
-        origemEndereco: origemAddr,
-        destinoEndereco: destinoAddr,
-        origemLat: geoO? geoO.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : '-'),
-        origemLng: geoO? geoO.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : '-'),
-        destinoLat: geoD? geoD.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : '-'),
-        destinoLng: geoD? geoD.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : '-'),
-        origemAccuracy: geoO? fmtAcc(geoO.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : '-'),
-        destinoAccuracy: geoD? fmtAcc(geoD.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : '-'),
-        origemTimestamp: geoO? fmtDT(geoO.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : '-'),
-        destinoTimestamp: geoD? fmtDT(geoD.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : '-'),
-        observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || '-'
+        servicosLista: getServicosLista() || '',
+        perfume: f.perfume.value || '',
+        acessorio: f.acessorio.value || '',
+        escovacao: f.escovacao.checked ? 'Sim' : '',
+        dataPreferida: f.dataPreferida.value ? fmtDate(f.dataPreferida.value) : '',
+        janela: f.janela.value || '',
+        tutorNome: f.tutorNome.value.trim() || '',
+        tutorTelefone: f.tutorTelefone.value.trim() || '',
+        modalidade: modalidade || '',
+        enderecoLoja: window.CONFIG?.business?.addressLine || '',
+        origemEndereco: origemAddr || '',
+        destinoEndereco: destinoAddr || '',
+        origemLat: geoO? geoO.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
+        origemLng: geoO? geoO.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
+        destinoLat: geoD? geoD.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
+        destinoLng: geoD? geoD.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
+        origemAccuracy: geoO? fmtAcc(geoO.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : ''),
+        destinoAccuracy: geoD? fmtAcc(geoD.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : ''),
+        origemTimestamp: geoO? fmtDT(geoO.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : ''),
+        destinoTimestamp: geoD? fmtDT(geoD.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : ''),
+        observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || ''
       };
       const tpl = window.CONFIG.waTemplates.agendar;
   console.debug('[agendar] resumoTexto result preview', { petsLista: map.petsLista && map.petsLista.slice(0,80) });
-      return interpolate(tpl, map);
+      const raw = interpolate(tpl, map);
+      return tidyMessage(raw);
     }
 
     function validar(){
@@ -586,17 +605,17 @@
     function resumoTexto(){
       const geo = Geo.get('default');
       const map = {
-        itensLista: listagem() || '-',
-        nome: (els.recebedor.value||'').trim(),
-        telefone: (els.tel.value||'').trim(),
-        enderecoCompleto: (els.endereco.value||'').trim(),
-        lat: geo? geo.lat.toFixed(6) : '-',
-        lng: geo? geo.lng.toFixed(6) : '-',
-        accuracy: geo? fmtAcc(geo.accuracy) : '-',
-        timestamp: geo? fmtDT(geo.timestamp) : '-',
-        observacoes: (els.obs.value||'').trim() || '-'
+        itensLista: listagem() || '',
+        nome: (els.recebedor.value||'').trim() || '',
+        telefone: (els.tel.value||'').trim() || '',
+        enderecoCompleto: (els.endereco.value||'').trim() || '',
+        lat: geo? geo.lat.toFixed(6) : '',
+        lng: geo? geo.lng.toFixed(6) : '',
+        accuracy: geo? fmtAcc(geo.accuracy) : '',
+        timestamp: geo? fmtDT(geo.timestamp) : '',
+        observacoes: (els.obs.value||'').trim() || ''
       };
-      return interpolate(window.CONFIG.waTemplates.delivery, map);
+      return tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map));
     }
 
     function validar(){
@@ -664,7 +683,7 @@
         horario: fmtDT(byId('horario')?.value||'') || '-',
         observacoes: (byId('obs')?.value||'').trim() || '-'
       };
-      return interpolate(window.CONFIG.waTemplates.taxiBanho, map);
+  return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiBanho, map));
     }
 
     function resumoAgendado(){
@@ -684,7 +703,7 @@
         tutorTelefone: (tutorTelefone||'').trim() || '-',
         observacoes: (byId('obs2')?.value||'').trim() || '-'
       };
-      return interpolate(window.CONFIG.waTemplates.taxiAgendado, map);
+  return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiAgendado, map));
     }
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }
