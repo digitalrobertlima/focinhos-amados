@@ -4,5 +4,5 @@ Allow: /
 # Opcional: ajuste se precisar bloquear algo específico
 # Disallow: /assets/
 
-# Sitemap (atualize com o domínio do Pages)
-Sitemap: https://seu-dominio/sitemap.xml
+# Sitemap (GitHub Pages)
+Sitemap: https://digitalrobertlima.github.io/focinhos-amados/sitemap.xml

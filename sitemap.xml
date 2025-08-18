@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Substitua https://seu-dominio pelo domínio final do GitHub Pages -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://seu-dominio/index.html</loc></url>
-  <url><loc>https://seu-dominio/agendar.html</loc></url>
-  <url><loc>https://seu-dominio/delivery.html</loc></url>
-  <url><loc>https://seu-dominio/taxi.html</loc></url>
-  <url><loc>https://seu-dominio/sobre.html</loc></url>
+  <url><loc>https://digitalrobertlima.github.io/focinhos-amados/index.html</loc></url>
+  <url><loc>https://digitalrobertlima.github.io/focinhos-amados/agendar.html</loc></url>
+  <url><loc>https://digitalrobertlima.github.io/focinhos-amados/delivery.html</loc></url>
+  <url><loc>https://digitalrobertlima.github.io/focinhos-amados/taxi.html</loc></url>
+  <url><loc>https://digitalrobertlima.github.io/focinhos-amados/sobre.html</loc></url>
 </urlset>

@@ -548,6 +548,7 @@
     if(btnAddPet){
       function handleAddPet(e){
         e.preventDefault(); // Prevent double triggers
+        try{ e.stopPropagation && e.stopPropagation(); e.stopImmediatePropagation && e.stopImmediatePropagation(); }catch(_){}
         try{
           addPet();
           // Give feedback
@@ -557,7 +558,15 @@
           console.error('[agendar] add pet click failed', err);
         }
       }
+      // Direct binding
       btnAddPet.addEventListener('click', handleAddPet);
+      // Delegated fallback to survive odd event blockers or overlays
+      document.addEventListener('click', (ev)=>{
+        try{
+          const t = ev.target && (ev.target.id==='btn-add-pet' ? ev.target : (ev.target.closest && ev.target.closest('#btn-add-pet')));
+          if(t){ handleAddPet(ev); }
+        }catch(_){ /* noop */ }
+      }, true);
     } else { 
       console.warn('[agendar] btn-add-pet not found'); 
     }
@@ -742,8 +751,10 @@
       try{ btnWA.href = url; }catch(e){}
     });
 
-    // Add 'Adicionar delivery a este agendamento' button to summary actions
-    if(summaryActions && !byId('btn-add-delivery')){
+  // Add 'Adicionar delivery a este agendamento' button to summary actions
+  // Derive the actions container from the parent of the WhatsApp button
+  const summaryActions = (btnWA && btnWA.parentNode) || null;
+  if(summaryActions && !byId('btn-add-delivery')){
       const b = document.createElement('button');
       b.type = 'button'; b.id = 'btn-add-delivery'; b.className = 'btn btn--primary'; b.textContent = '➕ Adicionar delivery a este agendamento';
       b.addEventListener('click', ()=>{
@@ -837,8 +848,8 @@
 
       // attach listeners
       // attach listeners
-      els.carrinho.querySelectorAll('.qty-dec').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const cart = getCartFromStorage(); const newQ = Math.max(1, (cart[i].qtd||1) - 1); updateCartQty(i,newQ); cart = getCartFromStorage(); renderCart(); }));
-      els.carrinho.querySelectorAll('.qty-inc').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const cart = getCartFromStorage(); const newQ = (cart[i].qtd||1) + 1; updateCartQty(i,newQ); renderCart(); }));
+  els.carrinho.querySelectorAll('.qty-dec').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = Math.max(1, (c[i].qtd||1) - 1); updateCartQty(i,newQ); renderCart(); }));
+  els.carrinho.querySelectorAll('.qty-inc').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = (c[i].qtd||1) + 1; updateCartQty(i,newQ); renderCart(); }));
       els.carrinho.querySelectorAll('.item__qty_input').forEach(inp=> inp.addEventListener('change', (e)=>{ const i = +inp.dataset.idx; const v = Math.max(1, Number(inp.value)||1); if(v<1){ inp.value = 1; } updateCartQty(i, v); renderCart(); }));
       els.carrinho.querySelectorAll('.item__remove').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; removeCartItem(i); renderCart(); }));
     }

@@ -1,5 +1,5 @@
 /* Focinhos Amados — Service Worker (cache-first para estáticos, network-first para HTML) */
-const SW_VERSION = 'fa-0.1.0';
+const SW_VERSION = 'fa-0.1.1';
 const STATIC_CACHE = `fa-static-${SW_VERSION}`;
 const STATIC_ASSETS = [
   './',
