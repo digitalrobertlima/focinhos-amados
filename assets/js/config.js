@@ -14,9 +14,9 @@ window.CONFIG = {
     hours: {
       mon_sat: "10:00–20:00",
       sun: "10:00–13:00",
-      holidays_note: "Feriados e outras datas: confirme pelo WhatsApp Status."
+      holidays_note: "Feriados e outras datas: confirme pelo Status do WhatsApp."
     },
-  shopCoords: { lat: -19.9520894, lng: -43.9926409 }, // coordinates for Av. Padre José Maurício, 572 - Nova Cintra
+  shopCoords: { lat: -19.953147097101922, lng: -43.993680031948806 }, // coordinates for Av. Padre José Maurício, 572 - Nova Cintra
     // placeId: "" // opcional
   },
 
@@ -50,48 +50,46 @@ window.CONFIG = {
 
   waTemplates: {
     agendar:
-  `AGENDAMENTO — FOCINHOS AMADOS (BH)
-  Pets:
-  {petsLista}
-  Serviços: {servicosLista}
-  Preferências: Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
-  Quando: {dataPreferida} • Janela: {janela}
-  Tutor: {tutorNome} • Tel: {tutorTelefone}
-  Modalidade de localização: {modalidade}
-  Loja (end): {enderecoLoja}
-  Origem: {origemEndereco} • Geo: {origemLat},{origemLng} (precisão {origemAccuracy}m @ {origemTimestamp})
-  Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng} (precisão {destinoAccuracy}m @ {destinoTimestamp})
-  Observações gerais: {observacoes}
-  Obs preço: valores personalizados serão confirmados pela equipe.`,
+  `📅 AGENDAMENTO — FOCINHOS AMADOS (BH)
+🐾 Pets: {petsLista}
+✂️ Serviços: {servicosLista}
+🌸 Preferências: Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
+⏰ Quando: {dataPreferida} • Janela: {janela}
+👤 Tutor: {tutorNome} • 📞 {tutorTelefone}
+🚕 Modalidade de localização: {modalidade}
+🏪 Loja (end): {enderecoLoja}
+📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng} (precisão {origemAccuracy}m @ {origemTimestamp})
+📍 Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng} (precisão {destinoAccuracy}m @ {destinoTimestamp})
+📝 Observações gerais: {observacoes}
+💰 Obs preço: valores personalizados serão confirmados pela equipe.`,
 
     delivery:
-`DELIVERY — FOCINHOS AMADOS (BH)
-Itens:
-{itensLista}
-Recebedor: {nome} • Tel: {telefone}
-Endereço: {enderecoCompleto}
-Geo: {lat},{lng} (precisão {accuracy}m @ {timestamp})
-Observações: {observacoes}
-Obs preço: valores personalizados serão confirmados pela equipe.`,
+`📦 DELIVERY — FOCINHOS AMADOS (BH)
+📋 Itens: {itensLista}
+👤 Recebedor: {nome} • 📞 {telefone}
+📍 Endereço: {enderecoCompleto}
+🛰️ Geo: {lat},{lng} (precisão {accuracy}m @ {timestamp})
+📝 Observações: {observacoes}
+💰 Obs preço: valores personalizados serão confirmados pela equipe.`,
 
     taxiBanho:
-`TÁXI DOG — BANHO/TOSA (BH)
-Modalidade: {modalidade}
-Pet: {petNome} • Tutor: {tutorNome} • Tel: {tutorTelefone}
-Origem: {origemEndereco} • Geo: {origemLat},{origemLng}
-Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng}
-Horário desejado: {horario}
-Observações: {observacoes}
-Obs preço: valores personalizados serão confirmados pela equipe.`,
+`🚕 TÁXI DOG — BANHO/TOSA (BH)
+🚦 Modalidade: {modalidade}
+🐾 Pet: {petNome} • 👤 Tutor: {tutorNome} • 📞 {tutorTelefone}
+📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng}
+📍 Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng}
+⏰ Horário desejado: {horario}
+📝 Observações: {observacoes}
+💰 Obs preço: valores personalizados serão confirmados pela equipe.`,
 
     taxiAgendado:
-`TÁXI DOG — AGENDADO (BH)
-Origem: {origemEndereco} • Geo: {origemLat},{origemLng}
-Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng}
-Horário desejado: {horario}
-Contato: {tutorNome} • {tutorTelefone}
-Observações: {observacoes}
-Obs preço: valores personalizados serão confirmados pela equipe.`
+`🚕 TÁXI DOG — AGENDADO (BH)
+📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng}
+📍 Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng}
+⏰ Horário desejado: {horario}
+👤 Contato: {tutorNome} • 📞 {tutorTelefone}
+📝 Observações: {observacoes}
+💰 Obs preço: valores personalizados serão confirmados pela equipe.`
   }
 };
 
