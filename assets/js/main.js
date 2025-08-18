@@ -24,6 +24,88 @@
     return template.replace(/\{(.*?)\}/g, (_,k)=> String(map[k] ?? '').trim());
   }
 
+  // ===== Persistência de formulários (localStorage) =====
+  function debounce(fn, wait=300){ let t; return function(...a){ clearTimeout(t); t = setTimeout(()=> fn.apply(this,a), wait); }; }
+  const storageKey = (page)=> `focinhos:${page}`;
+
+  function saveFormState(page){
+    try{
+      const scope = document.querySelector('body[data-page="'+page+'"]');
+      if(!scope) return;
+      const data = {};
+      const els = scope.querySelectorAll('input,select,textarea');
+      els.forEach(el=>{
+        const id = el.id ? `#${el.id}` : (el.name ? `name:${el.name}` : (el.dataset.role? `role:${el.dataset.role}` : null));
+        if(!id) return;
+        if(el.type === 'checkbox' || el.type === 'radio') data[id] = !!el.checked; else data[id] = el.value || '';
+      });
+      localStorage.setItem(storageKey(page), JSON.stringify(data));
+    }catch(e){ console.warn('saveFormState failed', e); }
+  }
+
+  function restoreFormState(page){
+    try{
+      const raw = localStorage.getItem(storageKey(page));
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      const scope = document.querySelector('body[data-page="'+page+'"]');
+      if(!scope) return;
+      Object.keys(data).forEach(key=>{
+        let el = null;
+        if(key.startsWith('#')) el = scope.querySelector(key);
+        else if(key.startsWith('name:')) el = scope.querySelector(`[name="${key.slice(5)}"]`);
+        else if(key.startsWith('role:')) el = scope.querySelector(`[data-role="${key.slice(5)}"]`);
+        if(!el) return;
+        if(el.type === 'checkbox' || el.type === 'radio') el.checked = !!data[key]; else el.value = data[key];
+        // dispatch events so other listeners react (e.g. UI toggles)
+        try{ el.dispatchEvent(new Event('input', { bubbles:true })); el.dispatchEvent(new Event('change', { bubbles:true })); }catch(e){}
+      });
+    }catch(e){ console.warn('restoreFormState failed', e); }
+  }
+
+  function clearFormState(page){
+    try{
+      const scope = document.querySelector('body[data-page="'+page+'"]');
+      if(!scope) return;
+      const els = scope.querySelectorAll('input,select,textarea');
+      els.forEach(el=>{
+        if(el.type === 'checkbox' || el.type === 'radio') el.checked = false; else el.value = '';
+        try{ el.dispatchEvent(new Event('input', { bubbles:true })); el.dispatchEvent(new Event('change', { bubbles:true })); }catch(e){}
+      });
+      localStorage.removeItem(storageKey(page));
+    }catch(e){ console.warn('clearFormState failed', e); }
+  }
+
+  function initFormPersistence(){
+    const page = document.body.dataset.page;
+    if(!page) return;
+    const scope = document.querySelector('body[data-page="'+page+'"]');
+    if(!scope) return;
+    // restore first so UI reflects saved values before other inits run
+    restoreFormState(page);
+    const els = Array.from(scope.querySelectorAll('input,select,textarea'));
+    if(els.length===0) return;
+    const saver = debounce(()=> saveFormState(page), 300);
+    els.forEach(el=>{
+      el.addEventListener('input', saver, { passive:true });
+      el.addEventListener('change', saver, { passive:true });
+    });
+    // add a small clear button in the form actions area if present
+    const actions = scope.querySelector('.actions');
+    if(actions){
+      const id = `btn-clear-data-${page}`;
+      if(!byId(id)){
+        const b = document.createElement('button');
+        b.type = 'button'; b.id = id; b.className = 'btn btn--ghost'; b.textContent = 'Limpar dados salvos';
+        b.addEventListener('click', ()=>{
+          if(!confirm('Remover dados salvos desta página?')) return;
+          clearFormState(page);
+        });
+        actions.appendChild(b);
+      }
+    }
+  }
+
   // Link do WhatsApp com encode
   function waLink(msg){
     const phone = (window.CONFIG?.business?.phones?.whatsappE164) || '5531982339672';
@@ -345,7 +427,17 @@
     on(btnWA,'click', (e)=>{
       console.debug('[agendar] btn-wa clicked', { focused: document.activeElement && (document.activeElement.id || document.activeElement.tagName) });
       e.preventDefault();
-      if(!validar()){ console.debug('[agendar] btn-wa blocked by validar'); return; }
+      if(!validar()){
+        console.debug('[agendar] btn-wa blocked by validar');
+        // Mostrar feedback visível e focar o primeiro campo com erro
+        try{
+          const toast = byId('agendar-err');
+          if(toast){ toast.classList.add('error'); if(!toast.textContent) toast.textContent = 'Preencha os campos obrigatórios.'; toast.scrollIntoView({behavior:'smooth', block:'center'}); }
+          const firstInvalid = document.querySelector('[aria-invalid="true"]');
+          if(firstInvalid && typeof firstInvalid.focus === 'function') firstInvalid.focus();
+        }catch(fe){ console.warn('[agendar] feedback error', fe); }
+        return;
+      }
       const url = waLink(resumoTexto());
       try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
       // abrir em nova aba de forma robusta
@@ -566,9 +658,10 @@
   // Boot
   document.addEventListener('DOMContentLoaded', ()=>{
     // Run each init inside try/catch so a failure in one doesn't stop others
-    [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW].forEach(fn=>{
+  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW].forEach(fn=>{
       try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
     });
+  try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
     // Global error handler to help identificar erros em produção/local
     window.addEventListener('error', (ev)=>{
       try{ console.error('Unhandled error:', ev.error || ev.message || ev); }catch(e){}
