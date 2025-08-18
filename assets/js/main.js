@@ -41,6 +41,34 @@
     return lines.join('\n').replace(/\n{2,}/g,'\n\n').trim();
   }
 
+  // ===== Reverse geocoding (resolve coords -> human address) =====
+  // Uses OpenStreetMap Nominatim public endpoint with a small local cache to avoid repeated requests.
+  function addrCacheKey(lat, lng){ return `focinhos:addr:${Number(lat).toFixed(6)},${Number(lng).toFixed(6)}`; }
+  function getAddrFromCache(lat, lng){ try{ const raw = localStorage.getItem(addrCacheKey(lat,lng)); return raw? JSON.parse(raw): null; }catch(e){ return null; } }
+  function saveAddrToCache(lat, lng, addrObj){ try{ localStorage.setItem(addrCacheKey(lat,lng), JSON.stringify(addrObj)); }catch(e){ } }
+  function reverseGeocode(lat, lng, opts={timeout:8000}){
+    return new Promise((resolve)=>{
+      if(lat==null || lng==null) return resolve(null);
+      try{
+        const cached = getAddrFromCache(lat,lng);
+        if(cached){ console.debug('[geo-addr] cache hit', cached); return resolve(cached); }
+      }catch(e){}
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&addressdetails=1`;
+      let done = false;
+      const timer = setTimeout(()=>{ if(done) return; done = true; console.warn('[geo-addr] reverseGeocode timeout for', lat, lng); resolve(null); }, opts.timeout);
+      fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } }).then(r=> r.ok? r.json() : null).then(json=>{
+        if(done) return; done = true; clearTimeout(timer);
+        if(!json) return resolve(null);
+        // Build a readable address line
+        const display = json.display_name || null;
+        const addr = { display, details: json.address || null, provider: 'nominatim', fetchedAt: Date.now() };
+        try{ saveAddrToCache(lat,lng, addr); }catch(e){}
+        console.debug('[geo-addr] resolved', addr);
+        resolve(addr);
+      }).catch(err=>{ if(done) return; done = true; clearTimeout(timer); console.warn('[geo-addr] fetch failed', err); resolve(null); });
+    });
+  }
+
   // ===== Persistência de formulários (localStorage) =====
   function debounce(fn, wait=300){ let t; return function(...a){ clearTimeout(t); t = setTimeout(()=> fn.apply(this,a), wait); }; }
   const storageKey = (page)=> `focinhos:${page}`;
@@ -221,7 +249,9 @@
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
             accuracy: pos.coords.accuracy,
-            timestamp: pos.timestamp
+            timestamp: pos.timestamp,
+            // will be populated asynchronously by reverseGeocode
+            address: null
           };
           const best = state.best[key];
           if(!best || r.accuracy < best.accuracy){ state.best[key] = r; }
@@ -230,6 +260,32 @@
             const when = new Date(state.best[key].timestamp).toLocaleTimeString('pt-BR');
             b.textContent = `~${fmtAcc(state.best[key].accuracy)}m @ ${when}`;
           }
+          // If we don't have a resolved address yet, try to fetch one in background
+          (async ()=>{
+            try{
+              const cur = state.best[key];
+              if(cur && (!cur.address) && cur.lat!=null && cur.lng!=null){
+                const addr = await reverseGeocode(cur.lat, cur.lng);
+                if(addr){
+                  state.best[key].address = addr;
+                  // update UI badge to include a short form of the address if present
+                  try{
+                    if(b && addr.display){
+                      const short = String(addr.display).split(',').slice(0,3).join(', ');
+                      b.textContent = short + ` — ~${fmtAcc(cur.accuracy)}m`;
+                    }
+                  }catch(e){}
+                  // if there is an input field for this key and it's empty, fill it to help the user
+                  try{
+                    const inpf = byId(key);
+                    if(inpf && (inpf.value||'').trim() === '' && addr.display){ inpf.value = addr.display; inpf.dispatchEvent(new Event('input',{bubbles:true})); inpf.dispatchEvent(new Event('change',{bubbles:true})); }
+                  }catch(e){ }
+                  // notify listeners
+                  try{ window.dispatchEvent(new CustomEvent('focinhos:geo:address:resolved', { detail: { key, address: addr } })); }catch(e){}
+                }
+              }
+            }catch(e){ console.warn('[geo-addr] resolve background failed', e); }
+          })();
           if(state.best[key].accuracy <= cfg.requiredPrecisionM){
             stop(key);
           }
@@ -419,8 +475,10 @@
       const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
       const geoO = Geo.get('origem');
       const geoD = Geo.get('destino');
-      const origemAddr = byId('origem')?.value.trim() || '-';
-      const destinoAddr = byId('destino')?.value.trim() || '-';
+  const origemInputAddr = (byId('origem')?.value||'').trim() || '';
+  const destinoInputAddr = (byId('destino')?.value||'').trim() || '';
+  const origemAddr = (geoO && geoO.address && geoO.address.display) || (Geo.get('default') && Geo.get('default').address && Geo.get('default').address.display) || origemInputAddr || '';
+  const destinoAddr = (geoD && geoD.address && geoD.address.display) || (Geo.get('default') && Geo.get('default').address && Geo.get('default').address.display) || destinoInputAddr || '';
 
       // Use empty strings as fallback so tidyMessage can remove empty sections
       const map = {
@@ -435,12 +493,12 @@
         tutorTelefone: f.tutorTelefone.value.trim() || '',
         modalidade: modalidade || '',
         enderecoLoja: window.CONFIG?.business?.addressLine || '',
-        origemEndereco: origemAddr || '',
-        destinoEndereco: destinoAddr || '',
-        origemLat: geoO? geoO.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
-        origemLng: geoO? geoO.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
-        destinoLat: geoD? geoD.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
-        destinoLng: geoD? geoD.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
+  origemEndereco: origemAddr || '',
+  destinoEndereco: destinoAddr || '',
+  origemLat: geoO? geoO.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
+  origemLng: geoO? geoO.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
+  destinoLat: geoD? geoD.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
+  destinoLng: geoD? geoD.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
         origemAccuracy: geoO? fmtAcc(geoO.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : ''),
         destinoAccuracy: geoD? fmtAcc(geoD.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : ''),
         origemTimestamp: geoO? fmtDT(geoO.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : ''),
@@ -608,11 +666,11 @@
         itensLista: listagem() || '',
         nome: (els.recebedor.value||'').trim() || '',
         telefone: (els.tel.value||'').trim() || '',
-        enderecoCompleto: (els.endereco.value||'').trim() || '',
-        lat: geo? geo.lat.toFixed(6) : '',
-        lng: geo? geo.lng.toFixed(6) : '',
-        accuracy: geo? fmtAcc(geo.accuracy) : '',
-        timestamp: geo? fmtDT(geo.timestamp) : '',
+  enderecoCompleto: (geo && geo.address && geo.address.display) || (els.endereco.value||'').trim() || '',
+  lat: geo? geo.lat.toFixed(6) : '',
+  lng: geo? geo.lng.toFixed(6) : '',
+  accuracy: geo? fmtAcc(geo.accuracy) : '',
+  timestamp: geo? fmtDT(geo.timestamp) : '',
         observacoes: (els.obs.value||'').trim() || ''
       };
       return tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map));
@@ -674,8 +732,8 @@
         petNome: (byId('petNome')?.value||'').trim() || '-',
         tutorNome: (byId('tutorNome')?.value||'').trim() || '-',
         tutorTelefone: (byId('tutorTelefone')?.value||'').trim() || '-',
-        origemEndereco: (byId('origem')?.value||'').trim() || '-',
-        destinoEndereco: (byId('destino')?.value||'').trim() || '-',
+        origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem')?.value||'').trim() || '-',
+        destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino')?.value||'').trim() || '-',
         origemLat: geoO? geoO.lat.toFixed(6) : '-',
         origemLng: geoO? geoO.lng.toFixed(6) : '-',
         destinoLat: geoD? geoD.lat.toFixed(6) : '-',
@@ -692,8 +750,8 @@
       const contato = (byId('contato2')?.value||'').trim();
       const [tutorNome, tutorTelefone] = contato.split(/•|\||-/).map(s=>s&&s.trim()) || ['',''];
       const map = {
-        origemEndereco: (byId('origem2')?.value||'').trim() || '-',
-        destinoEndereco: (byId('destino2')?.value||'').trim() || '-',
+  origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem2')?.value||'').trim() || '-',
+  destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino2')?.value||'').trim() || '-',
         origemLat: geoO? geoO.lat.toFixed(6) : '-',
         origemLng: geoO? geoO.lng.toFixed(6) : '-',
         destinoLat: geoD? geoD.lat.toFixed(6) : '-',
