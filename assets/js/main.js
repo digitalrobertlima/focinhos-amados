@@ -473,8 +473,9 @@
     // Elementos estáticos
     const f = {
       tutorNome: byId('tutorNome'), tutorTelefone: byId('tutorTelefone'),
-      srvBanho: byId('srv-banho'), srvTosa: byId('srv-tosa'), tosaTipo: byId('tosaTipo'),
+      // serviços globais (não por pet)
       perfume: byId('perfume'), acessorio: byId('acessorio'), escovacao: byId('escovacao'),
+      hidratacao: byId('hidratacao'), corteUnhas: byId('corte-unhas'), limpezaOuvido: byId('limpeza-ouvido'),
       dataPreferida: byId('dataPreferida'), janela: byId('janela')
     };
     const btnGeo = byId('btn-use-geo');
@@ -509,7 +510,16 @@
             // per-pet services (first pet block uses data-roles too)
             srvBanho: !!el.querySelector('[data-role="srv-banho"]:checked'),
             srvTosa: !!el.querySelector('[data-role="srv-tosa"]:checked'),
-            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim()
+            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim(),
+            ozonio: !!el.querySelector('[data-role="srv-ozonio"]:checked'),
+            melaleuca: !!el.querySelector('[data-role="srv-melaleuca"]:checked'),
+            // per-pet preferences/extras
+            perfume: (el.querySelector('[data-role="perfume"]')?.value||'').trim(),
+            acessorio: (el.querySelector('[data-role="acessorio"]')?.value||'').trim(),
+            escovacao: !!el.querySelector('[data-role="escovacao"]:checked'),
+            hidratacao: !!el.querySelector('[data-role="hidratacao"]:checked'),
+            corteUnhas: !!el.querySelector('[data-role="corte-unhas"]:checked'),
+            limpezaOuvido: !!el.querySelector('[data-role="limpeza-ouvido"]:checked')
           });
         } else {
           const get = (sel)=> el.querySelector(sel)?.value || '';
@@ -522,7 +532,15 @@
             observacoes: (el.querySelector('[data-role="observacoes"]')?.value||'').trim() || '-',
             srvBanho: !!el.querySelector('[data-role="srv-banho"]:checked'),
             srvTosa: !!el.querySelector('[data-role="srv-tosa"]:checked'),
-            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim()
+            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim(),
+            ozonio: !!el.querySelector('[data-role="srv-ozonio"]:checked'),
+            melaleuca: !!el.querySelector('[data-role="srv-melaleuca"]:checked'),
+            perfume: (el.querySelector('[data-role="perfume"]')?.value||'').trim(),
+            acessorio: (el.querySelector('[data-role="acessorio"]')?.value||'').trim(),
+            escovacao: !!el.querySelector('[data-role="escovacao"]:checked'),
+            hidratacao: !!el.querySelector('[data-role="hidratacao"]:checked'),
+            corteUnhas: !!el.querySelector('[data-role="corte-unhas"]:checked'),
+            limpezaOuvido: !!el.querySelector('[data-role="limpeza-ouvido"]:checked')
           });
         }
       });
@@ -602,11 +620,8 @@
 
   function getServicosGlobaisLista(){
       const list = [];
-      if(f.srvBanho.checked) list.push('Banho');
-      if(f.srvTosa.checked){ list.push('Tosa' + (f.tosaTipo.value? ` (${f.tosaTipo.value})` : '')); }
-      // upsell chips
+      // Upsell chips adicionais de config (globais)
       $$('#upsell-services input[type="checkbox"]').forEach(ch=>{ if(ch.checked) list.push(ch.value); });
-      if(f.escovacao.checked) list.push('Escovação (espuma)');
       return list.join(', ');
     }
 
@@ -616,9 +631,18 @@
       const pets = readPetsFromDOM();
       // formatar lista de pets
       const petsTxt = pets.map((p, i)=>{
-        const perPetServ = [];
-        if(p.srvBanho) perPetServ.push('Banho');
+  const perPetServ = [];
+  if(p.srvBanho) perPetServ.push('Banho');
         if(p.srvTosa) perPetServ.push('Tosa' + (p.tosaTipo? ` (${p.tosaTipo})` : ''));
+  if(p.ozonio) perPetServ.push('Banho de ozônio (+R$5,00)');
+  if(p.melaleuca) perPetServ.push('Shampoo de melaleuca (+R$5,00)');
+  // per-pet preferences
+  if(p.perfume) perPetServ.push(`Perfume: ${p.perfume}`);
+  if(p.acessorio) perPetServ.push(`Acessório: ${p.acessorio}`);
+  if(p.escovacao) perPetServ.push('Espuma dental para tártaro (+R$7,00)');
+  if(p.hidratacao) perPetServ.push('Hidratação (+R$30,00)');
+  if(p.corteUnhas) perPetServ.push('Corte de unhas (R$20,00 avulso)');
+  if(p.limpezaOuvido) perPetServ.push('Limpeza de ouvido');
         const servStr = perPetServ.length ? ` • Serviços: ${perPetServ.join(', ')}` : '';
         return `Pet ${i+1}: ${p.nome || '-'} • Espécie: ${p.especie || '-'} • Porte: ${p.porte || '-'} • Pelagem: ${p.pelagem || '-'} • Temperamento: ${p.temperamento || '-'} • Observações: ${p.observacoes || '-'}${servStr}`;
       }).join('\n');
@@ -715,12 +739,12 @@
       if(ok && !isTelBR(f.tutorTelefone.value)) { setErr(f.tutorTelefone,'Informe um telefone válido.'); ok=false; }
       ok &= required(f.dataPreferida,'Escolha a data.');
       ok &= required(f.janela,'Selecione a janela.');
-      // Pelo menos 1 serviço (global ou por pet)
+      // Pelo menos 1 serviço (por pet: Banho ou Tosa)
       const hasAnyPerPetService = pets.some(p=> p && (p.srvBanho || p.srvTosa));
-      if(!(f.srvBanho.checked || f.srvTosa.checked || hasAnyPerPetService)){
+      if(!hasAnyPerPetService){
         const toast = byId('agendar-err');
         toast.classList.add('error');
-        toast.textContent = 'Selecione pelo menos um serviço (Banho e/ou Tosa), globalmente ou por pet.';
+        toast.textContent = 'Selecione pelo menos um serviço por pet (Banho e/ou Tosa).';
         ok = false;
       } else { byId('agendar-err').textContent=''; byId('agendar-err').classList.remove('error'); }
 
