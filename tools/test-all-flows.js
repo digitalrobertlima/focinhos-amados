@@ -44,9 +44,9 @@ async function runTests() {
     await page.select('#porte', 'Médio');
     
     // Selecionar serviços
-    await page.click('#srv-banho');
-    await page.click('#srv-tosa');
-    await page.type('#tosaTipo', 'Higiênica');
+  await page.click('[data-role="srv-banho"]');
+  await page.click('[data-role="srv-tosa"]');
+  await page.select('[data-role="tosaTipo"]', 'Higiênica');
     
     // Dados do tutor
     await page.type('#tutorNome', 'João Silva');

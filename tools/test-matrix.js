@@ -154,7 +154,7 @@ async function ensureWaIntercept(page){
     await page.type('#tutorTelefone','31999998888');
     await page.type('#dataPreferida', new Date(Date.now()+86400000).toISOString().slice(0,10));
     await page.select('#janela','Tarde');
-    await page.click('#srv-banho');
+  await page.click('[data-role="srv-banho"]');
     await page.click('#btn-ver-resumo');
     await page.waitForFunction(()=> (document.getElementById('agendar-resumo')||{}).textContent.includes('Rex'), {timeout:3000});
     await ensureWaIntercept(page);
@@ -173,7 +173,7 @@ async function ensureWaIntercept(page){
     await page.type('#tutorTelefone','31988887777');
     await page.type('#dataPreferida', new Date(Date.now()+86400000).toISOString().slice(0,10));
     await page.select('#janela','Manhã');
-    await page.click('#srv-banho');
+  await page.click('[data-role="srv-banho"]');
     // click add another pet
     await page.click('#btn-add-pet');
     // fill dynamic pet by data-role selectors
@@ -194,7 +194,7 @@ async function ensureWaIntercept(page){
     await page.type('#tutorTelefone','31977776666');
     await page.type('#dataPreferida', new Date(Date.now()+86400000).toISOString().slice(0,10));
     await page.select('#janela','Tarde');
-    await page.click('#srv-banho');
+  await page.click('[data-role="srv-banho"]');
   // switch to taxi-both
     await page.evaluate(()=>{ const r = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']")).find(x=> x.value==='taxi-both'); if(r){ r.click(); }});
   // trigger geo for both fields

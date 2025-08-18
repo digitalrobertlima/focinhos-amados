@@ -68,8 +68,8 @@ function mockGeolocation(page){
   // AGENDAR: happy path
   await run('agendar - happy', async (p)=>{
     await p.goto(`http://localhost:${port}/agendar.html`, {waitUntil:'networkidle2'});
-    // ensure no services -> validation
-    await p.$$eval('#srv-banho, #srv-tosa', els => els.forEach(e=> e.checked = false));
+  // ensure no services -> validation (per-pet)
+  await p.$$eval('[data-role="srv-banho"], [data-role="srv-tosa"]', els => els.forEach(e=> e.checked = false));
     await p.click('#btn-ver-resumo');
     // summary should still be present but validation prevents WA.
     await p.click('#btn-wa');
@@ -81,7 +81,7 @@ function mockGeolocation(page){
     await p.select('#porte', 'Médio');
     await p.type('#tutorNome', 'João Silva');
     await p.type('#tutorTelefone', '31988887777');
-    await p.click('#srv-banho');
+  await p.click('[data-role="srv-banho"]');
     await p.click('#btn-ver-resumo');
     await p.waitForFunction(()=> document.getElementById('agendar-resumo') && document.getElementById('agendar-resumo').textContent.includes('Rex'), {timeout:3000});
     // intercept open

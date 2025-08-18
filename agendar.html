@@ -16,7 +16,7 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
 </head>
-<body data-page="agendar">
+<body data-page="agendar" data-disable-generic-persist>
   <a class="skip" href="#conteudo">Ir para o conteúdo</a>
   <header class="topbar" role="banner">
     <div class="container topbar__inner">
@@ -262,32 +262,14 @@
       </section>
 
       <section class="card">
-        <h2 class="card__title">🧼 Serviços</h2>
+        <h2 class="card__title">🧰 Serviços avulsos</h2>
         <div class="grid grid--3">
-          <div class="field">
-            <label for="perfume">Perfume</label>
-            <select id="perfume" class="select">
-              <option>Sem perfume</option>
-              <option>Perfume marcante</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="acessorio">Acessório</label>
-            <select id="acessorio" class="select">
-              <option>Sem</option>
-              <option>Laço</option>
-              <option>Gravata</option>
-            </select>
-          </div>
-          <label class="check"><input type="checkbox" id="escovacao"> <span>Espuma dental para tártaro (+R$7,00)</span></label>
+          <label class="check"><input type="checkbox" id="avulso-corte-unhas-global"> <span>Corte de unhas (R$20,00 avulso)</span></label>
         </div>
-
-        <div class="grid grid--3" style="margin-top:6px">
-          <label class="check"><input type="checkbox" id="hidratacao"> <span>Hidratação (+R$30,00)</span></label>
-          <label class="check"><input type="checkbox" id="corte-unhas"> <span>Corte de unhas (R$20,00 avulso)</span></label>
-          <label class="check"><input type="checkbox" id="limpeza-ouvido"> <span>Limpeza de ouvido</span></label>
-        </div>
+        <p class="muted">Este serviço é opcional e se aplica ao agendamento como um todo.</p>
       </section>
+
+  <!-- Seção de serviços globais removida: todos os serviços/preferências agora são por pet. -->
 
       <section class="card">
         <h2 class="card__title">🗓️ Quando</h2>

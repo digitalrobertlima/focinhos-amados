@@ -99,7 +99,7 @@ async function safeLaunch(){
     await p.$eval('#dataPreferida', (el,v)=> el.value = v, tomorrow);
     await p.select('#janela', 'Manhã').catch(()=>{});
     // select a service
-    await p.click('#srv-banho');
+  await p.click('[data-role="srv-banho"]');
 
     // add two more pets and fill minimal fields
     const initial = await p.$$eval('.pet', els=>els.length);

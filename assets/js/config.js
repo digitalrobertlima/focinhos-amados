@@ -49,45 +49,34 @@ window.CONFIG = {
   },
 
   waTemplates: {
-    agendar: `📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)
+  agendar: `📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)
 
-🐾 *Pets*  
+🐾 *Pets*
 {petsLista}
 
-✂️ *Serviços*  
-{servicosLista}
-
-🌸 *Preferências*  
-• Perfume: {perfume}  
-• Acessório: {acessorio}  
-• Escovação (espuma): {escovacao}
-
-⏰ *Quando*  
+⏰ *Quando*
 {dataPreferida} • Janela: {janela}
 
-👤 *Tutor*  
+👤 *Tutor*
 {tutorNome} • 📞 {tutorTelefone}
 
-🚕 *Modalidade de localização*  
+🚕 *Modalidade de localização*
 {modalidade}
 
-
-📍 *Origem*  
-{origemEndereco}  
-Geo: {origemLat},{origemLng}  
+📍 *Origem*
+{origemEndereco}
+Geo: {origemLat},{origemLng}
 Precisão: {origemAccuracy}m @ {origemTimestamp}
 
-📍 *Destino*  
-{destinoEndereco}  
-Geo: {destinoLat},{destinoLng}  
+📍 *Destino*
+{destinoEndereco}
+Geo: {destinoLat},{destinoLng}
 Precisão: {destinoAccuracy}m @ {destinoTimestamp}
 
-
-📝 *Observações gerais*  
+📝 *Observações gerais*
 {observacoes}
 
-
-🏪 *Loja física*  
+🏪 *Loja física*
 {enderecoLoja}`,
 
     delivery:

@@ -48,7 +48,7 @@
   },
 
   "waTemplates": {
-    "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*  \n{petsLista}\n\n✂️ *Serviços*  \n{servicosLista}\n\n🌸 *Preferências*  \n• Perfume: {perfume}  \n• Acessório: {acessorio}  \n• Escovação (espuma): {escovacao}\n\n⏰ *Quando*  \n{dataPreferida} • Janela: {janela}\n\n👤 *Tutor*  \n{tutorNome} • 📞 {tutorTelefone}\n\n🚕 *Modalidade de localização*  \n{modalidade}\n\n\n📍 *Origem*  \n{origemEndereco}  \nGeo: {origemLat},{origemLng}  \nPrecisão: {origemAccuracy}m @ {origemTimestamp}\n\n📍 *Destino*  \n{destinoEndereco}  \nGeo: {destinoLat},{destinoLng}  \nPrecisão: {destinoAccuracy}m @ {destinoTimestamp}\n\n\n📝 *Observações gerais*  \n{observacoes}\n\n\n🏪 *Loja física*  \n{enderecoLoja}",
+  "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Janela: {janela}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}\n\n🚕 *Modalidade de localização*\n{modalidade}\n\n📍 *Origem*\n{origemEndereco}\nGeo: {origemLat},{origemLng}\nPrecisão: {origemAccuracy}m @ {origemTimestamp}\n\n📍 *Destino*\n{destinoEndereco}\nGeo: {destinoLat},{destinoLng}\nPrecisão: {destinoAccuracy}m @ {destinoTimestamp}\n\n📝 *Observações gerais*\n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
 
     "delivery": "📦 *DELIVERY* — FOCINHOS AMADOS (BH)\n\n📋 *Itens*  \n{itensLista}\n\n👤 *Recebedor*  \n{nome} • 📞 {telefone}\n\n📍 *Endereço*  \n{enderecoCompleto}  \nGeo: {lat},{lng}  \nPrecisão: {accuracy}m @ {timestamp}\n\n📝 *Observações*  \n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
 

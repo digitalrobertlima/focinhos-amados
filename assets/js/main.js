@@ -212,6 +212,8 @@
     if(!page) return;
     const scope = document.querySelector('body[data-page="'+page+'"]');
     if(!scope) return;
+  // Allow pages to opt-out of the generic persistence to use a custom flow
+  if(document.body.hasAttribute('data-disable-generic-persist')) return;
     // restore first so UI reflects saved values before other inits run
     restoreFormState(page);
     const els = Array.from(scope.querySelectorAll('input,select,textarea'));
@@ -473,9 +475,7 @@
     // Elementos estáticos
     const f = {
       tutorNome: byId('tutorNome'), tutorTelefone: byId('tutorTelefone'),
-      // serviços globais (não por pet)
-      perfume: byId('perfume'), acessorio: byId('acessorio'), escovacao: byId('escovacao'),
-      hidratacao: byId('hidratacao'), corteUnhas: byId('corte-unhas'), limpezaOuvido: byId('limpeza-ouvido'),
+      // todos os serviços/preferências são por pet agora
       dataPreferida: byId('dataPreferida'), janela: byId('janela')
     };
     const btnGeo = byId('btn-use-geo');
@@ -565,6 +565,7 @@
         const newPet = petsContainer.querySelector(`.pet[data-pet-index="${idx}"]`);
         if(newPet) newPet.scrollIntoView({behavior:'smooth', block:'center'});
         console.debug('[agendar] addPet -> added index', idx, 'petsNow', petsContainer.querySelectorAll('.pet').length);
+  try{ saveAgendarDraftDebounced(); }catch(e){}
       }catch(err){ console.error('[agendar] addPet error', err); }
     }
   // Expose for tests / external triggers
@@ -619,8 +620,8 @@
     updateLocalizacaoFields();
 
   function getServicosGlobaisLista(){
+      // Mantido apenas para compat; hoje não há serviços globais.
       const list = [];
-      // Upsell chips adicionais de config (globais)
       $$('#upsell-services input[type="checkbox"]').forEach(ch=>{ if(ch.checked) list.push(ch.value); });
       return list.join(', ');
     }
@@ -659,9 +660,10 @@
       const map = {
         petsLista: petsTxt,
   servicosLista: getServicosGlobaisLista() || '',
-        perfume: f.perfume.value || '',
-        acessorio: f.acessorio.value || '',
-        escovacao: f.escovacao.checked ? 'Sim' : '',
+  // Preferências agora já vêm por pet dentro de petsLista
+  perfume: '',
+  acessorio: '',
+  escovacao: '',
         dataPreferida: f.dataPreferida.value ? fmtDate(f.dataPreferida.value) : '',
         janela: f.janela.value || '',
         tutorNome: f.tutorNome.value.trim() || '',
@@ -682,7 +684,12 @@
       };
       const tpl = window.CONFIG.waTemplates.agendar;
   console.debug('[agendar] resumoTexto result preview', { petsLista: map.petsLista && map.petsLista.slice(0,80) });
-      const raw = interpolate(tpl, map);
+      let raw = interpolate(tpl, map);
+      // Append optional global add-on services section when selected
+      try{
+        const avulso = byId('avulso-corte-unhas-global');
+        if(avulso && avulso.checked){ raw += `\n\n🧰 Serviços avulsos\nCorte de unhas (R$20,00 avulso)`; }
+      }catch(e){}
       return tidyMessage(raw);
     }
 
@@ -799,7 +806,7 @@
         try{
           const geo = Geo.get('default');
           const draft = {
-            itensLista: getServicosLista() || '',
+            itensLista: '',
             recebedor: (f.tutorNome.value||'').trim(),
             tel: (f.tutorTelefone.value||'').trim(),
             endereco: (byId('origem')?.value||'').trim() || (geo && geo.address && geo.address.display) || '',
@@ -844,6 +851,117 @@
         try{ mo.observe(firstPet, { attributes: true, childList: true, subtree: true }); }catch(e){ console.warn('mo observe failed', e); }
       }
     }
+
+    // ===== Agendar custom persistence (multi-pet aware) =====
+    const AGENDAR_DRAFT_KEY = 'focinhos:agendar:v2';
+    function saveAgendarDraft(){
+      try{
+        const pets = readPetsFromDOM();
+        const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
+        const draft = {
+          pets,
+          tutorNome: (byId('tutorNome')?.value||'').trim(),
+          tutorTelefone: (byId('tutorTelefone')?.value||'').trim(),
+          dataPreferida: byId('dataPreferida')?.value || '',
+          janela: byId('janela')?.value || '',
+          modalidade,
+          origem: byId('origem')?.value || '',
+          origemNumero: byId('origem-numero')?.value || '',
+          destino: byId('destino')?.value || '',
+          destinoNumero: byId('destino-numero')?.value || '',
+          avulsoCorteUnhas: !!(byId('avulso-corte-unhas-global') && byId('avulso-corte-unhas-global').checked)
+        };
+        localStorage.setItem(AGENDAR_DRAFT_KEY, JSON.stringify(draft));
+      }catch(e){ console.warn('saveAgendarDraft failed', e); }
+    }
+    const saveAgendarDraftDebounced = debounce(saveAgendarDraft, 300);
+
+    function restoreAgendarDraft(){
+      try{
+        const raw = localStorage.getItem(AGENDAR_DRAFT_KEY);
+        if(!raw) return;
+        const d = JSON.parse(raw);
+        if(!d || typeof d !== 'object') return;
+        // restore pets
+        const pets = Array.isArray(d.pets) ? d.pets : [];
+        const ensurePetsCount = Math.max(1, pets.length);
+        // Add missing pet blocks
+        const existingCount = petsContainer.querySelectorAll('.pet').length;
+        for(let i=existingCount; i<ensurePetsCount; i++){ addPet(); }
+        // Fill each pet block
+        const petBlocks = Array.from(petsContainer.querySelectorAll('.pet'));
+        pets.forEach((p, idx)=>{
+          const el = petBlocks[idx]; if(!el) return;
+          if(idx===0){
+            if(byId('petNome')) byId('petNome').value = p.nome||'';
+            if(byId('especie')) byId('especie').value = p.especie||'';
+            if(byId('porte')) byId('porte').value = p.porte||'';
+            if(byId('pelagem')) byId('pelagem').value = p.pelagem||'';
+            if(byId('temperamento')) byId('temperamento').value = p.temperamento||'';
+            if(byId('observacoes')) byId('observacoes').value = p.observacoes||'';
+          } else {
+            const set = (sel, val)=>{ const e = el.querySelector(sel); if(e) e.value = val||''; };
+            set('[data-role="petNome"]', p.nome||'');
+            set('[data-role="especie"]', p.especie||'');
+            set('[data-role="porte"]', p.porte||'');
+            set('[data-role="pelagem"]', p.pelagem||'');
+            set('[data-role="temperamento"]', p.temperamento||'');
+            set('[data-role="observacoes"]', p.observacoes||'');
+          }
+          // shared per-pet services/extras for both first and subsequent blocks
+          const setChk = (role, val)=>{ const e = el.querySelector(`[data-role="${role}"]`); if(e) e.checked = !!val; };
+          const setVal = (role, val)=>{ const e = el.querySelector(`[data-role="${role}"]`); if(e) e.value = val||''; };
+          setChk('srv-banho', p.srvBanho);
+          setChk('srv-tosa', p.srvTosa);
+          setVal('tosaTipo', p.tosaTipo||'');
+          setChk('srv-ozonio', p.ozonio);
+          setChk('srv-melaleuca', p.melaleuca);
+          setVal('perfume', p.perfume||'');
+          setVal('acessorio', p.acessorio||'');
+          setChk('escovacao', p.escovacao);
+          setChk('hidratacao', p.hidratacao);
+          setChk('corte-unhas', p.corteUnhas);
+          setChk('limpeza-ouvido', p.limpezaOuvido);
+        });
+
+        // restore other fields
+        if(byId('tutorNome')) byId('tutorNome').value = d.tutorNome||'';
+        if(byId('tutorTelefone')) byId('tutorTelefone').value = d.tutorTelefone||'';
+        if(byId('dataPreferida')) byId('dataPreferida').value = d.dataPreferida||'';
+        if(byId('janela')) byId('janela').value = d.janela||'';
+        if(typeof d.modalidade === 'string'){
+          const r = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']")).find(x=> x.value === d.modalidade);
+          if(r){ r.checked = true; updateLocalizacaoFields(); }
+        }
+        if(byId('origem')) byId('origem').value = d.origem||'';
+        if(d.origemNumero){
+          let num = byId('origem-numero');
+          if(!num){ num = document.createElement('input'); num.id='origem-numero'; num.className='input'; num.placeholder='Nº'; num.style.marginTop='6px'; num.inputMode='numeric'; byId('origem').parentNode.insertBefore(num, byId('origem').nextSibling); }
+          num.value = d.origemNumero;
+        }
+        if(byId('destino')) byId('destino').value = d.destino||'';
+        if(d.destinoNumero){
+          let num2 = byId('destino-numero');
+          if(!num2){ num2 = document.createElement('input'); num2.id='destino-numero'; num2.className='input'; num2.placeholder='Nº'; num2.style.marginTop='6px'; num2.inputMode='numeric'; byId('destino').parentNode.insertBefore(num2, byId('destino').nextSibling); }
+          num2.value = d.destinoNumero;
+        }
+        if(byId('avulso-corte-unhas-global')) byId('avulso-corte-unhas-global').checked = !!d.avulsoCorteUnhas;
+
+        // dispatch change/input to update any dependent UI
+        document.querySelectorAll('#form-agendar input, #form-agendar select, #form-agendar textarea').forEach(el=>{
+          try{ el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){}
+        });
+      }catch(e){ console.warn('restoreAgendarDraft failed', e); }
+    }
+
+    // Hook save on any change within the form
+    try{
+      const form = byId('form-agendar');
+      if(form){ form.addEventListener('input', saveAgendarDraftDebounced, { passive:true }); form.addEventListener('change', saveAgendarDraftDebounced, { passive:true }); }
+    }catch(e){ console.warn('bind agendar save failed', e); }
+
+    // Restore immediately on init
+    restoreAgendarDraft();
   }
 
   // ====== Fluxo: DELIVERY ======
