@@ -318,8 +318,17 @@
       return !!ok;
     }
 
-    on(btnResumo,'click', ()=>{ preResumo.textContent = resumoTexto(); });
-    on(btnWA,'click', (e)=>{ if(!validar()){ e.preventDefault(); return; } btnWA.href = waLink(resumoTexto()); });
+    on(btnResumo,'click', ()=>{ if(preResumo) preResumo.textContent = resumoTexto(); });
+    on(btnWA,'click', (e)=>{
+      e.preventDefault();
+      if(!validar()){ return; }
+      const url = waLink(resumoTexto());
+      try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
+      // abrir em nova aba de forma robusta
+      window.open(url, '_blank');
+      // manter href atualizado por acessibilidade
+      try{ btnWA.href = url; }catch(e){}
+    });
   }
 
   // ====== Fluxo: DELIVERY ======
@@ -400,8 +409,15 @@
       return !!ok;
     }
 
-    on(els.btnResumo,'click', ()=> els.preResumo.textContent = resumoTexto());
-    on(els.btnWA,'click', (e)=>{ if(!validar()){ e.preventDefault(); return; } els.btnWA.href = waLink(resumoTexto()); });
+    on(els.btnResumo,'click', ()=>{ if(els.preResumo) els.preResumo.textContent = resumoTexto(); });
+    on(els.btnWA,'click', (e)=>{
+      e.preventDefault();
+      if(!validar()){ return; }
+      const url = waLink(resumoTexto());
+      try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
+      window.open(url, '_blank');
+      try{ els.btnWA.href = url; }catch(e){}
+    });
   }
 
   // ====== Fluxo: TÁXI ======
@@ -472,9 +488,13 @@
     }
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }
-    on(R.btnResumo,'click', ()=> R.resumo.textContent = resumo());
-    on(R.btnWA,'click', (e)=>{ R.btnWA.href = waLink(resumo());
-      try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa href set ->', R.btnWA.href); }catch(e){}
+    on(R.btnResumo,'click', ()=>{ if(R.resumo) R.resumo.textContent = resumo(); });
+    on(R.btnWA,'click', (e)=>{
+      e.preventDefault();
+      const url = waLink(resumo());
+      try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
+      window.open(url, '_blank');
+      try{ R.btnWA.href = url; }catch(e){}
     });
   }
 
