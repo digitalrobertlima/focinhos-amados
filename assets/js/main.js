@@ -732,12 +732,16 @@
       box.querySelector('#__cart-close').addEventListener('click', ()=>{ document.body.removeChild(modal); });
     }
 
-    const top = byId('topbar-cart'); if(top) on(top,'click', openCartModal);
+  const top = byId('topbar-cart'); if(top) on(top,'click', openCartModal);
     const drawer = byId('drawer-cart'); if(drawer) on(drawer,'click', (e)=>{ e.preventDefault(); openCartModal(); });
     // also respond to cart change events to show small badge (optional)
     window.addEventListener('focinhos:cart:changed', (ev)=>{
       try{ const b = byId('topbar-cart'); if(b){ b.classList.add('has-cart'); setTimeout(()=>b.classList.remove('has-cart'), 800); } }catch(e){}
     });
+  // initialize count
+  function updateTopbarCount(){ try{ const b = byId('topbar-cart'); if(!b) return; const cart = getCartFromStorage(); const total = cart.reduce((s,it)=> s + (Number(it.qtd||1)||1), 0); if(total>0){ b.setAttribute('data-count', String(total)); } else { b.removeAttribute('data-count'); } }catch(e){}}
+  updateTopbarCount();
+  window.addEventListener('focinhos:cart:changed', updateTopbarCount);
   }
 
   // Boot

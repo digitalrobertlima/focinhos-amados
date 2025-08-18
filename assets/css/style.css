@@ -117,6 +117,26 @@ a:hover{text-decoration:underline}
 .hide{display:none !important}
 .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
+/* Topbar quick actions (cart) */
+.topbar__actions{display:flex;align-items:center;gap:8px}
+.topbar__actions .btn{padding:8px 10px;min-width:44px;min-height:44px}
+.topbar__actions .btn[data-count]:not([data-count="0"])::after{
+  content: attr(data-count);
+  position: absolute; top:6px; right:6px; display:inline-block; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:var(--brand); color:#fff; font-size:12px; line-height:18px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+
+/* Modal basic styles (used by JS-created modal) */
+.modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1200}
+.modal > div{background:#fff;padding:16px;border-radius:12px;max-width:520px;width:92%;max-height:86%;overflow:auto;box-shadow:var(--shadow-md)}
+.modal h3{margin:0 0 8px}
+.modal button{cursor:pointer}
+
+/* Mobile: make drawer full width for easier touch targets */
+@media(max-width:600px){
+  .nav__drawer{position:fixed;left:0;right:0;top:56px;min-width:auto;border-radius:0;padding:12px;box-shadow:none}
+  .nav__drawer a{padding:12px}
+}
+
 /* Respeitar preferências do usuário */
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
