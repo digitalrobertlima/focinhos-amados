@@ -51,18 +51,18 @@ window.CONFIG = {
   waTemplates: {
     agendar:
   `📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)
-🐾 Pets:
-{petsLista}
-✂️ Serviços:
-{servicosLista}
-🌸 Preferências:
-Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
-⏰ Quando:
-{dataPreferida} • Janela: {janela}
-👤 Tutor:
-{tutorNome} • 📞 {tutorTelefone}
-🚕 Modalidade de localização:
-{modalidade}
+  🐾 Pets:
+  {petsLista}
+  ✂️ Serviços:
+  {servicosLista}
+  🌸 Preferências:
+  Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
+  ⏰ Quando:
+  {dataPreferida} • Janela: {janela}
+  👤 Tutor:
+  {tutorNome} • 📞 {tutorTelefone}
+  🚕 Modalidade de localização:
+  {modalidade}
 
 📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng} (precisão {origemAccuracy}m @ {origemTimestamp})
 
