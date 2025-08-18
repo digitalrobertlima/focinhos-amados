@@ -51,27 +51,48 @@ window.CONFIG = {
   waTemplates: {
     agendar:
   `📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)
-  🐾 Pets:
-  {petsLista}
-  ✂️ Serviços:
-  {servicosLista}
-  🌸 Preferências:
-  Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
-  ⏰ Quando:
-  {dataPreferida} • Janela: {janela}
-  👤 Tutor:
-  {tutorNome} • 📞 {tutorTelefone}
-  🚕 Modalidade de localização:
-  {modalidade}
 
-📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng} (precisão {origemAccuracy}m @ {origemTimestamp})
+🐾 *Pets*  
+{petsLista}
 
-📍 Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng} (precisão {destinoAccuracy}m @ {destinoTimestamp})
+✂️ *Serviços*  
+{servicosLista}
 
-📝 Observações gerais: {observacoes}
-💰 Obs preço: valores personalizados serão confirmados pela equipe.
+🌸 *Preferências*  
+• Perfume: {perfume}  
+• Acessório: {acessorio}  
+• Escovação (espuma): {escovacao}
 
-🏪 *Loja física* situada em: {enderecoLoja}`,
+⏰ *Quando*  
+{dataPreferida} • Janela: {janela}
+
+👤 *Tutor*  
+{tutorNome} • 📞 {tutorTelefone}
+
+🚕 *Modalidade de localização*  
+{modalidade}
+
+
+📍 *Origem*  
+{origemEndereco}  
+Geo: {origemLat},{origemLng}  
+Precisão: {origemAccuracy}m @ {origemTimestamp}
+
+📍 *Destino*  
+{destinoEndereco}  
+Geo: {destinoLat},{destinoLng}  
+Precisão: {destinoAccuracy}m @ {destinoTimestamp}
+
+
+📝 *Observações gerais*  
+{observacoes}
+
+💰 *Obs preço*  
+Valores personalizados serão confirmados pela equipe.
+
+
+🏪 *Loja física*  
+{enderecoLoja}`,
 
     delivery:
 `📦 DELIVERY — FOCINHOS AMADOS (BH)
