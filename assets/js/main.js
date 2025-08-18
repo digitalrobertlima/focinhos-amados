@@ -505,7 +505,11 @@
             porte: (byId('porte')?.value||'').trim(),
             pelagem: (byId('pelagem')?.value||'').trim() || '-',
             temperamento: (byId('temperamento')?.value||'').trim() || '-',
-            observacoes: (byId('observacoes')?.value||'').trim() || '-'
+            observacoes: (byId('observacoes')?.value||'').trim() || '-',
+            // per-pet services (first pet block uses data-roles too)
+            srvBanho: !!el.querySelector('[data-role="srv-banho"]:checked'),
+            srvTosa: !!el.querySelector('[data-role="srv-tosa"]:checked'),
+            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim()
           });
         } else {
           const get = (sel)=> el.querySelector(sel)?.value || '';
@@ -515,7 +519,10 @@
             porte: (el.querySelector('[data-role="porte"]')?.value||'').trim(),
             pelagem: (el.querySelector('[data-role="pelagem"]')?.value||'').trim() || '-',
             temperamento: (el.querySelector('[data-role="temperamento"]')?.value||'').trim() || '-',
-            observacoes: (el.querySelector('[data-role="observacoes"]')?.value||'').trim() || '-'
+            observacoes: (el.querySelector('[data-role="observacoes"]')?.value||'').trim() || '-',
+            srvBanho: !!el.querySelector('[data-role="srv-banho"]:checked'),
+            srvTosa: !!el.querySelector('[data-role="srv-tosa"]:checked'),
+            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim()
           });
         }
       });
@@ -593,7 +600,7 @@
     modalidadeEls.forEach(r=> on(r,'change', updateLocalizacaoFields));
     updateLocalizacaoFields();
 
-  function getServicosLista(){
+  function getServicosGlobaisLista(){
       const list = [];
       if(f.srvBanho.checked) list.push('Banho');
       if(f.srvTosa.checked){ list.push('Tosa' + (f.tosaTipo.value? ` (${f.tosaTipo.value})` : '')); }
@@ -608,7 +615,13 @@
       const geoDefault = Geo.get('default');
       const pets = readPetsFromDOM();
       // formatar lista de pets
-      const petsTxt = pets.map((p, i)=> `Pet ${i+1}: ${p.nome || '-'} • Espécie: ${p.especie || '-'} • Porte: ${p.porte || '-'} • Pelagem: ${p.pelagem || '-'} • Temperamento: ${p.temperamento || '-'} • Observações: ${p.observacoes || '-'} `).join('\n');
+      const petsTxt = pets.map((p, i)=>{
+        const perPetServ = [];
+        if(p.srvBanho) perPetServ.push('Banho');
+        if(p.srvTosa) perPetServ.push('Tosa' + (p.tosaTipo? ` (${p.tosaTipo})` : ''));
+        const servStr = perPetServ.length ? ` • Serviços: ${perPetServ.join(', ')}` : '';
+        return `Pet ${i+1}: ${p.nome || '-'} • Espécie: ${p.especie || '-'} • Porte: ${p.porte || '-'} • Pelagem: ${p.pelagem || '-'} • Temperamento: ${p.temperamento || '-'} • Observações: ${p.observacoes || '-'}${servStr}`;
+      }).join('\n');
       // Localização
       const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
       const geoO = Geo.get('origem');
@@ -621,7 +634,7 @@
       // Use empty strings as fallback so tidyMessage can remove empty sections
       const map = {
         petsLista: petsTxt,
-        servicosLista: getServicosLista() || '',
+  servicosLista: getServicosGlobaisLista() || '',
         perfume: f.perfume.value || '',
         acessorio: f.acessorio.value || '',
         escovacao: f.escovacao.checked ? 'Sim' : '',
@@ -702,11 +715,12 @@
       if(ok && !isTelBR(f.tutorTelefone.value)) { setErr(f.tutorTelefone,'Informe um telefone válido.'); ok=false; }
       ok &= required(f.dataPreferida,'Escolha a data.');
       ok &= required(f.janela,'Selecione a janela.');
-      // Pelo menos 1 serviço
-      if(!(f.srvBanho.checked || f.srvTosa.checked)){
+      // Pelo menos 1 serviço (global ou por pet)
+      const hasAnyPerPetService = pets.some(p=> p && (p.srvBanho || p.srvTosa));
+      if(!(f.srvBanho.checked || f.srvTosa.checked || hasAnyPerPetService)){
         const toast = byId('agendar-err');
         toast.classList.add('error');
-        toast.textContent = 'Selecione pelo menos um serviço (Banho e/ou Tosa).';
+        toast.textContent = 'Selecione pelo menos um serviço (Banho e/ou Tosa), globalmente ou por pet.';
         ok = false;
       } else { byId('agendar-err').textContent=''; byId('agendar-err').classList.remove('error'); }
 
