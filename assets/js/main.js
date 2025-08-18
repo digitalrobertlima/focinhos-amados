@@ -163,6 +163,7 @@
     const petsContainer = byId('pets');
     const tplPet = byId('tpl-pet');
     const btnAddPet = byId('btn-add-pet');
+  console.debug('[agendar] init elements', { btnAddPet: !!btnAddPet, tplPet: !!tplPet, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
     const modalidadeEls = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']"));
     const fieldOrigem = byId('field-origem');
     const fieldDestino = byId('field-destino');
@@ -170,6 +171,7 @@
   // Controle de pets: cria um array de pets com base no DOM; suportar múltiplos pets dinâmicos
   // Use a robust counter: start at current count so new pets get unique indexes
   let petIndexCounter = (petsContainer && petsContainer.querySelectorAll('.pet')?.length) || 0;
+  console.debug('[agendar] petIndexCounter init', petIndexCounter);
     function readPetsFromDOM(){
       const pets = [];
       petsContainer.querySelectorAll('.pet').forEach((el, idx)=>{
@@ -201,6 +203,11 @@
     // Adicionar novo pet
     function addPet(){
       try{
+        console.debug('[agendar] addPet clicked', {
+          petIndexCounterBefore: petIndexCounter,
+          focused: (document.activeElement && (document.activeElement.id || document.activeElement.tagName)) || null,
+          firstPet: { nome: byId('petNome')?.value, especie: byId('especie')?.value, porte: byId('porte')?.value }
+        });
         if(!tplPet){ console.warn('tpl-pet not found'); return; }
         if(!petsContainer){ console.warn('pets container not found'); return; }
         const idx = petIndexCounter++;
@@ -210,7 +217,7 @@
         // scroll to new pet
         const newPet = petsContainer.querySelector(`.pet[data-pet-index="${idx}"]`);
         if(newPet) newPet.scrollIntoView({behavior:'smooth', block:'center'});
-        console.debug('[agendar] addPet -> added index', idx);
+        console.debug('[agendar] addPet -> added index', idx, 'petsNow', petsContainer.querySelectorAll('.pet').length);
       }catch(err){ console.error('[agendar] addPet error', err); }
     }
     if(btnAddPet){ on(btnAddPet,'click', addPet); } else { console.warn('[agendar] btn-add-pet not found'); }
@@ -245,6 +252,7 @@
     }
 
     function resumoTexto(){
+  console.debug('[agendar] resumoTexto start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
       const geoDefault = Geo.get('default');
       const pets = readPetsFromDOM();
       // formatar lista de pets
@@ -281,10 +289,12 @@
         observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || '-'
       };
       const tpl = window.CONFIG.waTemplates.agendar;
+  console.debug('[agendar] resumoTexto result preview', { petsLista: map.petsLista && map.petsLista.slice(0,80) });
       return interpolate(tpl, map);
     }
 
     function validar(){
+  console.debug('[agendar] validar start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
       let ok = true;
       const pets = readPetsFromDOM();
       if(pets.length===0){ const t = byId('agendar-err'); t.classList.add('error'); t.textContent='Adicione ao menos um pet.'; ok=false; }
@@ -321,19 +331,30 @@
         if(!geoD && !(byId('destino')?.value||'').trim()){ setErr(byId('destino'),'Informe o endereço de destino ou compartilhe a localização.'); ok=false; } else clearErr(byId('destino'));
       }
       // Se loja, não requer endereço
+  console.debug('[agendar] validar result', ok);
       return !!ok;
     }
 
-    on(btnResumo,'click', ()=>{ if(preResumo) preResumo.textContent = resumoTexto(); });
+    on(btnResumo,'click', ()=>{ console.debug('[agendar] btn-ver-resumo clicked'); if(preResumo) preResumo.textContent = resumoTexto(); });
     on(btnWA,'click', (e)=>{
+      console.debug('[agendar] btn-wa clicked', { focused: document.activeElement && (document.activeElement.id || document.activeElement.tagName) });
       e.preventDefault();
-      if(!validar()){ return; }
+      if(!validar()){ console.debug('[agendar] btn-wa blocked by validar'); return; }
       const url = waLink(resumoTexto());
       try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
       // abrir em nova aba de forma robusta
       window.open(url, '_blank');
       // manter href atualizado por acessibilidade
       try{ btnWA.href = url; }catch(e){}
+    });
+
+    // Attach quick listeners to first pet fields to help debugging focus/changes
+    ['petNome','especie','porte'].forEach(id=>{
+      const el = byId(id);
+      if(!el) return;
+      on(el,'focus', ()=> console.debug('[agendar] field focus', id));
+      on(el,'blur', ()=> console.debug('[agendar] field blur', id, 'value', el.value));
+      on(el,'change', ()=> console.debug('[agendar] field change', id, 'value', el.value));
     });
   }
 
