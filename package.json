@@ -4,9 +4,10 @@
   "description": "Site estático PWA leve para Focinhos Amados (BH)",
   "private": true,
   "scripts": {
-  "preview": "python -m http.server 8080",
-  "test:flows": "node tools/test-full-flows.js",
-  "test:a11y": "node tools/test-accessibility.js"
+    "preview": "python -m http.server 8080",
+    "test:flows": "node tools/test-full-flows.js",
+    "test:a11y": "node tools/test-accessibility.js",
+    "test:matrix": "node tools/test-matrix.js"
   },
   "devDependencies": {
     "puppeteer": "^24.16.2"
