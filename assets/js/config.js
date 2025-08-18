@@ -16,7 +16,7 @@ window.CONFIG = {
       sun: "10:00–13:00",
       holidays_note: "Feriados e outras datas: confirme pelo Status do WhatsApp."
     },
-  shopCoords: { lat: -19.953147097101922, lng: -43.993680031948806 }, // coordinates for Av. Padre José Maurício, 572 - Nova Cintra
+    shopCoords: { lat: -19.953147097101922, lng: -43.993680031948806 }, // coordinates for Av. Padre José Maurício, 572 - Nova Cintra
     // placeId: "" // opcional
   },
 

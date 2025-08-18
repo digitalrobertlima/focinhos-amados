@@ -509,11 +509,13 @@
 
   // Boot
   document.addEventListener('DOMContentLoaded', ()=>{
-    initNav();
-    bindConfig();
-    initAgendar();
-    initDelivery();
-    initTaxi();
-    initSW();
+    // Run each init inside try/catch so a failure in one doesn't stop others
+    [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW].forEach(fn=>{
+      try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
+    });
+    // Global error handler to help identificar erros em produção/local
+    window.addEventListener('error', (ev)=>{
+      try{ console.error('Unhandled error:', ev.error || ev.message || ev); }catch(e){}
+    });
   });
 })();
