@@ -1,19 +1,18 @@
 /* Focinhos Amados — Service Worker (cache-first para estáticos, network-first para HTML) */
-const SW_VERSION = 'fa-1.0.1';
+const SW_VERSION = 'fa-1.0.2';
 const STATIC_CACHE = `fa-static-${SW_VERSION}`;
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/assets/css/style.css',
-  '/assets/js/config.js',
-  '/assets/js/main.js',
-  '/assets/img/pwa-192.png',
-  '/assets/img/pwa-512.png',
-  '/assets/img/gallery-pet-1.webp',
-  '/assets/img/gallery-pet-2.webp',
-  '/assets/img/gallery-pet-4.webp',
-  '/assets/img/sprite.svg',
-  '/manifest.webmanifest'
+  'index.html',
+  'assets/css/style.css',
+  'assets/js/config.js',
+  'assets/js/main.js',
+  'assets/img/pwa-192.png',
+  'assets/img/pwa-512.png',
+  'assets/img/gallery-pet-1.webp',
+  'assets/img/gallery-pet-2.webp',
+  'assets/img/gallery-pet-4.webp',
+  'assets/img/sprite.svg',
+  'manifest.webmanifest'
 ];
 
 self.addEventListener('install', (e) => {
