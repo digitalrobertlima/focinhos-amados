@@ -710,10 +710,40 @@
     }
   }
 
+  // ===== Init cart menu (header/drawer) =====
+  function initCartMenu(){
+    // open modal showing current cart
+    function openCartModal(){
+      const cart = getCartFromStorage();
+      const modal = document.createElement('div');
+      modal.className = 'modal'; modal.style.position='fixed'; modal.style.left='0'; modal.style.top='0'; modal.style.right='0'; modal.style.bottom='0'; modal.style.background='rgba(0,0,0,0.5)'; modal.style.display='flex'; modal.style.alignItems='center'; modal.style.justifyContent='center';
+      const box = document.createElement('div'); box.style.background='#fff'; box.style.padding='16px'; box.style.maxWidth='520px'; box.style.width='95%'; box.style.maxHeight='80%'; box.style.overflow='auto';
+      box.innerHTML = `<h3>Seu carrinho</h3><div id="__cart-items"></div><div style="margin-top:12px;text-align:right"><button id="__cart-close" class="btn btn--ghost">Fechar</button></div>`;
+      modal.appendChild(box); document.body.appendChild(modal);
+      const node = box.querySelector('#__cart-items');
+      if(!cart || cart.length===0){ node.innerHTML = '<p>Seu carrinho está vazio.</p>'; }
+      else{
+        node.innerHTML = cart.map((it,idx)=> `<div style="display:flex;justify-content:space-between;margin:6px 0"><div><strong>${it.nome}</strong>${it.variacao? ' — '+it.variacao : ''}</div><div><span style="margin-right:8px">${it.qtd}x</span><button data-idx="${idx}" class="btn btn--ghost" data-act="rm">Remover</button></div></div>`).join('');
+        node.querySelectorAll('button[data-act="rm"]').forEach(btn=> btn.addEventListener('click', (e)=>{
+          const idx = +btn.dataset.idx; const c = getCartFromStorage(); c.splice(idx,1); saveCartToStorage(c); // update UI
+          btn.closest('div').remove();
+        }));
+      }
+      box.querySelector('#__cart-close').addEventListener('click', ()=>{ document.body.removeChild(modal); });
+    }
+
+    const top = byId('topbar-cart'); if(top) on(top,'click', openCartModal);
+    const drawer = byId('drawer-cart'); if(drawer) on(drawer,'click', (e)=>{ e.preventDefault(); openCartModal(); });
+    // also respond to cart change events to show small badge (optional)
+    window.addEventListener('focinhos:cart:changed', (ev)=>{
+      try{ const b = byId('topbar-cart'); if(b){ b.classList.add('has-cart'); setTimeout(()=>b.classList.remove('has-cart'), 800); } }catch(e){}
+    });
+  }
+
   // Boot
   document.addEventListener('DOMContentLoaded', ()=>{
     // Run each init inside try/catch so a failure in one doesn't stop others
-  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW].forEach(fn=>{
+  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW, initCartMenu].forEach(fn=>{
       try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
     });
   try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
