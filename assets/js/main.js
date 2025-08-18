@@ -189,7 +189,9 @@
 
   // ===== Init cart menu (header/drawer) =====
   function initCartMenu(){
-    let panel = null;
+  // only enable cart UI on delivery page
+  if(document.body.dataset.page !== 'delivery') return;
+  let panel = null;
 
     function buildTeamMessage(){
       const tpl = window.CONFIG?.waTemplates?.teamReply || '';
@@ -578,6 +580,43 @@
       return tidyMessage(raw);
     }
 
+    // When a reverse-geocode result is available, suggest confirmation and show a
+    // house-number input so the user can verify the detected street and add the
+    // residence number.
+    window.addEventListener('focinhos:geo:address:resolved', (ev)=>{
+      try{
+        const key = ev?.detail?.key || 'default';
+        const addr = ev?.detail?.address?.display || '';
+        if(!addr) return;
+        // Map key to a likely input id on Agendar form
+        const inputId = (key === 'default') ? 'origem' : key;
+        const inp = byId(inputId);
+        if(!inp) return;
+        // Insert a lightweight confirmation area if not present
+        const cid = `__geo-confirm-${inputId}`;
+        if(!byId(cid)){
+          const wrap = document.createElement('div'); wrap.id = cid; wrap.className = 'muted'; wrap.style.marginTop = '6px';
+          wrap.innerHTML = `<div>Detectamos esta rua: <strong>${String(addr).split(',').slice(0,3).join(', ')}</strong></div>
+            <div style="margin-top:6px"><button type="button" id="${cid}-confirm" class="btn btn--ghost">Confirmar rua</button> <button type="button" id="${cid}-edit" class="btn btn--ghost">Editar</button></div>`;
+          inp.parentNode.insertBefore(wrap, inp.nextSibling);
+          // handlers
+          on(byId(`${cid}-confirm`),'click', ()=>{
+            try{
+              // mark input as confirmed (for later validation) and create number field
+              inp.dataset.geoConfirmed = 'true';
+              const numId = `${inputId}-numero`;
+              if(!byId(numId)){
+                const num = document.createElement('input'); num.id = numId; num.className='input'; num.placeholder='Nº'; num.style.marginTop='6px'; num.inputMode='numeric'; inp.parentNode.insertBefore(num, wrap.nextSibling);
+              }
+              // visually indicate confirmation
+              wrap.innerHTML = `<div>Rua confirmada: <strong>${String(addr).split(',').slice(0,3).join(', ')}</strong></div>`;
+            }catch(e){ console.warn('confirm geo addr', e); }
+          });
+          on(byId(`${cid}-edit`),'click', ()=>{ try{ inp.focus(); inp.select(); }catch(e){} });
+        }
+      }catch(e){ console.warn('geo confirm handler', e); }
+    });
+
     function validar(){
   console.debug('[agendar] validar start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
       let ok = true;
@@ -643,6 +682,29 @@
       try{ btnWA.href = url; }catch(e){}
     });
 
+    // Add 'Adicionar delivery a este agendamento' button to summary actions
+    if(summaryActions && !byId('btn-add-delivery')){
+      const b = document.createElement('button');
+      b.type = 'button'; b.id = 'btn-add-delivery'; b.className = 'btn btn--primary'; b.textContent = '➕ Adicionar delivery a este agendamento';
+      b.addEventListener('click', ()=>{
+        try{
+          const geo = Geo.get('default');
+          const draft = {
+            itensLista: getServicosLista() || '',
+            recebedor: (f.tutorNome.value||'').trim(),
+            tel: (f.tutorTelefone.value||'').trim(),
+            endereco: (byId('origem')?.value||'').trim() || (geo && geo.address && geo.address.display) || '',
+            numero: (byId('origem-numero')?.value||'').trim() || '',
+            observacoes: (byId('observacoes')?.value||'').trim() || ''
+          };
+          localStorage.setItem('focinhos:delivery:draft', JSON.stringify(draft));
+          // navigate to delivery to finish flow
+          window.location.href = 'delivery.html';
+        }catch(e){ console.warn('add delivery from agendar failed', e); }
+      });
+      summaryActions.appendChild(b);
+    }
+
   try{ attachCopyButton(btnWA && btnWA.parentNode || document.body, 'btn-copy-msg-agendar', resumoTexto); }catch(e){ console.warn('attach copy (agendar) failed', e); }
 
     // Attach quick listeners to first pet fields to help debugging focus/changes
@@ -685,6 +747,21 @@
       preResumo: byId('delivery-resumo'), btnResumo: byId('btn-ver-resumo'), btnWA: byId('btn-wa')
     };
   let cart = getCartFromStorage();
+
+    // Prefill from agendar draft if present
+    try{
+      const raw = localStorage.getItem('focinhos:delivery:draft');
+      if(raw){ const draft = JSON.parse(raw); if(draft){
+        if(draft.endereco && !els.endereco.value) els.endereco.value = draft.endereco;
+        if(draft.numero && !byId('endereco-numero')){
+          const num = document.createElement('input'); num.id='endereco-numero'; num.className='input'; num.placeholder='Nº'; num.style.marginTop='6px'; num.inputMode='numeric'; els.endereco.parentNode.insertBefore(num, els.endereco.nextSibling);
+          if(draft.numero) num.value = draft.numero;
+        }
+        if(draft.recebedor && !els.recebedor.value) els.recebedor.value = draft.recebedor;
+        if(draft.tel && !els.tel.value) els.tel.value = draft.tel;
+        if(draft.observacoes && !els.obs.value) els.obs.value = draft.observacoes;
+      } }
+    }catch(e){ console.warn('prefill delivery draft failed', e); }
 
     function renderCart(){
       if(!els.carrinho) return;
@@ -756,7 +833,10 @@
       ok &= required(els.recebedor, 'Informe o nome do recebedor.');
       ok &= required(els.tel, 'Informe um telefone válido.');
       if(ok && !isTelBR(els.tel.value)){ setErr(els.tel,'Informe um telefone válido.'); ok=false; }
-      if(!Geo.get('default') && !(els.endereco.value||'').trim()){ setErr(els.endereco,'Informe o endereço ou compartilhe sua localização.'); ok=false; } else clearErr(els.endereco);
+  // require endereco and número if endereco provided and no precise geo
+  const numEl = byId('endereco-numero');
+  if(!Geo.get('default') && !(els.endereco.value||'').trim()){ setErr(els.endereco,'Informe o endereço ou compartilhe sua localização.'); ok=false; } else clearErr(els.endereco);
+  if((els.endereco.value||'').trim() && (!numEl || !(numEl.value||'').trim())){ if(numEl) setErr(numEl,'Informe o número da residência.'); else setErr(els.endereco,'Informe também o número da residência.'); ok=false; } else if(numEl){ clearErr(numEl); }
       return !!ok;
     }
 
