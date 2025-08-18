@@ -167,8 +167,9 @@
     const fieldOrigem = byId('field-origem');
     const fieldDestino = byId('field-destino');
 
-    // Controle de pets: cria um array de pets com base no DOM; suportar múltiplos pets dinâmicos
-    let petIndexCounter = petsContainer.querySelectorAll('.pet').length - 1;
+  // Controle de pets: cria um array de pets com base no DOM; suportar múltiplos pets dinâmicos
+  // Use a robust counter: start at current count so new pets get unique indexes
+  let petIndexCounter = (petsContainer && petsContainer.querySelectorAll('.pet')?.length) || 0;
     function readPetsFromDOM(){
       const pets = [];
       petsContainer.querySelectorAll('.pet').forEach((el, idx)=>{
@@ -199,15 +200,20 @@
 
     // Adicionar novo pet
     function addPet(){
-      petIndexCounter++;
-      const html = tplPet.innerHTML.replace(/__IDX__/g, String(petIndexCounter));
-      const frag = document.createRange().createContextualFragment(html);
-      petsContainer.appendChild(frag);
-      // scroll to new pet
-      const newPet = petsContainer.querySelector(`.pet[data-pet-index="${petIndexCounter}"]`);
-      if(newPet) newPet.scrollIntoView({behavior:'smooth', block:'center'});
+      try{
+        if(!tplPet){ console.warn('tpl-pet not found'); return; }
+        if(!petsContainer){ console.warn('pets container not found'); return; }
+        const idx = petIndexCounter++;
+        const html = tplPet.innerHTML.replace(/__IDX__/g, String(idx));
+        const frag = document.createRange().createContextualFragment(html);
+        petsContainer.appendChild(frag);
+        // scroll to new pet
+        const newPet = petsContainer.querySelector(`.pet[data-pet-index="${idx}"]`);
+        if(newPet) newPet.scrollIntoView({behavior:'smooth', block:'center'});
+        console.debug('[agendar] addPet -> added index', idx);
+      }catch(err){ console.error('[agendar] addPet error', err); }
     }
-    on(btnAddPet,'click', addPet);
+    if(btnAddPet){ on(btnAddPet,'click', addPet); } else { console.warn('[agendar] btn-add-pet not found'); }
 
     on(btnGeo,'click', ()=> Geo.start('default', badge));
     // Geo buttons for origem/destino
