@@ -187,84 +187,81 @@
     }
   }
 
-  // ===== Carrinho persistido (localStorage) =====
-  const CART_KEY = 'focinhos:cart';
-  function getCartFromStorage(){
-    try{ const raw = localStorage.getItem(CART_KEY); return raw? JSON.parse(raw): []; }catch(e){ return []; }
-  }
-  function saveCartToStorage(cart){
-    try{ localStorage.setItem(CART_KEY, JSON.stringify(cart||[])); }catch(e){ console.warn('saveCartToStorage failed', e); }
-  }
-  function addToCartItem(item){
-    try{
+  // ===== Init cart menu (header/drawer) =====
+  function initCartMenu(){
+    let panel = null;
+
+    function buildTeamMessage(){
+      const tpl = window.CONFIG?.waTemplates?.teamReply || '';
       const cart = getCartFromStorage();
-      // normalize item
-  // do NOT store or surface prices per product per Juliana's request
-  const it = { nome: item.nome || item, variacao: item.variacao || '', qtd: Number(item.qtd||1) || 1 };
-      // try merge by name+variacao
-      const found = cart.find(c=> c.nome === it.nome && c.variacao === it.variacao);
-      if(found){ found.qtd = (found.qtd||0) + it.qtd; } else { cart.push(it); }
-      saveCartToStorage(cart);
-      console.debug('[cart] added', it, 'cartLen', cart.length);
-      // show lightweight feedback
-      const t = byId('agendar-err'); if(t){ t.textContent = `Adicionado: ${it.nome}`; t.classList.add('ok'); setTimeout(()=>{ t.textContent=''; t.classList.remove('ok'); }, 2500); }
-      // notify other pages by dispatching storage event (for same-window listeners)
-      try{ window.dispatchEvent(new CustomEvent('focinhos:cart:changed', { detail: { cart } })); }catch(e){}
-      return cart;
-    }catch(e){ console.warn('addToCartItem failed', e); return null; }
-  }
-
-  // Central cart mutators with events and undo support
-  const _undoStack = [];
-  function setCart(cart){ try{ saveCartToStorage(cart); try{ window.dispatchEvent(new CustomEvent('focinhos:cart:changed', { detail:{ cart } })); }catch(e){} }catch(e){console.warn('setCart failed', e);} }
-  function updateCartQty(idx, qty){ try{ const cart = getCartFromStorage(); if(!cart[idx]) return; const prev = { ...cart[idx] }; cart[idx].qtd = Math.max(1, Number(qty) || 1); setCart(cart); console.debug('[cart] qty updated', idx, cart[idx]); return cart; }catch(e){ console.warn('updateCartQty failed', e); } }
-  function removeCartItem(idx){ try{ const cart = getCartFromStorage(); if(!cart[idx]) return null; const removed = cart.splice(idx,1)[0]; setCart(cart); console.debug('[cart] removed', removed); // push to undo
-    _undoStack.push({ action:'remove', item: removed, at: Date.now() }); showCartUndo(removed); return cart; }catch(e){ console.warn('removeCartItem failed', e); } }
-  function undoLast(){ try{ const last = _undoStack.pop(); if(!last) return; if(last.action==='remove'){ const cart = getCartFromStorage(); cart.splice(0,0,last.item); setCart(cart); console.debug('[cart] undo remove', last.item); } }catch(e){ console.warn('undo failed', e); } }
-  function showCartUndo(removed){ try{
-    // small snackbar with undo
-    const id = '__cart-undo-snackbar';
-    let node = document.getElementById(id);
-    if(node) node.remove();
-    node = document.createElement('div'); node.id = id; node.className = 'cart-snackbar'; node.innerHTML = `<div>Removido: <strong>${removed.nome}</strong></div><div><button id="__cart-undo-btn" class="btn btn--ghost">Desfazer</button></div>`;
-    document.body.appendChild(node);
-    const btn = document.getElementById('__cart-undo-btn'); if(btn) btn.addEventListener('click', ()=>{ undoLast(); node.remove(); });
-    // auto dismiss
-    setTimeout(()=>{ try{ node.remove(); }catch(e){} }, 4500);
-  }catch(e){}}
-
-  // Calculate totals: return counts only (no monetary values per Juliana's request)
-  function cartTotals(cart){ try{ cart = cart || getCartFromStorage(); const items = cart.length; const totalUnits = cart.reduce((s,it)=> s + (Number(it.qtd)||0), 0); return { items, totalUnits }; }catch(e){ return { items:0, totalUnits:0 }; } }
-
-  // Multi-tab sync: react to changes in localStorage
-  window.addEventListener('storage', (ev)=>{
-    try{
-      if(!ev.key) return;
-      if(ev.key.startsWith('focinhos:cart')){
-        // notify in-window listeners
-        try{ window.dispatchEvent(new CustomEvent('focinhos:cart:changed', { detail: { cart: getCartFromStorage() } })); }catch(e){}
-      }
-    }catch(e){ console.warn('storage event handling failed', e); }
-  });
-
-  // Link do WhatsApp com encode
-  function waLink(msg){
-    const phone = (window.CONFIG?.business?.phones?.whatsappE164) || '5531982339672';
-    return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-  }
-  window.waLink = waLink; // expõe globalmente conforme SPEC
-  // Dev helper: log quando em localhost para depuração rápida
-  try{
-    if(location && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')){
-      console.debug('[dev] waLink ready ->', waLink('teste-de-conexao'));
+      const items = cart.map(it=> `${it.qtd}x ${it.nome}${it.variacao? ' '+it.variacao : ''}`).join('\n');
+      const nome = (byId('recebedor')?.value|| byId('tutorNome')?.value || '').trim();
+      const telefone = (byId('tel')?.value|| byId('tutorTelefone')?.value || '').trim();
+      const observacoes = (byId('obs')?.value || byId('observacoes')?.value || '').trim();
+      const map = { itensLista: items, nome, telefone, observacoes };
+      return tidyMessage(interpolate(tpl, map));
     }
-  }catch(e){}
 
-  // ===== Navegação mobile =====
-  function initNav(){
-    const btn = $('.nav__btn');
-    const drawer = byId('drawer');
-    if(!btn || !drawer) return;
+    function createPanel(){
+      if(panel) return panel;
+      panel = document.createElement('aside');
+      panel.id = '__cart-panel'; panel.className = 'cart-panel';
+      panel.setAttribute('role','region'); panel.setAttribute('aria-label','Carrinho');
+      panel.innerHTML = `
+        <div class="cart-panel__head">
+          <strong>Seu carrinho</strong>
+          <div><button id="__cart-panel-close" class="btn btn--ghost" aria-label="Fechar carrinho">Fechar</button></div>
+        </div>
+        <div class="cart-panel__body" id="__cart-panel-body"></div>
+        <div class="cart-panel__footer">
+          <div class="cart-note">Detalhes e confirmações serão combinados via WhatsApp.</div>
+          <div>
+            <button id="__cart-panel-copy" class="btn btn--ghost">Copiar modelo</button>
+            <button id="__cart-panel-open" class="btn btn--primary">Abrir no WhatsApp</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(panel);
+      const closeBtn = byId('__cart-panel-close'); if(closeBtn) on(closeBtn,'click', ()=> panel.classList.remove('open'));
+      const copyBtn = byId('__cart-panel-copy'); const openBtn = byId('__cart-panel-open');
+      if(copyBtn) on(copyBtn,'click', async ()=>{ try{ await copyToClipboard(buildTeamMessage()); copyBtn.textContent='Copiado'; setTimeout(()=> copyBtn.textContent='Copiar modelo',1800); }catch(e){ copyBtn.textContent='Erro'; setTimeout(()=> copyBtn.textContent='Copiar modelo',1800); } });
+      if(openBtn) on(openBtn,'click', ()=>{ try{ const txt = buildTeamMessage(); window.open(waLink(txt), '_blank'); }catch(e){} });
+      return panel;
+    }
+
+    function renderPanel(){
+      const p = createPanel();
+      const body = byId('__cart-panel-body');
+      const cart = getCartFromStorage();
+      if(!body) return;
+      if(!cart || cart.length===0){ body.innerHTML = '<p>Seu carrinho está vazio.</p>'; return; }
+      body.innerHTML = cart.map((it,idx)=> `
+        <div class="cart-item" data-idx="${idx}">
+          <div class="cart-item__main"><strong>${it.nome}</strong>${it.variacao? ' — '+it.variacao : ''}</div>
+          <div class="cart-item__controls">
+            <button class="item__btn qty-dec" data-idx="${idx}" aria-label="Diminuir quantidade">−</button>
+            <input class="item__qty_input" data-idx="${idx}" type="number" min="1" value="${it.qtd}" aria-label="Quantidade" />
+            <button class="item__btn qty-inc" data-idx="${idx}" aria-label="Aumentar quantidade">＋</button>
+            <button class="item__btn item__remove" data-idx="${idx}" aria-label="Remover item">remover</button>
+          </div>
+        </div>
+      `).join('');
+      body.querySelectorAll('.qty-dec').forEach(b=> on(b,'click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = Math.max(1, (c[i].qtd||1)-1); updateCartQty(i,newQ); renderPanel(); }));
+      body.querySelectorAll('.qty-inc').forEach(b=> on(b,'click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = (c[i].qtd||1)+1; updateCartQty(i,newQ); renderPanel(); }));
+      body.querySelectorAll('.item__qty_input').forEach(inp=> on(inp,'change', ()=>{ const i = +inp.dataset.idx; const v = Math.max(1, Number(inp.value)||1); updateCartQty(i, v); renderPanel(); }));
+      body.querySelectorAll('.item__remove').forEach(b=> on(b,'click', ()=>{ const i = +b.dataset.idx; removeCartItem(i); renderPanel(); }));
+    }
+
+    function openPanel(){ const p = createPanel(); renderPanel(); p.classList.add('open'); try{ p.focus(); }catch(e){} }
+
+    const top = byId('topbar-cart'); if(top) on(top,'click', (e)=>{ e.preventDefault(); openPanel(); });
+    const drawerCart = byId('drawer-cart'); if(drawerCart) on(drawerCart,'click', (e)=>{ e.preventDefault(); openPanel(); });
+
+    function updateTopbarCount(){ try{ const b = byId('topbar-cart'); if(!b) return; const cart = getCartFromStorage(); const total = cart.reduce((s,it)=> s + (Number(it.qtd||1)||1), 0); if(total>0){ b.setAttribute('data-count', String(total)); } else { b.removeAttribute('data-count'); } }catch(e){}
+    }
+    updateTopbarCount();
+    window.addEventListener('focinhos:cart:changed', ()=>{ updateTopbarCount(); renderPanel(); });
+  }
     const close = ()=>{ btn.setAttribute('aria-expanded','false'); drawer.setAttribute('aria-hidden','true'); };
     const open = ()=>{ btn.setAttribute('aria-expanded','true'); drawer.setAttribute('aria-hidden','false'); };
     on(btn,'click', ()=>{
