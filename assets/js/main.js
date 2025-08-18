@@ -19,6 +19,44 @@
   const fmtAcc = (n)=> typeof n==='number' ? Math.round(n) : '';
   const text = (el, v)=>{ if(el) el.textContent = v; };
 
+  // ===== Cart storage & operations =====
+  function getCartFromStorage(){
+    try{ const raw = localStorage.getItem('focinhos:cart'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
+  }
+  function saveCartToStorage(cart){
+    try{ localStorage.setItem('focinhos:cart', JSON.stringify(cart||[])); }catch(e){}
+    try{ window.dispatchEvent(new CustomEvent('focinhos:cart:changed', { detail:{ cart } })); }catch(e){}
+  }
+  function updateCartQty(idx, newQty){
+    const cart = getCartFromStorage();
+    if(cart[idx]){ cart[idx].qtd = Math.max(1, newQty||1); saveCartToStorage(cart); }
+  }
+  function removeCartItem(idx){
+    const cart = getCartFromStorage();
+    if(idx >= 0 && idx < cart.length){ cart.splice(idx,1); saveCartToStorage(cart); }
+  }
+  // Calculate cart totals (items count and optional prices)
+  function cartTotals(cart){
+    if(!cart || !Array.isArray(cart)) return { count: 0 };
+    return { count: cart.reduce((s,it)=> s + (Number(it.qtd||1)||1), 0) };
+  }
+  function updateCartBadges(){
+    const els = $$('[data-cart-count]');
+    const cart = getCartFromStorage();
+    const totals = cartTotals(cart);
+    els.forEach(el=>{
+      if(totals.count > 0) el.setAttribute('data-cart-count', String(totals.count));
+      else el.removeAttribute('data-cart-count');
+    });
+  }
+  window.addEventListener('focinhos:cart:changed', updateCartBadges);
+  // Run once at startup to initialize badges
+  try{ updateCartBadges(); }catch(e){}
+  function waLink(text){
+    const waNum = window.CONFIG?.business?.phones?.whatsappE164 || '';
+    return `https://wa.me/${waNum}?text=${encodeURIComponent(text||'')}`;
+  }
+
   // Interpolação simples {chave}
   function interpolate(template, map){
     return template.replace(/\{(.*?)\}/g, (_,k)=> String(map[k] ?? '').trim());
@@ -270,11 +308,30 @@
     const btn = document.querySelector('.nav__btn');
     const drawer = byId('drawer');
     if(!btn || !drawer) return;
-    const close = ()=>{ btn.setAttribute('aria-expanded','false'); drawer.setAttribute('aria-hidden','true'); try{ btn.blur(); }catch(e){} };
-    const open = ()=>{ btn.setAttribute('aria-expanded','true'); drawer.setAttribute('aria-hidden','false'); try{ drawer.focus(); }catch(e){} };
-    on(btn,'click', ()=>{ const exp = btn.getAttribute('aria-expanded')==='true'; exp?close():open(); });
+    const close = ()=>{ 
+      drawer.classList.remove('open'); 
+      btn.setAttribute('aria-expanded','false'); 
+      drawer.setAttribute('aria-hidden','true'); 
+      try{ btn.blur(); }catch(e){} 
+    };
+    const open = ()=>{ 
+      drawer.classList.add('open');
+      btn.setAttribute('aria-expanded','true'); 
+      drawer.setAttribute('aria-hidden','false'); 
+      try{ drawer.focus(); }catch(e){} 
+    };
+    on(btn,'click', ()=>{ 
+      const isOpen = drawer.classList.contains('open');
+      if(isOpen) close(); else open();
+    });
     on(document,'keydown', (e)=>{ if(e.key==='Escape') close(); });
     $$('#drawer a').forEach(a=> on(a,'click', close));
+    // Close on click outside
+    document.addEventListener('click', (e)=>{
+      if(!drawer.contains(e.target) && !btn.contains(e.target) && drawer.classList.contains('open')){
+        close();
+      }
+    });
   }
 
   // ===== Bind de CONFIG em elementos =====
@@ -475,13 +532,23 @@
     }
   // Expose for tests / external triggers
   try{ window.addPet = addPet; }catch(e){}
-    // attach pointerdown to handle cases where browser autofill overlay steals the first click
-    let _lastAddPetAt = 0;
-    function invokeAddPetOnce(){ const t = Date.now(); if(t - _lastAddPetAt > 500){ _lastAddPetAt = t; addPet(); } }
+    // Improved button handler that works reliably
     if(btnAddPet){
-      on(btnAddPet,'pointerdown', (e)=>{ try{ invokeAddPetOnce(); }catch(e){ console.error(e); } });
-      on(btnAddPet,'click', addPet);
-    } else { console.warn('[agendar] btn-add-pet not found'); }
+      function handleAddPet(e){
+        e.preventDefault(); // Prevent double triggers
+        try{
+          addPet();
+          // Give feedback
+          btnAddPet.classList.add('clicked');
+          setTimeout(()=> btnAddPet.classList.remove('clicked'), 200);
+        }catch(err){ 
+          console.error('[agendar] add pet click failed', err);
+        }
+      }
+      btnAddPet.addEventListener('click', handleAddPet);
+    } else { 
+      console.warn('[agendar] btn-add-pet not found'); 
+    }
 
   // Cart upsell removed: 'Ver carrinho' button disabled to restore original menu layout.
   // If you later want to re-enable a cart upsell, reintroduce a lightweight control here.
