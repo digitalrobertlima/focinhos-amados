@@ -313,7 +313,12 @@
     }
 
     on(btnResumo,'click', ()=>{ preResumo.textContent = resumoTexto(); });
-    on(btnWA,'click', (e)=>{ if(!validar()){ e.preventDefault(); return; } btnWA.href = waLink(resumoTexto()); });
+    on(btnWA,'click', (e)=>{
+      e.preventDefault();
+      if(!validar()) return;
+      const link = waLink(resumoTexto());
+      try { window.open(link, '_blank', 'noopener'); } catch (err) { window.location.href = link; }
+    });
   }
 
   // ====== Fluxo: DELIVERY ======
@@ -395,7 +400,12 @@
     }
 
     on(els.btnResumo,'click', ()=> els.preResumo.textContent = resumoTexto());
-    on(els.btnWA,'click', (e)=>{ if(!validar()){ e.preventDefault(); return; } els.btnWA.href = waLink(resumoTexto()); });
+    on(els.btnWA,'click', (e)=>{
+      e.preventDefault();
+      if(!validar()) return;
+      const link = waLink(resumoTexto());
+      try { window.open(link, '_blank', 'noopener'); } catch (err) { window.location.href = link; }
+    });
   }
 
   // ====== Fluxo: TÁXI ======
@@ -467,7 +477,11 @@
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }
     on(R.btnResumo,'click', ()=> R.resumo.textContent = resumo());
-    on(R.btnWA,'click', (e)=>{ R.btnWA.href = waLink(resumo()); });
+    on(R.btnWA,'click', (e)=>{
+      e.preventDefault();
+      const link = waLink(resumo());
+      try { window.open(link, '_blank', 'noopener'); } catch (err) { window.location.href = link; }
+    });
   }
 
   // ===== SW Register =====
