@@ -187,8 +187,8 @@
     }
   }
 
-  // ===== Init cart menu (header/drawer) =====
-  function initCartMenu(){
+  // ===== Init cart panel (delivery) =====
+  function initCartPanel(){
   // only enable cart UI on delivery page
   if(document.body.dataset.page !== 'delivery') return;
   let panel = null;
@@ -262,14 +262,17 @@
     function updateTopbarCount(){ try{ const b = byId('topbar-cart'); if(!b) return; const cart = getCartFromStorage(); const total = cart.reduce((s,it)=> s + (Number(it.qtd||1)||1), 0); if(total>0){ b.setAttribute('data-count', String(total)); } else { b.removeAttribute('data-count'); } }catch(e){}
     }
     updateTopbarCount();
-    window.addEventListener('focinhos:cart:changed', ()=>{ updateTopbarCount(); renderPanel(); });
+  window.addEventListener('focinhos:cart:changed', ()=>{ updateTopbarCount(); renderPanel(); });
   }
-    const close = ()=>{ btn.setAttribute('aria-expanded','false'); drawer.setAttribute('aria-hidden','true'); };
-    const open = ()=>{ btn.setAttribute('aria-expanded','true'); drawer.setAttribute('aria-hidden','false'); };
-    on(btn,'click', ()=>{
-      const exp = btn.getAttribute('aria-expanded')==='true';
-      exp?close():open();
-    });
+
+  // ===== Init navigation (drawer) =====
+  function initNav(){
+    const btn = document.querySelector('.nav__btn');
+    const drawer = byId('drawer');
+    if(!btn || !drawer) return;
+    const close = ()=>{ btn.setAttribute('aria-expanded','false'); drawer.setAttribute('aria-hidden','true'); try{ btn.blur(); }catch(e){} };
+    const open = ()=>{ btn.setAttribute('aria-expanded','true'); drawer.setAttribute('aria-hidden','false'); try{ drawer.focus(); }catch(e){} };
+    on(btn,'click', ()=>{ const exp = btn.getAttribute('aria-expanded')==='true'; exp?close():open(); });
     on(document,'keydown', (e)=>{ if(e.key==='Escape') close(); });
     $$('#drawer a').forEach(a=> on(a,'click', close));
   }
@@ -948,8 +951,8 @@
     }
   }
 
-  // ===== Init cart menu (header/drawer) =====
-  function initCartMenu(){
+  // ===== Init cart modal (header) =====
+  function initCartModal(){
     // open modal showing current cart
     function openCartModal(){
       const cart = getCartFromStorage();
@@ -1036,7 +1039,7 @@
         if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }
       }catch(e){ console.warn('config.json fetch failed, using inline CONFIG if present', e); }
       // Run each init inside try/catch so a failure in one doesn't stop others
-      [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW].forEach(fn=>{
+  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initCartPanel, initCartModal, initSW].forEach(fn=>{
         try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
       });
       try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }

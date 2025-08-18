@@ -23,7 +23,7 @@ function serve() {
 }
 
 async function safeLaunch(){
-  try{ return await puppeteer.launch({args:['--no-sandbox','--disable-setuid-sandbox'], timeout:120000, protocolTimeout:120000}); }
+  try{ return await puppeteer.launch({args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu','--disable-dev-shm-usage'], timeout:600000, protocolTimeout:600000}); }
   catch(e){
     const possible = [
       'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -32,7 +32,7 @@ async function safeLaunch(){
     ];
     const found = possible.find(p=> fs.existsSync(p));
     if(!found) throw e;
-  return await puppeteer.launch({executablePath: found, args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu'], timeout:120000, protocolTimeout:120000});
+  return await puppeteer.launch({executablePath: found, args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu','--disable-dev-shm-usage'], timeout:600000, protocolTimeout:600000});
   }
 }
 
