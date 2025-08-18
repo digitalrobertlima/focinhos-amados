@@ -95,32 +95,79 @@ Valores personalizados serão confirmados pela equipe.
 {enderecoLoja}`,
 
     delivery:
-`📦 DELIVERY — FOCINHOS AMADOS (BH)
-📋 Itens: {itensLista}
-👤 Recebedor: {nome} • 📞 {telefone}
-📍 Endereço: {enderecoCompleto}
-🛰️ Geo: {lat},{lng} (precisão {accuracy}m @ {timestamp})
-📝 Observações: {observacoes}
-💰 Obs preço: valores personalizados serão confirmados pela equipe.`,
+`📦 *DELIVERY* — FOCINHOS AMADOS (BH)
+
+📋 *Itens*  
+{itensLista}
+
+👤 *Recebedor*  
+{nome} • 📞 {telefone}
+
+📍 *Endereço*  
+{enderecoCompleto}  
+Geo: {lat},{lng}  
+Precisão: {accuracy}m @ {timestamp}
+
+📝 *Observações*  
+{observacoes}
+
+💰 *Obs preço*  
+Valores personalizados serão confirmados pela equipe.
+
+🏪 *Loja física*
+{enderecoLoja}`,
 
     taxiBanho:
-`🚕 TÁXI DOG — BANHO/TOSA (BH)
-🚦 Modalidade: {modalidade}
-🐾 Pet: {petNome} • 👤 Tutor: {tutorNome} • 📞 {tutorTelefone}
-📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng}
-📍 Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng}
-⏰ Horário desejado: {horario}
-📝 Observações: {observacoes}
-💰 Obs preço: valores personalizados serão confirmados pela equipe.`,
+`🚕 *TÁXI DOG — BANHO/TOSA* (BH)
+
+🚦 *Modalidade*  
+{modalidade}
+
+🐾 *Pet*  
+{petNome}  
+
+👤 *Tutor*  
+{tutorNome} • 📞 {tutorTelefone}
+
+📍 *Origem*  
+{origemEndereco}  
+Geo: {origemLat},{origemLng}
+
+📍 *Destino*  
+{destinoEndereco}  
+Geo: {destinoLat},{destinoLng}
+
+⏰ *Horário desejado*  
+{horario}
+
+📝 *Observações*  
+{observacoes}
+
+💰 *Obs preço*  
+Valores personalizados serão confirmados pela equipe.`,
 
     taxiAgendado:
-`🚕 TÁXI DOG — AGENDADO (BH)
-📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng}
-📍 Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng}
-⏰ Horário desejado: {horario}
-👤 Contato: {tutorNome} • 📞 {tutorTelefone}
-📝 Observações: {observacoes}
-💰 Obs preço: valores personalizados serão confirmados pela equipe.`
+`🚕 *TÁXI DOG — AGENDADO* (BH)
+
+📍 *Origem*  
+{origemEndereco}  
+Geo: {origemLat},{origemLng}
+
+📍 *Destino*  
+{destinoEndereco}  
+Geo: {destinoLat},{destinoLng}
+
+⏰ *Horário desejado*  
+{horario}
+
+👤 *Contato*  
+{tutorNome} • 📞 {tutorTelefone}
+
+📝 *Observações*  
+{observacoes}
+
+💰 *Obs preço*  
+Valores personalizados serão confirmados pela equipe.`
   }
 };
 
