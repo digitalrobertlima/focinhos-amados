@@ -50,6 +50,7 @@ window.CONFIG = {
 
   waTemplates: {
     agendar:
+<<<<<<< HEAD
   `📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)
 
 🐾 *Pets*  
@@ -93,6 +94,20 @@ Valores personalizados serão confirmados pela equipe.
 
 🏪 *Loja física*  
 {enderecoLoja}`,
+=======
+  `📅 AGENDAMENTO — FOCINHOS AMADOS (BH)
+🐾 Pets: {petsLista}
+✂️ Serviços: {servicosLista}
+🌸 Preferências: Perfume={perfume}; Acessório={acessorio}; Escovação(espuma)={escovacao}
+⏰ Quando: {dataPreferida} • Janela: {janela}
+👤 Tutor: {tutorNome} • 📞 {tutorTelefone}
+🚕 Modalidade de localização: {modalidade}
+🏪 Loja (end): {enderecoLoja}
+📍 Origem: {origemEndereco} • Geo: {origemLat},{origemLng} (precisão {origemAccuracy}m @ {origemTimestamp})
+📍 Destino: {destinoEndereco} • Geo: {destinoLat},{destinoLng} (precisão {destinoAccuracy}m @ {destinoTimestamp})
+📝 Observações gerais: {observacoes}
+💰 Obs preço: valores personalizados serão confirmados pela equipe.`,
+>>>>>>> parent of 21295b5 (edit wa template agendamento)
 
     delivery:
 `📦 *DELIVERY* — FOCINHOS AMADOS (BH)
