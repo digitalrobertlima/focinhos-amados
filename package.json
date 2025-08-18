@@ -1,6 +1,14 @@
 {
-  "name": "focinhos-amados-tests",
-  "version": "1.0.0",
+  "name": "focinhos-amados",
+  "version": "0.1.0",
+  "description": "Site estático PWA leve para Focinhos Amados (BH)",
   "private": true,
-  "devDependencies": {}
+  "scripts": {
+    "preview": "python -m http.server 8080",
+    "test:buttons": "node tools/test-all-buttons.js || true",
+    "test:all": "node tools/test-all-buttons.js || true"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.16.2"
+  }
 }

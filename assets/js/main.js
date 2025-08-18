@@ -470,6 +470,8 @@
         console.debug('[agendar] addPet -> added index', idx, 'petsNow', petsContainer.querySelectorAll('.pet').length);
       }catch(err){ console.error('[agendar] addPet error', err); }
     }
+  // Expose for tests / external triggers
+  try{ window.addPet = addPet; }catch(e){}
     // attach pointerdown to handle cases where browser autofill overlay steals the first click
     let _lastAddPetAt = 0;
     function invokeAddPetOnce(){ const t = Date.now(); if(t - _lastAddPetAt > 500){ _lastAddPetAt = t; addPet(); } }
@@ -635,7 +637,7 @@
       return !!ok;
     }
 
-    on(btnResumo,'click', ()=>{ console.debug('[agendar] btn-ver-resumo clicked'); if(preResumo) preResumo.textContent = resumoTexto(); });
+  on(btnResumo,'click', ()=>{ console.debug('[agendar] btn-ver-resumo clicked'); try{ if(preResumo) preResumo.textContent = resumoTexto(); }catch(e){ console.warn('resumoTexto failed', e); if(preResumo) preResumo.textContent = 'Resumo indisponível no momento.'; } });
     on(btnWA,'click', (e)=>{
       console.debug('[agendar] btn-wa clicked', { focused: document.activeElement && (document.activeElement.id || document.activeElement.tagName) });
       e.preventDefault();

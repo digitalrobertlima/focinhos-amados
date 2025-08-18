@@ -45,9 +45,33 @@
 
     <section class="card">
       <h2 class="card__title">🛒 Produtos</h2>
-      <p class="muted">Seção disponível em breve.</p>
-      <p>Enquanto isso, solicitar manualmente.</p>
-      <!-- product builder disabled for v0.1 beta -->
+      <p class="muted">Você pode adicionar manualmente produtos para facilitar o pedido via WhatsApp.</p>
+
+      <!-- Minimal product builder (keeps v0.1 beta simple but testable) -->
+      <div class="product-builder">
+        <div class="grid grid--3">
+          <div class="field">
+            <label for="produto">Produto</label>
+            <input id="produto" list="lista-produtos" class="input" autocomplete="off">
+            <datalist id="lista-produtos"></datalist>
+          </div>
+          <div class="field">
+            <label for="variacao">Variação (opcional)</label>
+            <input id="variacao" class="input">
+          </div>
+          <div class="field">
+            <label for="qtd">Quantidade</label>
+            <input id="qtd" class="input" type="number" min="1" value="1">
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <button id="btn-add-prod" class="btn btn--ghost" type="button">Adicionar ao carrinho</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <ul id="carrinho" class="cart-list" aria-live="polite"></ul>
+        </div>
+      </div>
     </section>
 
     <section class="card">
