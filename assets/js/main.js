@@ -529,7 +529,10 @@
   function initSW(){
     if('serviceWorker' in navigator){
       window.addEventListener('load', ()=>{
-  navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch((err)=>{ console.warn('ServiceWorker register failed:', err); });
+  // register service worker using relative path so it works on GitHub Pages and subpaths
+  try{
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((err)=>{ console.warn('ServiceWorker register failed:', err); });
+  }catch(err){ console.warn('ServiceWorker register throw:', err); }
       });
     }
   }

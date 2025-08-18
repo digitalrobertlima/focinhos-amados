@@ -2,24 +2,35 @@
 const SW_VERSION = 'fa-1.0.1';
 const STATIC_CACHE = `fa-static-${SW_VERSION}`;
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/assets/css/style.css',
-  '/assets/js/config.js',
-  '/assets/js/main.js',
-  '/assets/img/pwa-192.png',
-  '/assets/img/pwa-512.png',
-  '/assets/img/gallery-pet-1.webp',
-  '/assets/img/gallery-pet-2.webp',
-  '/assets/img/gallery-pet-4.webp',
-  '/assets/img/sprite.svg',
-  '/manifest.webmanifest'
+  './',
+  './index.html',
+  './assets/css/style.css',
+  './assets/js/config.js',
+  './assets/js/main.js',
+  './assets/img/pwa-192.png',
+  './assets/img/pwa-512.png',
+  './assets/img/gallery-pet-1.webp',
+  './assets/img/gallery-pet-2.webp',
+  './assets/img/gallery-pet-4.webp',
+  './assets/img/sprite.svg',
+  './manifest.webmanifest'
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const cache = await caches.open(STATIC_CACHE);
-    await cache.addAll(STATIC_ASSETS);
+    // Resolve assets relative to SW scope
+    const base = self.registration.scope || '/';
+    const resolved = STATIC_ASSETS.map(p=> new URL(p, base).href);
+    const results = await Promise.allSettled(resolved.map(u=> fetch(u, {cache: 'no-store'})));
+    // put successful responses into cache and log failures
+    await Promise.all(results.map(async (r, i)=>{
+      if(r.status === 'fulfilled' && r.value && r.value.ok){
+        try{ await cache.put(resolved[i], r.value.clone()); }catch(e){ console.warn('cache.put failed', resolved[i], e); }
+      } else {
+        console.warn('SW asset fetch failed:', resolved[i], r.reason || (r.value && r.value.status));
+      }
+    }));
     await self.skipWaiting();
   })());
 });
