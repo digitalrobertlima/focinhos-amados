@@ -31,11 +31,10 @@
           <li role="none"><a role="menuitem" href="delivery.html" aria-current="page">Delivery</a></li>
           <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
           <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
-          <li role="none"><a role="menuitem" id="drawer-cart" href="#">Carrinho</a></li>
         </ul>
       </nav>
       <div class="topbar__actions">
-        <button id="topbar-cart" class="btn btn--ghost" aria-label="Abrir carrinho" title="Carrinho"> <svg class="icon"><use href="#i-cart"></use></svg> </button>
+  <!-- cart removed per UX decision -->
       </div>
     </div>
   </header>
@@ -46,25 +45,9 @@
 
     <section class="card">
       <h2 class="card__title">🛒 Produtos</h2>
-      <div class="grid grid--3">
-        <div class="field">
-          <label for="produto">Produto</label>
-          <input id="produto" list="lista-produtos" class="input" placeholder="Ex.: GOLDEN GATOS CASTRADOS 1kg">
-          <datalist id="lista-produtos"></datalist>
-        </div>
-        <div class="field">
-          <label for="variacao">Variação</label>
-          <input id="variacao" class="input" placeholder="Ex.: Frango, 1kg">
-        </div>
-        <div class="field">
-          <label for="qtd">Quantidade</label>
-          <input id="qtd" type="number" min="1" step="1" value="1" class="input">
-        </div>
-      </div>
-      <div class="actions">
-        <button id="btn-add-prod" class="btn btn--primary" type="button">➕ Adicionar produtos</button>
-      </div>
-      <ul id="carrinho" class="list list--items"></ul>
+      <p class="muted">Seção disponível em breve.</p>
+      <p>Enquanto isso, solicitar manualmente.</p>
+      <!-- product builder disabled for v0.1 beta -->
     </section>
 
     <section class="card">

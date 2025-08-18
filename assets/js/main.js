@@ -478,32 +478,8 @@
       on(btnAddPet,'click', addPet);
     } else { console.warn('[agendar] btn-add-pet not found'); }
 
-    // Add "Ver carrinho" button near summary to encourage upsell
-    const summaryActions = document.querySelector('.card--summary .actions');
-    if(summaryActions && !byId('btn-view-cart')){
-      const b = document.createElement('button');
-      b.type = 'button'; b.id = 'btn-view-cart'; b.className = 'btn btn--ghost'; b.textContent = '🛒 Ver carrinho';
-      b.addEventListener('click', ()=>{
-        // build modal content from suggestions
-        const products = window.CONFIG?.suggestions?.products || [];
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.style.position='fixed'; modal.style.left='0'; modal.style.top='0'; modal.style.right='0'; modal.style.bottom='0'; modal.style.background='rgba(0,0,0,0.5)'; modal.style.display='flex'; modal.style.alignItems='center'; modal.style.justifyContent='center';
-        const box = document.createElement('div'); box.style.background='#fff'; box.style.padding='16px'; box.style.maxWidth='420px'; box.style.width='90%'; box.style.maxHeight='80%'; box.style.overflow='auto';
-  box.innerHTML = `<h3>Produtos sugeridos</h3><div id="__cart-suggest-list"></div><div style="margin-top:12px;text-align:right"><button id="__cart-close" class="btn btn--ghost" aria-label="Fechar" title="Fechar">Fechar</button></div>`;
-        modal.appendChild(box);
-        document.body.appendChild(modal);
-        const list = box.querySelector('#__cart-suggest-list');
-        products.forEach(p=>{
-          const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.margin='6px 0';
-          const name = document.createElement('div'); name.textContent = p;
-          const add = document.createElement('button'); add.className='btn btn--primary'; add.textContent='Adicionar'; add.addEventListener('click', ()=>{ addToCartItem({ nome:p, qtd:1 }); });
-          row.appendChild(name); row.appendChild(add); list.appendChild(row);
-        });
-        box.querySelector('#__cart-close').addEventListener('click', ()=>{ document.body.removeChild(modal); });
-      });
-      summaryActions.insertBefore(b, summaryActions.firstChild);
-    }
+  // Cart upsell removed: 'Ver carrinho' button disabled to restore original menu layout.
+  // If you later want to re-enable a cart upsell, reintroduce a lightweight control here.
 
     on(btnGeo,'click', ()=> Geo.start('default', badge));
     // Geo buttons for origem/destino
@@ -1058,7 +1034,7 @@
         if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }
       }catch(e){ console.warn('config.json fetch failed, using inline CONFIG if present', e); }
       // Run each init inside try/catch so a failure in one doesn't stop others
-      [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW, initCartMenu].forEach(fn=>{
+      [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW].forEach(fn=>{
         try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
       });
       try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
