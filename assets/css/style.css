@@ -104,6 +104,27 @@ a:hover{text-decoration:underline}
 .toast.error{background:var(--danger-050);border-color:var(--danger);color:var(--danger-700)}
 .notice{padding:10px;border-radius:12px;background:var(--brand-100);border:1px solid var(--brand)}
 
+/* Cart note (visible in delivery list and cart modal). Prominent, accessible, non-monetary messaging */
+.cart-note{
+  display:block;
+  padding:10px 12px;
+  margin:6px 0 0 0;
+  border-radius:10px;
+  background:linear-gradient(180deg, #ffffff, #fbfff9);
+  border:1px solid rgba(2,153,53,0.08);
+  color:var(--text);
+  font-weight:600;
+  font-size:14px;
+}
+.cart-note[role="status"], .cart-note[aria-live]{outline-offset:2px}
+
+/* Slightly stronger snackbar for undo action to improve contrast and readability */
+.cart-snackbar{background:#222;color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 12px 36px rgba(0,0,0,.45)}
+.cart-snackbar .btn{background:transparent;border:1px solid rgba(255,255,255,.18);color:#fff;padding:6px 8px;border-radius:8px}
+
+/* Hide any accidental hero price blocks to avoid showing prices on hero banners */
+.hero__price{display:none !important}
+
 .list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .list--items li{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);padding:10px;border-radius:12px;background:#fff}
 .item__qty{display:inline-flex;align-items:center;gap:6px}
@@ -130,6 +151,33 @@ a:hover{text-decoration:underline}
 .modal > div{background:#fff;padding:16px;border-radius:12px;max-width:520px;width:92%;max-height:86%;overflow:auto;box-shadow:var(--shadow-md)}
 .modal h3{margin:0 0 8px}
 .modal button{cursor:pointer}
+
+/* Icon inside buttons (consistent small icon) */
+.btn .icon{width:18px;height:18px;display:inline-block;vertical-align:middle}
+.btn--ghost[aria-label], .btn--primary[aria-label]{position:relative}
+
+/* Copy button specific tweaks */
+#btn-copy-msg-agendar, #__delivery-copy-msg, #__taxi-copy-msg{padding:8px 10px;font-size:14px}
+#btn-copy-msg-agendar[title], #__delivery-copy-msg[title], #__taxi-copy-msg[title]{cursor:pointer}
+
+/* Cart controls inside modal/delivery list */
+.cart-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--border)}
+.cart-item__controls{display:flex;align-items:center;gap:8px}
+.item__qty_input,.modal-qty{width:56px;padding:6px;border:1px solid var(--border);border-radius:8px;text-align:center}
+.qty-inc,.qty-dec{border:1px solid var(--border);background:#fff;border-radius:8px;width:32px;height:32px;display:grid;place-items:center}
+
+/* Snackbar undo */
+.cart-snackbar{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#111;color:#fff;padding:12px 16px;border-radius:8px;display:flex;gap:12px;align-items:center;z-index:1600;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.cart-snackbar .btn{background:transparent;border:1px solid rgba(255,255,255,.14);color:#fff}
+
+/* snackbar animation */
+.cart-snackbar{animation:snk-in .18s ease-out}
+@keyframes snk-in{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* subtotal styling */
+.cart-item__main strong{display:block}
+.cart-item__main{font-size:14px;color:var(--text)}
+.cart-item__main small{color:var(--muted)}
 
 /* Mobile: make drawer full width for easier touch targets */
 @media(max-width:600px){

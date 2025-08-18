@@ -41,6 +41,42 @@
     return lines.join('\n').replace(/\n{2,}/g,'\n\n').trim();
   }
 
+  // ===== Utilities: clipboard copy + attach copy button =====
+  function copyToClipboard(text){
+    if(!text) return Promise.resolve();
+    if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(String(text));
+    return new Promise((resolve, reject)=>{
+      try{
+        const ta = document.createElement('textarea'); ta.value = String(text); ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta); ta.select();
+        const ok = document.execCommand && document.execCommand('copy');
+        document.body.removeChild(ta);
+        if(ok) return resolve();
+        return reject(new Error('copy-failed'));
+      }catch(err){ try{ document.body.removeChild(ta); }catch(e){}; reject(err); }
+    });
+  }
+
+  function attachCopyButton(parentEl, id, textProvider, label = 'Copiar mensagem'){
+    try{
+      if(!parentEl) return null;
+      if(byId(id)) return byId(id);
+  const btn = document.createElement('button'); btn.type='button'; btn.id = id; btn.className = 'btn btn--ghost'; btn.textContent = label;
+  btn.setAttribute('aria-label', label);
+  btn.title = label;
+      // insert after the primary action if present
+      const ref = parentEl.querySelector('button, a');
+      if(ref && ref.parentNode === parentEl) parentEl.insertBefore(btn, ref.nextSibling); else parentEl.appendChild(btn);
+      btn.addEventListener('click', async ()=>{
+        try{
+          const txt = (typeof textProvider === 'function') ? textProvider() : textProvider;
+          await copyToClipboard(txt);
+          const prev = btn.textContent; btn.textContent = 'Copiado'; setTimeout(()=> btn.textContent = prev, 1800);
+        }catch(e){ console.warn('copy failed', e); const prev = btn.textContent; btn.textContent = 'Erro'; setTimeout(()=> btn.textContent = prev, 1800); }
+      });
+      return btn;
+    }catch(e){ console.warn('attachCopyButton failed', e); return null; }
+  }
+
   // ===== Reverse geocoding (resolve coords -> human address) =====
   // Uses OpenStreetMap Nominatim public endpoint with a small local cache to avoid repeated requests.
   function addrCacheKey(lat, lng){ return `focinhos:addr:${Number(lat).toFixed(6)},${Number(lng).toFixed(6)}`; }
@@ -163,7 +199,8 @@
     try{
       const cart = getCartFromStorage();
       // normalize item
-      const it = { nome: item.nome || item, variacao: item.variacao || '', qtd: Number(item.qtd||1) || 1 };
+  // do NOT store or surface prices per product per Juliana's request
+  const it = { nome: item.nome || item, variacao: item.variacao || '', qtd: Number(item.qtd||1) || 1 };
       // try merge by name+variacao
       const found = cart.find(c=> c.nome === it.nome && c.variacao === it.variacao);
       if(found){ found.qtd = (found.qtd||0) + it.qtd; } else { cart.push(it); }
@@ -176,6 +213,39 @@
       return cart;
     }catch(e){ console.warn('addToCartItem failed', e); return null; }
   }
+
+  // Central cart mutators with events and undo support
+  const _undoStack = [];
+  function setCart(cart){ try{ saveCartToStorage(cart); try{ window.dispatchEvent(new CustomEvent('focinhos:cart:changed', { detail:{ cart } })); }catch(e){} }catch(e){console.warn('setCart failed', e);} }
+  function updateCartQty(idx, qty){ try{ const cart = getCartFromStorage(); if(!cart[idx]) return; const prev = { ...cart[idx] }; cart[idx].qtd = Math.max(1, Number(qty) || 1); setCart(cart); console.debug('[cart] qty updated', idx, cart[idx]); return cart; }catch(e){ console.warn('updateCartQty failed', e); } }
+  function removeCartItem(idx){ try{ const cart = getCartFromStorage(); if(!cart[idx]) return null; const removed = cart.splice(idx,1)[0]; setCart(cart); console.debug('[cart] removed', removed); // push to undo
+    _undoStack.push({ action:'remove', item: removed, at: Date.now() }); showCartUndo(removed); return cart; }catch(e){ console.warn('removeCartItem failed', e); } }
+  function undoLast(){ try{ const last = _undoStack.pop(); if(!last) return; if(last.action==='remove'){ const cart = getCartFromStorage(); cart.splice(0,0,last.item); setCart(cart); console.debug('[cart] undo remove', last.item); } }catch(e){ console.warn('undo failed', e); } }
+  function showCartUndo(removed){ try{
+    // small snackbar with undo
+    const id = '__cart-undo-snackbar';
+    let node = document.getElementById(id);
+    if(node) node.remove();
+    node = document.createElement('div'); node.id = id; node.className = 'cart-snackbar'; node.innerHTML = `<div>Removido: <strong>${removed.nome}</strong></div><div><button id="__cart-undo-btn" class="btn btn--ghost">Desfazer</button></div>`;
+    document.body.appendChild(node);
+    const btn = document.getElementById('__cart-undo-btn'); if(btn) btn.addEventListener('click', ()=>{ undoLast(); node.remove(); });
+    // auto dismiss
+    setTimeout(()=>{ try{ node.remove(); }catch(e){} }, 4500);
+  }catch(e){}}
+
+  // Calculate totals: return counts only (no monetary values per Juliana's request)
+  function cartTotals(cart){ try{ cart = cart || getCartFromStorage(); const items = cart.length; const totalUnits = cart.reduce((s,it)=> s + (Number(it.qtd)||0), 0); return { items, totalUnits }; }catch(e){ return { items:0, totalUnits:0 }; } }
+
+  // Multi-tab sync: react to changes in localStorage
+  window.addEventListener('storage', (ev)=>{
+    try{
+      if(!ev.key) return;
+      if(ev.key.startsWith('focinhos:cart')){
+        // notify in-window listeners
+        try{ window.dispatchEvent(new CustomEvent('focinhos:cart:changed', { detail: { cart: getCartFromStorage() } })); }catch(e){}
+      }
+    }catch(e){ console.warn('storage event handling failed', e); }
+  });
 
   // Link do WhatsApp com encode
   function waLink(msg){
@@ -421,7 +491,7 @@
         modal.className = 'modal';
         modal.style.position='fixed'; modal.style.left='0'; modal.style.top='0'; modal.style.right='0'; modal.style.bottom='0'; modal.style.background='rgba(0,0,0,0.5)'; modal.style.display='flex'; modal.style.alignItems='center'; modal.style.justifyContent='center';
         const box = document.createElement('div'); box.style.background='#fff'; box.style.padding='16px'; box.style.maxWidth='420px'; box.style.width='90%'; box.style.maxHeight='80%'; box.style.overflow='auto';
-        box.innerHTML = `<h3>Produtos sugeridos</h3><div id="__cart-suggest-list"></div><div style="margin-top:12px;text-align:right"><button id="__cart-close" class="btn btn--ghost">Fechar</button></div>`;
+  box.innerHTML = `<h3>Produtos sugeridos</h3><div id="__cart-suggest-list"></div><div style="margin-top:12px;text-align:right"><button id="__cart-close" class="btn btn--ghost" aria-label="Fechar" title="Fechar">Fechar</button></div>`;
         modal.appendChild(box);
         document.body.appendChild(modal);
         const list = box.querySelector('#__cart-suggest-list');
@@ -576,6 +646,8 @@
       try{ btnWA.href = url; }catch(e){}
     });
 
+  try{ attachCopyButton(btnWA && btnWA.parentNode || document.body, 'btn-copy-msg-agendar', resumoTexto); }catch(e){ console.warn('attach copy (agendar) failed', e); }
+
     // Attach quick listeners to first pet fields to help debugging focus/changes
     ['petNome','especie','porte'].forEach(id=>{
       const el = byId(id);
@@ -619,17 +691,22 @@
 
     function renderCart(){
       if(!els.carrinho) return;
-      els.carrinho.innerHTML = cart.map((it,idx)=>
-        `<li>
-          <div><strong>${it.nome}</strong>${it.variacao? ` — ${it.variacao}`:''}</div>
-          <div class="item__qty">
-            <button class="item__btn" data-act="dec" data-idx="${idx}">−</button>
-            <span>${it.qtd}</span>
-            <button class="item__btn" data-act="inc" data-idx="${idx}">＋</button>
-            <button class="item__btn item__remove" data-act="rm" data-idx="${idx}">remover</button>
-          </div>
-        </li>`
-      ).join('');
+      // render items without showing prices
+      els.carrinho.innerHTML = cart.map((it,idx)=>{
+        return (`<li class="cart-item" data-idx="${idx}"><div class="cart-item__main"><strong>${it.nome}</strong>${it.variacao? ` — ${it.variacao}`:''}</div><div class="cart-item__controls"><button class="item__btn qty-dec" data-act="dec" data-idx="${idx}" aria-label="Diminuir quantidade">−</button><input class="item__qty_input" type="number" min="1" value="${it.qtd}" data-idx="${idx}" aria-label="Quantidade" /><button class="item__btn qty-inc" data-act="inc" data-idx="${idx}" aria-label="Aumentar quantidade">＋</button><button class="item__btn item__remove" data-idx="${idx}" aria-label="Remover item">remover</button></div></li>`);
+      }).join('');
+      // show notice about prices being provided via WhatsApp at checkout
+      try{
+        let note = document.getElementById('__delivery-price-note');
+  if(!note){ note = document.createElement('div'); note.id = '__delivery-price-note'; note.style.marginTop='8px'; note.className='cart-note'; note.textContent = 'Detalhes e confirmações serão combinados via WhatsApp.'; els.carrinho.parentNode.insertBefore(note, els.carrinho.nextSibling); }
+      }catch(e){}
+
+      // attach listeners
+      // attach listeners
+      els.carrinho.querySelectorAll('.qty-dec').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const cart = getCartFromStorage(); const newQ = Math.max(1, (cart[i].qtd||1) - 1); updateCartQty(i,newQ); cart = getCartFromStorage(); renderCart(); }));
+      els.carrinho.querySelectorAll('.qty-inc').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const cart = getCartFromStorage(); const newQ = (cart[i].qtd||1) + 1; updateCartQty(i,newQ); renderCart(); }));
+      els.carrinho.querySelectorAll('.item__qty_input').forEach(inp=> inp.addEventListener('change', (e)=>{ const i = +inp.dataset.idx; const v = Math.max(1, Number(inp.value)||1); if(v<1){ inp.value = 1; } updateCartQty(i, v); renderCart(); }));
+      els.carrinho.querySelectorAll('.item__remove').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; removeCartItem(i); renderCart(); }));
     }
 
     function listagem(){
@@ -695,6 +772,10 @@
       window.open(url, '_blank');
       try{ els.btnWA.href = url; }catch(e){}
     });
+
+  try{ attachCopyButton(els.btnWA && els.btnWA.parentNode || document.body, '__delivery-copy-msg', resumoTexto); }catch(e){ console.warn('attach copy (delivery) failed', e); }
+  // react to external cart changes
+  window.addEventListener('focinhos:cart:changed', ()=>{ cart = getCartFromStorage(); renderCart(); });
   }
 
   // ====== Fluxo: TÁXI ======
@@ -773,6 +854,8 @@
       window.open(url, '_blank');
       try{ R.btnWA.href = url; }catch(e){}
     });
+
+  try{ attachCopyButton(R.btnWA && R.btnWA.parentNode || document.body, '__taxi-copy-msg', resumo); }catch(e){ console.warn('attach copy (taxi) failed', e); }
   }
 
   // ===== SW Register =====
@@ -781,7 +864,30 @@
       window.addEventListener('load', ()=>{
   // register service worker using relative path so it works on GitHub Pages and subpaths
   try{
-    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((err)=>{ console.warn('ServiceWorker register failed:', err); });
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).then(reg=>{
+      // Poll for updates periodically (every 5 minutes) so deployed changes are noticed
+      try{ setInterval(()=>{ try{ reg.update(); }catch(e){} }, 1000 * 60 * 5); }catch(e){}
+
+      // If there's a waiting worker already, ask it to skipWaiting
+      try{
+        if(reg.waiting){ reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
+      }catch(e){}
+
+      // When a new SW is found, listen for state changes and attempt to activate it immediately
+      reg.addEventListener && reg.addEventListener('updatefound', ()=>{
+        const inst = reg.installing;
+        if(!inst) return;
+        inst.addEventListener('statechange', ()=>{
+          try{
+            if(inst.state === 'installed' && navigator.serviceWorker.controller){
+              // try to activate immediately
+              try{ reg.waiting && reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }catch(e){}
+              // show a gentle prompt could be implemented here instead of forcing reload
+            }
+          }catch(e){ console.warn('sw statechange handler failed', e); }
+        });
+      });
+    }).catch((err)=>{ console.warn('ServiceWorker register failed:', err); });
   }catch(err){ console.warn('ServiceWorker register throw:', err); }
       });
     }
@@ -794,19 +900,64 @@
       const cart = getCartFromStorage();
       const modal = document.createElement('div');
       modal.className = 'modal'; modal.style.position='fixed'; modal.style.left='0'; modal.style.top='0'; modal.style.right='0'; modal.style.bottom='0'; modal.style.background='rgba(0,0,0,0.5)'; modal.style.display='flex'; modal.style.alignItems='center'; modal.style.justifyContent='center';
-      const box = document.createElement('div'); box.style.background='#fff'; box.style.padding='16px'; box.style.maxWidth='520px'; box.style.width='95%'; box.style.maxHeight='80%'; box.style.overflow='auto';
-      box.innerHTML = `<h3>Seu carrinho</h3><div id="__cart-items"></div><div style="margin-top:12px;text-align:right"><button id="__cart-close" class="btn btn--ghost">Fechar</button></div>`;
+  const box = document.createElement('div'); box.style.background='#fff'; box.style.padding='16px'; box.style.maxWidth='520px'; box.style.width='95%'; box.style.maxHeight='80%'; box.style.overflow='auto';
+  // accessibility: mark as dialog and focusable
+  box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true'); box.tabIndex = -1;
+  const totals = cartTotals(cart);
+  box.innerHTML = `<h3 id="__cart-title">Seu carrinho</h3><div id="__cart-items"></div><div style="margin-top:12px" class="cart-note">Detalhes e confirmações serão combinados via WhatsApp.</div><div style="margin-top:12px;text-align:right"><button id="__cart-close" class="btn btn--ghost" aria-label="Fechar" title="Fechar">Fechar</button></div>`;
+  box.setAttribute('aria-labelledby','__cart-title');
       modal.appendChild(box); document.body.appendChild(modal);
+  // focus trap rudimentar
+  const focusable = box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  const firstFocusable = focusable[0]; const lastFocusable = focusable[focusable.length-1];
+  function trap(e){ if(e.key === 'Tab'){ if(e.shiftKey && document.activeElement === firstFocusable){ e.preventDefault(); lastFocusable.focus(); } else if(!e.shiftKey && document.activeElement === lastFocusable){ e.preventDefault(); firstFocusable.focus(); } } if(e.key==='Escape'){ closeModal(); } }
+  function closeModal(){ try{ window.removeEventListener('keydown', trap); document.body.removeChild(modal); opener?.focus(); }catch(e){} }
+  const opener = document.activeElement;
       const node = box.querySelector('#__cart-items');
       if(!cart || cart.length===0){ node.innerHTML = '<p>Seu carrinho está vazio.</p>'; }
       else{
-        node.innerHTML = cart.map((it,idx)=> `<div style="display:flex;justify-content:space-between;margin:6px 0"><div><strong>${it.nome}</strong>${it.variacao? ' — '+it.variacao : ''}</div><div><span style="margin-right:8px">${it.qtd}x</span><button data-idx="${idx}" class="btn btn--ghost" data-act="rm">Remover</button></div></div>`).join('');
-        node.querySelectorAll('button[data-act="rm"]').forEach(btn=> btn.addEventListener('click', (e)=>{
-          const idx = +btn.dataset.idx; const c = getCartFromStorage(); c.splice(idx,1); saveCartToStorage(c); // update UI
-          btn.closest('div').remove();
-        }));
+  node.innerHTML = cart.map((it,idx)=> `<div class="modal-cart-row" data-idx="${idx}" style="display:flex;justify-content:space-between;margin:6px 0"><div><strong>${it.nome}</strong>${it.variacao? ' — '+it.variacao : ''}</div><div><button class="btn qty-dec" data-act="dec" data-idx="${idx}">−</button><input class="modal-qty" data-idx="${idx}" type="number" min="1" value="${it.qtd}" style="width:56px;text-align:center;margin:0 6px" /><button class="btn qty-inc" data-act="inc" data-idx="${idx}">＋</button><button data-idx="${idx}" class="btn btn--ghost modal-remove" data-act="rm">Remover</button></div></div>`).join('');
+  // attach handlers
+  node.querySelectorAll('.qty-dec').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = Math.max(1, (c[i].qtd||1)-1); updateCartQty(i,newQ); node.querySelector(`.modal-qty[data-idx="${i}"]`).value = newQ; window.dispatchEvent(new CustomEvent('focinhos:cart:changed',{detail:{cart:getCartFromStorage()}})); }));
+  node.querySelectorAll('.qty-inc').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = (c[i].qtd||1)+1; updateCartQty(i,newQ); node.querySelector(`.modal-qty[data-idx="${i}"]`).value = newQ; window.dispatchEvent(new CustomEvent('focinhos:cart:changed',{detail:{cart:getCartFromStorage()}})); }));
+  node.querySelectorAll('.modal-qty').forEach(inp=> inp.addEventListener('change',(e)=>{ const i = +inp.dataset.idx; const v = Math.max(1, Number(inp.value)||1); updateCartQty(i,v); window.dispatchEvent(new CustomEvent('focinhos:cart:changed',{detail:{cart:getCartFromStorage()}})); }));
+  node.querySelectorAll('.modal-remove').forEach(btn=> btn.addEventListener('click', (e)=>{ const idx = +btn.dataset.idx; removeCartItem(idx); btn.closest('.modal-cart-row').remove(); window.dispatchEvent(new CustomEvent('focinhos:cart:changed',{detail:{cart:getCartFromStorage()}})); }));
       }
-      box.querySelector('#__cart-close').addEventListener('click', ()=>{ document.body.removeChild(modal); });
+      // Add quick team actions: copiar modelo e abrir no WhatsApp
+      try{
+        const actionsWrap = document.createElement('div'); actionsWrap.style.marginTop='12px'; actionsWrap.style.display='flex'; actionsWrap.style.gap='8px'; actionsWrap.style.justifyContent='flex-end';
+        const copyBtn = document.createElement('button'); copyBtn.className='btn btn--ghost'; copyBtn.textContent = 'Copiar modelo';
+        const openBtn = document.createElement('button'); openBtn.className='btn btn--primary'; openBtn.textContent = 'Abrir no WhatsApp';
+        actionsWrap.appendChild(copyBtn); actionsWrap.appendChild(openBtn);
+        box.appendChild(actionsWrap);
+        // build message from template
+        function buildTeamMessage(){
+          const tpl = window.CONFIG?.waTemplates?.teamReply || '';
+          const items = cart.map(it=> `${it.qtd}x ${it.nome}${it.variacao? ' '+it.variacao:''}`).join('\n');
+          // attempt to find contact fields on the page (delivery context)
+          const nome = (byId('recebedor')?.value|| byId('tutorNome')?.value || '').trim();
+          const telefone = (byId('tel')?.value|| byId('tutorTelefone')?.value || '').trim();
+          const observacoes = (byId('obs')?.value || byId('observacoes')?.value || '').trim();
+          const map = { itensLista: items, nome, telefone, observacoes };
+          return tidyMessage(interpolate(tpl, map));
+        }
+        copyBtn.addEventListener('click', async ()=>{
+          try{
+            const txt = buildTeamMessage();
+            await navigator.clipboard.writeText(txt);
+            copyBtn.textContent = 'Copiado'; setTimeout(()=> copyBtn.textContent = 'Copiar modelo', 1800);
+          }catch(e){ console.warn('copy failed', e); copyBtn.textContent = 'Erro'; setTimeout(()=> copyBtn.textContent = 'Copiar modelo', 1800); }
+        });
+        openBtn.addEventListener('click', ()=>{
+          try{
+            const txt = buildTeamMessage(); const url = waLink(txt); window.open(url, '_blank');
+          }catch(e){ console.warn('open whatsapp failed', e); }
+        });
+      }catch(e){ console.warn('cart modal team actions failed', e); }
+  box.querySelector('#__cart-close').addEventListener('click', ()=>{ closeModal(); });
+  window.addEventListener('keydown', trap);
+  // focus the dialog container for screen readers; fallback to first focusable element
+  try{ if(box && typeof box.focus === 'function') box.focus(); else if(firstFocusable && typeof firstFocusable.focus === 'function') firstFocusable.focus(); }catch(e){}
     }
 
   const top = byId('topbar-cart'); if(top) on(top,'click', openCartModal);
@@ -823,14 +974,35 @@
 
   // Boot
   document.addEventListener('DOMContentLoaded', ()=>{
-    // Run each init inside try/catch so a failure in one doesn't stop others
-  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW, initCartMenu].forEach(fn=>{
-      try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
-    });
-  try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
+    // Load dynamic config first (network-first). If fetch fails, fall back to any inline `window.CONFIG`.
+    (async ()=>{
+      try{
+        const resp = await fetch('/config.json', { cache: 'no-store' });
+        if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }
+      }catch(e){ console.warn('config.json fetch failed, using inline CONFIG if present', e); }
+      // Run each init inside try/catch so a failure in one doesn't stop others
+      [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initSW, initCartMenu].forEach(fn=>{
+        try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
+      });
+      try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
+    })();
     // Global error handler to help identificar erros em produção/local
     window.addEventListener('error', (ev)=>{
       try{ console.error('Unhandled error:', ev.error || ev.message || ev); }catch(e){}
     });
   });
+
+  // Reload the page when a new service worker takes control to ensure users get the latest UI
+  if('serviceWorker' in navigator){
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+      try{
+        // Avoid forcing reload when running on localhost or under automated tests (puppeteer)
+        const isLocal = location && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+        const isAutomated = !!navigator.webdriver;
+        if(isLocal || isAutomated) return; // do not reload in test/dev environments
+        if(refreshing) return; refreshing = true; try{ window.location.reload(); }catch(e){}
+      }catch(e){ /* silent */ }
+    });
+  }
 })();

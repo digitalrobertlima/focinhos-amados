@@ -86,9 +86,6 @@ Precisão: {destinoAccuracy}m @ {destinoTimestamp}
 📝 *Observações gerais*  
 {observacoes}
 
-💰 *Obs preço*  
-Valores personalizados serão confirmados pela equipe.
-
 
 🏪 *Loja física*  
 {enderecoLoja}`,
@@ -109,9 +106,6 @@ Precisão: {accuracy}m @ {timestamp}
 
 📝 *Observações*  
 {observacoes}
-
-💰 *Obs preço*  
-Valores personalizados serão confirmados pela equipe.
 
 🏪 *Loja física*
 {enderecoLoja}`,
@@ -141,11 +135,9 @@ Geo: {destinoLat},{destinoLng}
 
 📝 *Observações*  
 {observacoes}
+`,
 
-💰 *Obs preço*  
-Valores personalizados serão confirmados pela equipe.`,
-
-    taxiAgendado:
+  taxiAgendado:
 `🚕 *TÁXI DOG — AGENDADO* (BH)
 
 📍 *Origem*  
@@ -164,9 +156,22 @@ Geo: {destinoLat},{destinoLng}
 
 📝 *Observações*  
 {observacoes}
+`
+  ,
+  // Template para equipe agilizar respostas de confirmação (modelo de mensagem)
+  teamReply: `*Pedido recebido — Focinhos Amados (BH)*
 
-💰 *Obs preço*  
-Valores personalizados serão confirmados pela equipe.`
+📋 *Itens*  
+{itensLista}
+
+👤 *Contato*  
+{nome} • {telefone}
+
+📝 *Observações*  
+{observacoes}
+
+—
+Detalhes e confirmações serão combinados via WhatsApp.`,
   }
 };
 

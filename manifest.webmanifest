@@ -1,6 +1,6 @@
 {
   "name": "Focinhos Amados",
-  "short_name": "Pet shop",
+  "short_name": "Pet Shop",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",

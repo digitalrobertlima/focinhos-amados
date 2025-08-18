@@ -43,12 +43,30 @@ self.addEventListener('activate', (e) => {
   })());
 });
 
+// Listen to messages from the page (e.g., to trigger skipWaiting)
+self.addEventListener('message', (e)=>{
+  try{
+    if(!e.data) return;
+    if(e.data.type === 'SKIP_WAITING'){
+      self.skipWaiting();
+    }
+  }catch(err){ console.warn('sw message handler failed', err); }
+});
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   const url = new URL(req.url);
 
   // Só GET
   if (req.method !== 'GET') return;
+
+  // Treat config.js as network-first so administrators can update messaging/config quickly
+  if (url.pathname.endsWith('/assets/js/config.js') || url.pathname.endsWith('/config.json')) {
+    e.respondWith((async ()=>{
+      try{ const fresh = await fetch(req); const cache = await caches.open(STATIC_CACHE); cache.put(req, fresh.clone()); return fresh; }catch(err){ const cached = await caches.match(req); return cached || new Response('', { status: 504 }); }
+    })());
+    return;
+  }
 
   // HTML -> network-first
   if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
