@@ -12,8 +12,20 @@
   const byId = (id)=>document.getElementById(id);
   const now = ()=>new Date();
   const toISODate = (d)=>d instanceof Date?d.toISOString():new Date(d).toISOString();
-  const fmtDate = (v)=>{ try{const d=new Date(v);return d.toLocaleDateString('pt-BR');}catch{return v||''} };
-  const fmtDT = (v)=>{ try{const d=new Date(v);return d.toLocaleString('pt-BR');}catch{return v||''} };
+  const fmtDate = (v)=>{
+    try{
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('pt-BR');
+    }catch{ return v||'' }
+  };
+  const fmtDT = (v)=>{
+    try{
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleString('pt-BR');
+    }catch{ return v||'' }
+  };
   const onlyDigits = s=>String(s||'').replace(/\D+/g,'');
   const isTelBR = s=>{ const d=onlyDigits(s); return d.length===10 || d.length===11; };
   const fmtAcc = (n)=> typeof n==='number' ? Math.round(n) : '';
@@ -1102,7 +1114,8 @@
     // Load dynamic config first (network-first). If fetch fails, fall back to any inline `window.CONFIG`.
     (async ()=>{
       try{
-        const resp = await fetch('/config.json', { cache: 'no-store' });
+        // Use relative path so it works on GitHub Pages subpaths too
+        const resp = await fetch('./config.json', { cache: 'no-store' });
         if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }
       }catch(e){ console.warn('config.json fetch failed, using inline CONFIG if present', e); }
       // Run each init inside try/catch so a failure in one doesn't stop others

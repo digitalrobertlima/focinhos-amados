@@ -25,9 +25,9 @@ a:hover{text-decoration:underline}
 .brand__text{display:flex;flex-direction:column}
 .brand__city{color:var(--muted);font-size:var(--fs-400)}
 
-.nav__btn{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:#fff;padding:10px 12px;border-radius:var(--radius-300);cursor:pointer}
+.nav__btn{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:#fff;padding:10px 12px;border-radius:var(--radius-300);cursor:pointer; min-height:44px}
 .nav__drawer{position:absolute;right:16px;top:56px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);padding:8px;list-style:none;margin:0;min-width:220px;display:none}
-.nav__drawer[aria-hidden="false"]{display:block}
+.nav__drawer.open{ display:block; }
 .nav__drawer a{display:block;padding:10px 12px;border-radius:10px}
 .nav__drawer a:hover{background:#f7f7f7}
 
@@ -40,7 +40,7 @@ a:hover{text-decoration:underline}
 /* Destaque visual do hero para apresentação de venda */
 .hero{background:linear-gradient(180deg, rgba(2,153,53,0.06), transparent);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)}
 .hero__promo{display:inline-block;background:linear-gradient(90deg,#ffda7a,#ffb347);color:#723a00;padding:6px 10px;border-radius:999px;font-weight:700;margin-bottom:8px}
-.hero__price{display:block;font-size:20px;color:var(--brand-700);font-weight:800;margin-top:6px}
+.hero__price{display:none !important}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:var(--radius-300);border:1px solid var(--border);background:#fff;color:var(--text);font-weight:500;line-height:1.1;min-height:44px;cursor:pointer}
 .btn--primary{background:var(--brand);border-color:var(--brand);color:#fff}
@@ -61,6 +61,9 @@ a:hover{text-decoration:underline}
 
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:stretch}
 @media(min-width:760px){.gallery{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:480px){
+  .gallery{ grid-template-columns:repeat(2,1fr); }
+}
 .gallery__img{border-radius:12px;border:0;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.04));box-shadow:0 6px 20px rgba(0,0,0,0.08);padding:8px}
 .gallery__img text{font-weight:700}
 
@@ -128,7 +131,7 @@ a:hover{text-decoration:underline}
 .list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .list--items li{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);padding:10px;border-radius:12px;background:#fff}
 .item__qty{display:inline-flex;align-items:center;gap:6px}
-.item__btn{border:1px solid var(--border);background:#fff;border-radius:8px;width:28px;height:28px;display:grid;place-items:center}
+.item__btn{border:1px solid var(--border);background:#fff;border-radius:8px;width:28px;height:28px;display:grid;place-items:center; width:32px; height:32px; }
 .item__remove{color:var(--danger);border-color:#ffd5d8}
 
 .icon{width:20px;height:20px}
@@ -164,7 +167,7 @@ a:hover{text-decoration:underline}
 .cart-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--border)}
 .cart-item__controls{display:flex;align-items:center;gap:8px}
 .item__qty_input,.modal-qty{width:56px;padding:6px;border:1px solid var(--border);border-radius:8px;text-align:center}
-.qty-inc,.qty-dec{border:1px solid var(--border);background:#fff;border-radius:8px;width:32px;height:32px;display:grid;place-items:center}
+.qty-inc,.qty-dec{border:1px solid var(--border);background:#fff;border-radius:8px;width:32px;height:32px;display:grid;place-items:center; width:36px; height:36px; }
 
 /* Snackbar undo */
 .cart-snackbar{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#111;color:#fff;padding:12px 16px;border-radius:8px;display:flex;gap:12px;align-items:center;z-index:1600;box-shadow:0 8px 24px rgba(0,0,0,.3)}
@@ -206,7 +209,7 @@ a:hover{text-decoration:underline}
 .cart-panel.open{transform:translateX(0%)}
 .cart-panel__head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
 .cart-panel__body{padding:12px;flex:1;overflow:auto}
-.cart-panel__footer{padding:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:12px}
+.cart-panel__footer{padding:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:12px; position:sticky; bottom:0; background:#fff; }
 
 /* Bottom-sheet variant on small screens */
 @media(max-width:760px){
@@ -214,7 +217,27 @@ a:hover{text-decoration:underline}
   .cart-panel.open{transform:translateY(0%)}
 }
 
-/* Respeitar preferências do usuário */
-@media (prefers-reduced-motion: reduce){
-  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+/* --- Mobile harmony and responsiveness tweaks (2025-08) --- */
+/* Safer to override at the end to avoid regressions */
+
+/* Improve touch targets and drawer behavior */
+.nav__btn{ min-height:44px; }
+.nav__drawer.open{ display:block; }
+
+/* Calmer spacing between sections/cards */
+section{ margin:16px 0; }
+.card + .card{ margin-top:12px; }
+.section__title + .grid{ margin-top:8px; }
+
+/* Stronger labels and helper text spacing for readability */
+.field label{ font-weight:600; font-size:var(--fs-500); color:var(--text); }
+.help:not(:empty){ margin-top:2px; }
+
+/* Action groups behave well on small screens */
+@media(max-width:600px){
+  .actions .btn{ flex:1 1 48%; }
+  .footer__inner{ flex-direction:column; align-items:flex-start; }
 }
+
+/* Tiny tap feedback for quick actions */
+.btn.clicked{ transform:scale(0.98); transition:transform .12s ease; }
