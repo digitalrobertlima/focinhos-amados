@@ -36,6 +36,11 @@ a:hover{text-decoration:underline}
 .hero__sub{margin:0 0 12px;color:var(--muted)}
 .hero__actions{display:flex;flex-wrap:wrap;gap:8px}
 .hero__hint{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:var(--fs-400);margin-top:8px}
+/* Open/close status dot */
+.status-dot{width:10px;height:10px;border-radius:999px;display:inline-block;background:#bbb;box-shadow:0 0 0 2px rgba(0,0,0,0.04) inset}
+.status-dot.is-open{background:#22c55e; box-shadow:0 0 8px #22c55e66}
+.status-dot.is-closed{background:#ef4444}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* Destaque visual do hero para apresentação de venda */
 .hero{background:linear-gradient(180deg, rgba(2,153,53,0.06), transparent);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)}

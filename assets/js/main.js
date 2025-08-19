@@ -447,6 +447,63 @@
         `<label class="chip"><input type="checkbox" value="${s}"> <span>${s}</span></label>`
       ).join('');
     }
+
+    // Home: status aberto/fechado com ponto colorido e mensagem "Abre às" quando fechado
+    try{
+      if(document.body.dataset.page === 'home'){
+        const dot = byId('status-dot');
+        const txt = byId('status-text');
+        if(dot && txt){
+          const hours = C.business?.hours || { mon_sat:'10:00–20:00', sun:'10:00–13:00' };
+          function parseRange(range){
+            if(!range) return null;
+            const m = String(range).match(/^(\d{1,2}):(\d{2})\s*[–-]\s*(\d{1,2}):(\d{2})$/);
+            if(!m) return null; return { fromH:+m[1], fromM:+m[2], toH:+m[3], toM:+m[4] };
+          }
+          function nextOpenInfo(now){
+            // Return {open:true} if open now; else {open:false, label:"Abre às HH:MM"}
+            const d = new Date(now);
+            const day = d.getDay(); // 0=Sun,1=Mon...6=Sat
+            const isSun = day === 0;
+            const rangeStr = isSun ? hours.sun : hours.mon_sat;
+            const r = parseRange(rangeStr);
+            // Helper to build label HH:MM
+            const hhmm = (h,m)=> `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+            if(!r){ return { open:false, label:'' }; }
+            const curMin = d.getHours()*60 + d.getMinutes();
+            const fromMin = r.fromH*60 + r.fromM;
+            const toMin = r.toH*60 + r.toM;
+            if(curMin >= fromMin && curMin < toMin){
+              return { open:true };
+            }
+            if(curMin < fromMin){
+              return { open:false, label: `Abre às ${hhmm(r.fromH, r.fromM)}` };
+            }
+            // After closing today: compute next open
+            // Next day open is Monday-Saturday or Sunday accordingly
+            const nextDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1, 0, 0, 0);
+            const nextIsSun = nextDay.getDay() === 0;
+            const nr = parseRange(nextIsSun ? hours.sun : hours.mon_sat);
+            if(nr){ return { open:false, label:`Abre às ${hhmm(nr.fromH, nr.fromM)}` }; }
+            return { open:false, label:'' };
+          }
+          function updateStatus(){
+            const info = nextOpenInfo(new Date());
+            dot.classList.remove('is-open','is-closed');
+            if(info.open){
+              dot.classList.add('is-open');
+              txt.textContent = 'Aberto agora';
+            } else {
+              dot.classList.add('is-closed');
+              txt.textContent = info.label || 'Fechado';
+            }
+          }
+          updateStatus();
+          // refresh every minute to keep accurate
+          setInterval(updateStatus, 60000);
+        }
+      }
+    }catch(e){ console.warn('status aberto/fechado init falhou', e); }
   }
 
   // ===== Geolocalização (watch melhor precisão) =====
