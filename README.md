@@ -1,6 +1,6 @@
 # Focinhos Amados — Site estático (PWA leve)
 
-> **Stack:** HTML + CSS + JS vanilla (sem libs, sem bundlers). Publicação em GitHub Pages.
+> **Stack:** HTML + CSS + JS vanilla (sem libs, sem bundlers). Publicação em GitHub Pages (branch padrão: `v0.1-LTS`).
 
 ## 📦 Estrutura
 
@@ -25,7 +25,7 @@
     ├─ og.jpg
     ├─ pwa-192.png
     ├─ pwa-512.png
-    └─ sprite.svg
+  └─ sprite.svg
 ```
 
 ## 🛠️ O que editar primeiro (CONFIG)
@@ -64,7 +64,7 @@ window.CONFIG = {
 * **`assets/img/og.jpg`**: imagem 1200×630 (≤200KB). Usada em Open Graph (já presente).
 * **`assets/img/pwa-192.png`** e **`assets/img/pwa-512.png`**: ícones PWA (já presentes). O 512 deve ser **maskable**.
 * **`assets/img/escultura_unique.png`**: arquivo do logotipo usado atualmente; opcionalmente substitua por `logo.svg` para melhor escala.
-* **`assets/img/sprite.svg`**: sprite SVG com ícones (usado nas seções de serviço).
+* **`assets/img/sprite.svg`**: sprite SVG com ícones. Na Home, os serviços usam emojis para máxima compatibilidade.
 * (Opcional) Adicione imagens reais para a galeria em `assets/img/placeholder-*.webp` ou ajuste o HTML.
 
 ## 🌐 SEO / Social
@@ -108,11 +108,11 @@ python -m http.server 8080
 
 ## ☁️ Publicar no GitHub Pages
 
-1. Crie um repositório e suba todos os arquivos na branch **main** (raiz do repo).
+1. Crie um repositório e suba todos os arquivos na branch **v0.1-LTS** (raiz do repo) — ela é a estável.
 2. Em **Settings → Pages**:
 
-   * *Source*: **Deploy from a branch**
-   * *Branch*: **main** / **root**
+  * *Source*: **Deploy from a branch**
+  * *Branch*: **v0.1-LTS** / **root**
 3. Aguarde a URL do Pages. Atualize:
 
    * `robots.txt` → `Sitemap: https://SEU_USUARIO.github.io/SEU_REPO/sitemap.xml`
