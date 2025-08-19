@@ -389,6 +389,7 @@
     if(!C) return;
     $$('[data-bind="city"]').forEach(el=> text(el, C.business.city));
     $$('[data-bind="hoursLabel"]').forEach(el=> text(el, C.__format.hoursLabel()));
+  $$('[data-bind="version"]').forEach(el=> text(el, C.appVersion || ''));
     const addr = C.business.addressLine || '';
     $$('[data-bind="address"]').forEach(el=> text(el, addr));
     $$('[data-bind="landline"]').forEach(el=> text(el, C.business.phones.landline || ''));
@@ -544,52 +545,33 @@
   console.debug('[agendar] petIndexCounter init', petIndexCounter);
     function readPetsFromDOM(){
       const pets = [];
-      petsContainer.querySelectorAll('.pet').forEach((el, idx)=>{
-        // Primeiro pet usa ids; outros usam data-role
-        if(idx===0){
-          pets.push({
-            nome: (byId('petNome')?.value||'').trim(),
-            especie: (byId('especie')?.value||'').trim(),
-            porte: (byId('porte')?.value||'').trim(),
-            pelagem: (byId('pelagem')?.value||'').trim() || '-',
-            temperamento: (byId('temperamento')?.value||'').trim() || '-',
-            observacoes: (byId('observacoes')?.value||'').trim() || '-',
-            // per-pet services (first pet block uses data-roles too)
-            srvBanho: !!el.querySelector('[data-role="srv-banho"]:checked'),
-            srvTosa: !!el.querySelector('[data-role="srv-tosa"]:checked'),
-            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim(),
-            ozonio: !!el.querySelector('[data-role="srv-ozonio"]:checked'),
-            melaleuca: !!el.querySelector('[data-role="srv-melaleuca"]:checked'),
-            // per-pet preferences/extras
-            perfume: (el.querySelector('[data-role="perfume"]')?.value||'').trim(),
-            acessorio: (el.querySelector('[data-role="acessorio"]')?.value||'').trim(),
-            escovacao: !!el.querySelector('[data-role="escovacao"]:checked'),
-            hidratacao: !!el.querySelector('[data-role="hidratacao"]:checked'),
-            corteUnhas: !!el.querySelector('[data-role="corte-unhas"]:checked'),
-            limpezaOuvido: !!el.querySelector('[data-role="limpeza-ouvido"]:checked')
-          });
-        } else {
-          const get = (sel)=> el.querySelector(sel)?.value || '';
-          pets.push({
-            nome: (el.querySelector('[data-role="petNome"]')?.value||'').trim(),
-            especie: (el.querySelector('[data-role="especie"]')?.value||'').trim(),
-            porte: (el.querySelector('[data-role="porte"]')?.value||'').trim(),
-            pelagem: (el.querySelector('[data-role="pelagem"]')?.value||'').trim() || '-',
-            temperamento: (el.querySelector('[data-role="temperamento"]')?.value||'').trim() || '-',
-            observacoes: (el.querySelector('[data-role="observacoes"]')?.value||'').trim() || '-',
-            srvBanho: !!el.querySelector('[data-role="srv-banho"]:checked'),
-            srvTosa: !!el.querySelector('[data-role="srv-tosa"]:checked'),
-            tosaTipo: (el.querySelector('[data-role="tosaTipo"]')?.value||'').trim(),
-            ozonio: !!el.querySelector('[data-role="srv-ozonio"]:checked'),
-            melaleuca: !!el.querySelector('[data-role="srv-melaleuca"]:checked'),
-            perfume: (el.querySelector('[data-role="perfume"]')?.value||'').trim(),
-            acessorio: (el.querySelector('[data-role="acessorio"]')?.value||'').trim(),
-            escovacao: !!el.querySelector('[data-role="escovacao"]:checked'),
-            hidratacao: !!el.querySelector('[data-role="hidratacao"]:checked'),
-            corteUnhas: !!el.querySelector('[data-role="corte-unhas"]:checked'),
-            limpezaOuvido: !!el.querySelector('[data-role="limpeza-ouvido"]:checked')
-          });
-        }
+      petsContainer.querySelectorAll('.pet').forEach((el)=>{
+        const getVal = (role, id) => {
+          const r = el.querySelector(`[data-role="${role}"]`);
+          if(r) return (r.value||'').trim();
+          if(id) return (byId(id)?.value||'').trim();
+          return '';
+        };
+        const getChk = (role) => !!el.querySelector(`[data-role="${role}"]:checked`);
+        pets.push({
+          nome: getVal('petNome','petNome'),
+          especie: getVal('especie','especie'),
+          porte: getVal('porte','porte'),
+          pelagem: getVal('pelagem','pelagem') || '-',
+          temperamento: getVal('temperamento','temperamento') || '-',
+          observacoes: getVal('observacoes','observacoes') || '-',
+          srvBanho: getChk('srv-banho'),
+          srvTosa: getChk('srv-tosa'),
+          tosaTipo: getVal('tosaTipo'),
+          ozonio: getChk('srv-ozonio'),
+          melaleuca: getChk('srv-melaleuca'),
+          perfume: getVal('perfume'),
+          acessorio: getVal('acessorio'),
+          escovacao: getChk('escovacao'),
+          hidratacao: getChk('hidratacao'),
+          corteUnhas: getChk('corte-unhas'),
+          limpezaOuvido: getChk('limpeza-ouvido')
+        });
       });
       return pets;
     }

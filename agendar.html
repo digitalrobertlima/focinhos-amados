@@ -52,12 +52,12 @@
             <div class="grid grid--2">
               <div class="field">
                 <label for="petNome">Nome do pet <span class="req">*</span></label>
-                <input id="petNome" name="petNome" class="input" required autocomplete="off">
+                <input id="petNome" name="petNome" class="input" data-role="petNome" required autocomplete="off">
                 <small id="err-petNome" class="help" hidden></small>
               </div>
               <div class="field">
                 <label for="especie">Espécie <span class="req">*</span></label>
-                <select id="especie" name="especie" class="select" required>
+                <select id="especie" name="especie" class="select" data-role="especie" required>
                   <option value="">Selecione…</option>
                   <option>Cão</option>
                   <option>Gato</option>
@@ -67,7 +67,7 @@
               </div>
               <div class="field">
                 <label for="porte">Porte <span class="req">*</span></label>
-                <select id="porte" name="porte" class="select" required>
+                <select id="porte" name="porte" class="select" data-role="porte" required>
                   <option value="">Selecione…</option>
                   <option>Pequeno</option>
                   <option>Médio</option>
@@ -77,7 +77,7 @@
               </div>
               <div class="field">
                 <label for="pelagem">Pelagem</label>
-                <select id="pelagem" class="select">
+                <select id="pelagem" class="select" data-role="pelagem">
                   <option value="">Selecione…</option>
                   <option>Curta</option>
                   <option>Média</option>
@@ -86,7 +86,7 @@
               </div>
               <div class="field">
                 <label for="temperamento">Temperamento</label>
-                <select id="temperamento" class="select">
+                <select id="temperamento" class="select" data-role="temperamento">
                   <option value="">Selecione…</option>
                   <option>Calmo</option>
                   <option>Ativo</option>
@@ -95,7 +95,7 @@
               </div>
               <div class="field">
                 <label for="observacoes">Condições de saúde / observações</label>
-                <textarea id="observacoes" class="textarea" rows="3"></textarea>
+                <textarea id="observacoes" class="textarea" data-role="observacoes" rows="3"></textarea>
               </div>
             </div>
             <div style="margin-top:8px">
@@ -350,7 +350,7 @@
 
   <footer class="footer">
     <div class="container footer__inner">
-      <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span></p>
+  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1-beta</span></span></p>
       <a href="sobre.html">Sobre</a>
     </div>
   </footer>
