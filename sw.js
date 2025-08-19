@@ -1,12 +1,16 @@
 /* Focinhos Amados — Service Worker (cache-first para estáticos, network-first para HTML) */
-const SW_VERSION = 'fa-0.1.1';
+// Derive version from sw.js?v=... to bust CDN caches per deploy
+const SW_URL = new URL(self.location.href);
+const V = SW_URL.searchParams.get('v') || '';
+const SW_VERSION = `fa-${V || '0.1.1'}`;
 const STATIC_CACHE = `fa-static-${SW_VERSION}`;
+const q = V ? (`?v=${V}`) : '';
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './assets/css/style.css',
-  './assets/js/config.js',
-  './assets/js/main.js',
+  './assets/css/style.css'+q,
+  './assets/js/config.js'+q,
+  './assets/js/main.js'+q,
   './assets/img/pwa-192.png',
   './assets/img/pwa-512.png',
   './assets/img/gallery-pet-1.webp',
@@ -14,7 +18,7 @@ const STATIC_ASSETS = [
   './assets/img/gallery-pet-3.webp',
   './assets/img/gallery-pet-4.webp',
   './assets/img/sprite.svg',
-  './manifest.webmanifest'
+  './manifest.webmanifest'+q
 ];
 
 self.addEventListener('install', (e) => {
@@ -94,17 +98,12 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Estáticos -> cache-first
+  // Estáticos -> stale-while-revalidate (responde rápido e atualiza em background)
   e.respondWith((async () => {
-    const cached = await caches.match(req);
-    if (cached) return cached;
-    try {
-      const fresh = await fetch(req);
-      const cache = await caches.open(STATIC_CACHE);
-      cache.put(req, fresh.clone());
-      return fresh;
-    } catch {
-      return new Response('', { status: 504 });
-    }
+    const cache = await caches.open(STATIC_CACHE);
+    const cached = await cache.match(req);
+    const fetchAndUpdate = fetch(req).then(res=>{ if(res && res.ok) cache.put(req, res.clone()); return res; }).catch(()=> null);
+    if (cached) { e.waitUntil(fetchAndUpdate); return cached; }
+    const fresh = await fetchAndUpdate; if (fresh) return fresh; return new Response('', { status: 504 });
   })());
 });

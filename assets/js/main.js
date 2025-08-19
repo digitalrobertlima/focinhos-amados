@@ -749,39 +749,88 @@
       return tidyMessage(raw);
     }
 
-    // When a reverse-geocode result is available, suggest confirmation and show a
-    // house-number input so the user can verify the detected street and add the
-    // residence number.
+    // When a reverse-geocode result is available, show a confirmation helper that
+    // lets the user edit the street before confirming. Confirmation stores the
+    // CURRENT input value, not the suggested value.
     window.addEventListener('focinhos:geo:address:resolved', (ev)=>{
       try{
         const key = ev?.detail?.key || 'default';
         const addr = ev?.detail?.address?.display || '';
         if(!addr) return;
-        // Map key to a likely input id on Agendar form
-        const inputId = (key === 'default') ? 'origem' : key;
+        const page = document.body.dataset.page || '';
+        // Map key -> input id per page
+        let inputId = key;
+        if(key === 'default'){
+          inputId = (page === 'delivery') ? 'endereco' : 'origem';
+        }
         const inp = byId(inputId);
         if(!inp) return;
-        // Insert a lightweight confirmation area if not present
+        const short = (s)=> String(s||'').split(',').slice(0,3).join(', ');
+
+        // Prefill only if empty to avoid overwriting user input
+        if((inp.value||'').trim() === '' && addr){ inp.value = addr; try{ inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
+
+        // Insert or update confirmation helper
         const cid = `__geo-confirm-${inputId}`;
-        if(!byId(cid)){
-          const wrap = document.createElement('div'); wrap.id = cid; wrap.className = 'muted'; wrap.style.marginTop = '6px';
-          wrap.innerHTML = `<div>Detectamos esta rua: <strong>${String(addr).split(',').slice(0,3).join(', ')}</strong></div>
-            <div style="margin-top:6px"><button type="button" id="${cid}-confirm" class="btn btn--ghost">Confirmar rua</button> <button type="button" id="${cid}-edit" class="btn btn--ghost">Editar</button></div>`;
-          inp.parentNode.insertBefore(wrap, inp.nextSibling);
-          // handlers
-          on(byId(`${cid}-confirm`),'click', ()=>{
+        let wrap = byId(cid);
+        if(!wrap){
+          wrap = document.createElement('div'); wrap.id = cid; wrap.className = 'muted'; wrap.style.marginTop = '6px';
+          wrap.innerHTML = `
+            <div>Sugerido pelo GPS: <strong class="__addr-suggest">${short(addr)}</strong></div>
+            <div style="margin-top:6px">
+              <button type="button" id="${cid}-confirm" class="btn btn--ghost">Confirmar rua</button>
+              <button type="button" id="${cid}-edit" class="btn btn--ghost">Editar</button>
+            </div>`;
+    inp.parentNode.insertBefore(wrap, inp.nextSibling);
+        } else {
+          const sEl = wrap.querySelector('.__addr-suggest'); if(sEl) sEl.textContent = short(addr);
+        }
+
+        // Bind handlers (idempotent)
+        const confirmBtn = byId(`${cid}-confirm`);
+        const editBtn = byId(`${cid}-edit`);
+        if(confirmBtn && !confirmBtn.__bound){
+          confirmBtn.__bound = true;
+          on(confirmBtn,'click', ()=>{
             try{
-              // mark input as confirmed (for later validation) and create number field
+              // If user hasn't entered anything, use the suggestion first and focus for quick adjust
+              if((inp.value||'').trim() === '' && addr){ inp.value = addr; try{ inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
+              const chosen = (inp.value||'').trim();
               inp.dataset.geoConfirmed = 'true';
+              // ensure number field exists (id depends on input id)
               const numId = `${inputId}-numero`;
               if(!byId(numId)){
                 const num = document.createElement('input'); num.id = numId; num.className='input'; num.placeholder='Nº'; num.style.marginTop='6px'; num.inputMode='numeric'; inp.parentNode.insertBefore(num, wrap.nextSibling);
               }
-              // visually indicate confirmation
-              wrap.innerHTML = `<div>Rua confirmada: <strong>${String(addr).split(',').slice(0,3).join(', ')}</strong></div>`;
+              wrap.innerHTML = `<div>Rua confirmada: <strong>${short(chosen)}</strong></div>`;
             }catch(e){ console.warn('confirm geo addr', e); }
           });
-          on(byId(`${cid}-edit`),'click', ()=>{ try{ inp.focus(); inp.select(); }catch(e){} });
+        }
+        if(editBtn && !editBtn.__bound){
+          editBtn.__bound = true;
+          on(editBtn,'click', ()=>{ try{ if((inp.value||'').trim()==='' && addr){ inp.value = addr; } inp.focus(); inp.select(); }catch(e){} });
+        }
+
+        // If user edits after confirmation, clear confirmation state and show helper again
+        if(!inp.__geoConfirmBound){
+          inp.__geoConfirmBound = true;
+          on(inp,'input', ()=>{
+            try{
+              if(inp.dataset.geoConfirmed){ delete inp.dataset.geoConfirmed; }
+              const helper = byId(cid);
+              if(helper){ helper.innerHTML = `
+                <div>Sugerido pelo GPS: <strong class="__addr-suggest">${short(addr)}</strong></div>
+                <div style="margin-top:6px">
+                  <button type="button" id="${cid}-confirm" class="btn btn--ghost">Confirmar rua</button>
+                  <button type="button" id="${cid}-edit" class="btn btn--ghost">Editar</button>
+                </div>`;
+                // rebind buttons after reset
+                const c2 = byId(`${cid}-confirm`); const e2 = byId(`${cid}-edit`);
+                if(c2 && !c2.__bound){ c2.__bound = true; on(c2,'click', ()=>{ try{ if((inp.value||'').trim()==='' && addr){ inp.value = addr; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true})); } const chosen=(inp.value||'').trim(); inp.dataset.geoConfirmed='true'; const numId=`${inputId}-numero`; if(!byId(numId)){ const num=document.createElement('input'); num.id=numId; num.className='input'; num.placeholder='Nº'; num.style.marginTop='6px'; num.inputMode='numeric'; inp.parentNode.insertBefore(num, helper.nextSibling); } helper.innerHTML = `<div>Rua confirmada: <strong>${short(chosen)}</strong></div>`; }catch(e){} }); }
+                if(e2 && !e2.__bound){ e2.__bound = true; on(e2,'click', ()=>{ try{ if((inp.value||'').trim()==='' && addr){ inp.value = addr; } inp.focus(); inp.select(); }catch(e){} }); }
+              }
+            }catch(e){}
+          });
         }
       }catch(e){ console.warn('geo confirm handler', e); }
     });
@@ -1209,9 +1258,16 @@
       window.addEventListener('load', ()=>{
   // register service worker using relative path so it works on GitHub Pages and subpaths
   try{
-    navigator.serviceWorker.register('./sw.js', { scope: './' }).then(reg=>{
+    const ver = (window.CONFIG && window.CONFIG.appVersion) ? String(window.CONFIG.appVersion) : '';
+    const swUrl = ver ? `./sw.js?v=${encodeURIComponent(ver)}` : './sw.js';
+    navigator.serviceWorker.register(swUrl, { scope: './' }).then(reg=>{
       // Poll for updates periodically (every 5 minutes) so deployed changes are noticed
-      try{ setInterval(()=>{ try{ reg.update(); }catch(e){} }, 1000 * 60 * 5); }catch(e){}
+      try{
+        // Check more frequently to speed up propagation on devices (every 60s)
+        setInterval(()=>{ try{ reg.update(); }catch(e){} }, 1000 * 60);
+        // Also trigger an early update once after a short delay
+        setTimeout(()=>{ try{ reg.update(); }catch(e){} }, 5000);
+      }catch(e){}
 
       // If there's a waiting worker already, ask it to skipWaiting
       try{
