@@ -12,7 +12,9 @@
   "test:matrix:ui": "cross-env HEADFUL=1 SLOW_MS=80 node tools/test-matrix.js",
   "test:flows:ui:fast": "cross-env HEADFUL=1 SLOW_MS=0 node tools/test-full-flows.js",
   "test:matrix:ui:fast": "cross-env HEADFUL=1 SLOW_MS=0 node tools/test-matrix.js",
-  "test:all:fast": "npm run test:flows && npm run test:matrix"
+  "test:all:fast": "npm run test:flows && npm run test:matrix",
+  "scan:unused": "node tools/find-unreferenced.js",
+  "build:dist": "node tools/build-dist.js"
   },
   "devDependencies": {
   "puppeteer": "^24.16.2",

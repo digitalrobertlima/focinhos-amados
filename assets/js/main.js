@@ -643,6 +643,30 @@
     } else { 
       console.warn('[agendar] btn-add-pet not found'); 
     }
+    // Remover pet: delegate click to container, keep at least one pet block
+    if(petsContainer){
+      petsContainer.addEventListener('click', (ev)=>{
+        const btn = ev.target && (ev.target.classList && ev.target.classList.contains('btn-remove-pet') ? ev.target : (ev.target.closest && ev.target.closest('.btn-remove-pet')));
+        if(!btn) return;
+        ev.preventDefault();
+        try{
+          const card = btn.closest('.pet');
+          if(!card) return;
+          const total = petsContainer.querySelectorAll('.pet').length;
+          if(total <= 1){
+            // Instead of removing the only card, clear its fields
+            card.querySelectorAll('input,select,textarea').forEach(el=>{
+              if(el.type==='checkbox' || el.type==='radio') el.checked = false; else el.value='';
+              try{ el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){ }
+            });
+          } else {
+            card.remove();
+          }
+          try{ saveAgendarDraftDebounced(); }catch(_){ }
+          try{ const preResumo = byId('agendar-resumo'); if(preResumo) preResumo.textContent = resumoTexto(); }catch(_){ }
+        }catch(err){ console.warn('[agendar] remove pet failed', err); }
+      });
+    }
 
   // Cart upsell removed: 'Ver carrinho' button disabled to restore original menu layout.
   // If you later want to re-enable a cart upsell, reintroduce a lightweight control here.
