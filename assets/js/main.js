@@ -12,18 +12,28 @@
   const byId = (id)=>document.getElementById(id);
   const now = ()=>new Date();
   const toISODate = (d)=>d instanceof Date?d.toISOString():new Date(d).toISOString();
+  // Format helpers: Brazilian standard
+  function pad2(n){ return String(n).padStart(2,'0'); }
   const fmtDate = (v)=>{
     try{
       const d = new Date(v);
       if (isNaN(d.getTime())) return '';
-      return d.toLocaleDateString('pt-BR');
+      const dd = pad2(d.getDate());
+      const mm = pad2(d.getMonth()+1);
+      const yyyy = d.getFullYear();
+      return `${dd}-${mm}-${yyyy}`; // DD-MM-AAAA
     }catch{ return v||'' }
   };
   const fmtDT = (v)=>{
     try{
       const d = new Date(v);
       if (isNaN(d.getTime())) return '';
-      return d.toLocaleString('pt-BR');
+      const dd = pad2(d.getDate());
+      const mm = pad2(d.getMonth()+1);
+      const yyyy = d.getFullYear();
+      const hh = pad2(d.getHours());
+      const mi = pad2(d.getMinutes());
+      return `${dd}-${mm}-${yyyy} ${hh}:${mi}`; // DD-MM-AAAA HH:mm (24h)
     }catch{ return v||'' }
   };
   const onlyDigits = s=>String(s||'').replace(/\D+/g,'');
@@ -400,7 +410,8 @@
           if(!best || r.accuracy < best.accuracy){ state.best[key] = r; }
           const b = badge || byId(key.startsWith('origem')? 'geo-origem' : key.startsWith('destino')? 'geo-destino' : 'geo-badge');
           if(b){
-            const when = new Date(state.best[key].timestamp).toLocaleTimeString('pt-BR');
+            const d = new Date(state.best[key].timestamp);
+            const when = isNaN(d.getTime()) ? '' : `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
             b.textContent = `~${fmtAcc(state.best[key].accuracy)}m @ ${when}`;
           }
           // If we don't have a resolved address yet, try to fetch one in background

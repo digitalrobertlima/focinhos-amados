@@ -220,6 +220,11 @@ a:hover{text-decoration:underline}
 /* --- Mobile harmony and responsiveness tweaks (2025-08) --- */
 /* Safer to override at the end to avoid regressions */
 
+/* Header layout fix: ensure the menu button stays on the right side */
+.topbar__inner{ justify-content:flex-start; }
+.nav{ margin-left:auto; }
+.topbar__actions{ margin-left:8px; }
+
 /* Improve touch targets and drawer behavior */
 .nav__btn{ min-height:44px; }
 .nav__drawer.open{ display:block; }
