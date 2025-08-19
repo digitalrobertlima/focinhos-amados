@@ -87,18 +87,43 @@
   // Remove linhas vazias e seções órfãs para evitar mensagens com blocos vazios
   function tidyMessage(raw){
     if(!raw) return '';
-    // split lines, trim, remove lines that are only separators or '-' or empty
-    const lines = raw.split(/\r?\n/).map(l=> l.replace(/\s+$/,'')).map(l=> l.replace(/^\s+/,'')).filter(l=>{
-      if(!l) return false; // drop empty
-      // drop common placeholder markers or lines that are just punctuation
-      if(/^[-•\*\s]+$/.test(l)) return false;
-      // drop lines that are '—' or just a dash
-      if(/^[-–—]{1,3}$/.test(l)) return false;
+    // 1) normalize and pre-filter trivial empties
+    let lines = raw.split(/\r?\n/).map(l=> String(l).replace(/\s+$/,'')).map(l=> l.replace(/^\s+/,'')).filter(l=>{
+      const t = l.trim();
+      if(!t) return false; // drop empty
+      if(/^[‑\-•\*\s]+$/.test(t)) return false; // only bullets/dashes
+      if(/^[\-–—]{1,3}$/.test(t)) return false; // separators
       return true;
     });
-    // collapse multiple blank-ish separators into a single blank line between sections
-    // join with single newline
-    return lines.join('\n').replace(/\n{2,}/g,'\n\n').trim();
+
+    // 2) remove lines with empty dynamic content patterns
+    const isEmptyGeo = (s)=> /^Geo:\s*(?:-|)?,\s*(?:-|)?$/i.test(s);
+    const isEmptyPrec = (s)=> /^Precis[aã]o:\s*(?:-|)?\s*(?:m)?\s*(?:@\s*)?$/i.test(s);
+    const isEmptyLabelColon = (s)=> /[:：]\s*$/.test(s) && !/https?:\/\//i.test(s); // e.g., "Acessório:" with nothing
+    lines = lines.filter(l=> !(isEmptyGeo(l) || isEmptyPrec(l) || isEmptyLabelColon(l)));
+
+    // 3) drop section headers that ended up with no content
+    const isHeader = (s)=> /\*[^*]+\*/.test(s); // lines with *Header*
+    const keep = [];
+    for(let i=0;i<lines.length;i++){
+      const line = lines[i];
+      if(i===0){ keep.push(line); continue; } // keep top title
+      if(!isHeader(line)){ keep.push(line); continue; }
+      // look ahead for next non-empty, non-blank line that is not removed later
+      let j=i+1; let hasBody=false;
+      while(j<lines.length){
+        const nxt = lines[j].trim();
+        if(!nxt){ j++; continue; }
+        if(isHeader(nxt)) break; // next section reached without body
+        // found body content line
+        hasBody = true; break;
+      }
+      if(hasBody) keep.push(line); // keep header only if followed by some body content
+    }
+
+    // 4) collapse excessive blank lines again and return
+    const out = keep.join('\n').replace(/\n{2,}/g,'\n\n').trim();
+    return out;
   }
 
   // ===== Utilities: clipboard copy + attach copy button =====
@@ -489,8 +514,8 @@
       // todos os serviços/preferências são por pet agora
       dataPreferida: byId('dataPreferida'), janela: byId('janela')
     };
-    const btnGeo = byId('btn-use-geo');
-    const badge = byId('geo-badge');
+  const btnGeo = byId('btn-use-geo');
+  const badge = byId('geo-badge');
     const btnResumo = byId('btn-ver-resumo');
     const preResumo = byId('agendar-resumo');
     const btnWA = byId('btn-wa');
@@ -498,9 +523,20 @@
     const tplPet = byId('tpl-pet');
     const btnAddPet = byId('btn-add-pet');
   console.debug('[agendar] init elements', { btnAddPet: !!btnAddPet, tplPet: !!tplPet, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
-    const modalidadeEls = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']"));
+  const modalidadeEls = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']"));
     const fieldOrigem = byId('field-origem');
     const fieldDestino = byId('field-destino');
+
+    // Geo: botão geral e por campo (origem/destino)
+    if(btnGeo) on(btnGeo,'click', ()=> Geo.start('default', badge));
+    try{
+      $$('button[data-geo]')
+        .forEach(b=> on(b,'click', ()=>{
+          const key = b.getAttribute('data-geo');
+          const bEl = byId('geo-' + key);
+          Geo.start(key, bEl);
+        }));
+    }catch(e){ console.warn('[agendar] bind per-field geo failed', e); }
 
   // Controle de pets: cria um array de pets com base no DOM; suportar múltiplos pets dinâmicos
   // Use a robust counter: start at current count so new pets get unique indexes
@@ -641,23 +677,30 @@
     console.debug('[agendar] resumoTexto start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
       const geoDefault = Geo.get('default');
       const pets = readPetsFromDOM();
-      // formatar lista de pets
+      // formatar lista de pets (omitindo campos vazios ou '-')
       const petsTxt = pets.map((p, i)=>{
-  const perPetServ = [];
-  if(p.srvBanho) perPetServ.push('Banho');
+        const valOk = (v)=> !!v && String(v).trim() !== '-' && String(v).trim() !== '';
+        const details = [];
+        if(valOk(p.especie)) details.push(`Espécie: ${p.especie}`);
+        if(valOk(p.porte)) details.push(`Porte: ${p.porte}`);
+        if(valOk(p.pelagem)) details.push(`Pelagem: ${p.pelagem}`);
+        if(valOk(p.temperamento)) details.push(`Temperamento: ${p.temperamento}`);
+        if(valOk(p.observacoes)) details.push(`Observações: ${p.observacoes}`);
+        const perPetServ = [];
+        if(p.srvBanho) perPetServ.push('Banho');
         if(p.srvTosa) perPetServ.push('Tosa' + (p.tosaTipo? ` (${p.tosaTipo})` : ''));
-  if(p.ozonio) perPetServ.push('Banho de ozônio (+R$5,00)');
-  if(p.melaleuca) perPetServ.push('Shampoo de melaleuca (+R$5,00)');
-  // per-pet preferences
-  if(p.perfume) perPetServ.push(`Perfume: ${p.perfume}`);
-  if(p.acessorio) perPetServ.push(`Acessório: ${p.acessorio}`);
-  if(p.escovacao) perPetServ.push('Espuma dental para tártaro (+R$7,00)');
-  if(p.hidratacao) perPetServ.push('Hidratação (+R$30,00)');
-  if(p.corteUnhas) perPetServ.push('Corte de unhas (R$20,00 avulso)');
-  if(p.limpezaOuvido) perPetServ.push('Limpeza de ouvido');
-        const servStr = perPetServ.length ? ` • Serviços: ${perPetServ.join(', ')}` : '';
-        return `Pet ${i+1}: ${p.nome || '-'} • Espécie: ${p.especie || '-'} • Porte: ${p.porte || '-'} • Pelagem: ${p.pelagem || '-'} • Temperamento: ${p.temperamento || '-'} • Observações: ${p.observacoes || '-'}${servStr}`;
-      }).join('\n');
+        if(p.ozonio) perPetServ.push('Banho de ozônio (+R$5,00)');
+        if(p.melaleuca) perPetServ.push('Shampoo de melaleuca (+R$5,00)');
+        if(valOk(p.perfume)) perPetServ.push(`Perfume: ${p.perfume}`);
+        if(valOk(p.acessorio)) perPetServ.push(`Acessório: ${p.acessorio}`);
+        if(p.escovacao) perPetServ.push('Espuma dental para tártaro (+R$7,00)');
+        if(p.hidratacao) perPetServ.push('Hidratação (+R$30,00)');
+        if(p.corteUnhas) perPetServ.push('Corte de unhas');
+        if(p.limpezaOuvido) perPetServ.push('Limpeza de ouvido');
+        if(perPetServ.length) details.push(`Serviços: ${perPetServ.join(', ')}`);
+        const head = `Pet ${i+1}: ${p.nome || ''}`.trim();
+        if(details.length>0) return `${head} • ${details.join(' • ')}`; else return head;
+      }).filter(Boolean).join('\n');
       // Localização
       const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
       const geoO = Geo.get('origem');
@@ -696,11 +739,7 @@
       const tpl = window.CONFIG.waTemplates.agendar;
   console.debug('[agendar] resumoTexto result preview', { petsLista: map.petsLista && map.petsLista.slice(0,80) });
       let raw = interpolate(tpl, map);
-      // Append optional global add-on services section when selected
-      try{
-        const avulso = byId('avulso-corte-unhas-global');
-        if(avulso && avulso.checked){ raw += `\n\n🧰 Serviços avulsos\nCorte de unhas (R$20,00 avulso)`; }
-      }catch(e){}
+  // Serviços avulsos removidos (não há seção global)
       return tidyMessage(raw);
     }
 
@@ -865,8 +904,7 @@
           origem: byId('origem')?.value || '',
           origemNumero: byId('origem-numero')?.value || '',
           destino: byId('destino')?.value || '',
-          destinoNumero: byId('destino-numero')?.value || '',
-          avulsoCorteUnhas: !!(byId('avulso-corte-unhas-global') && byId('avulso-corte-unhas-global').checked)
+          destinoNumero: byId('destino-numero')?.value || ''
         };
         localStorage.setItem(AGENDAR_DRAFT_KEY, JSON.stringify(draft));
       }catch(e){ console.warn('saveAgendarDraft failed', e); }
@@ -942,7 +980,7 @@
           if(!num2){ num2 = document.createElement('input'); num2.id='destino-numero'; num2.className='input'; num2.placeholder='Nº'; num2.style.marginTop='6px'; num2.inputMode='numeric'; byId('destino').parentNode.insertBefore(num2, byId('destino').nextSibling); }
           num2.value = d.destinoNumero;
         }
-        if(byId('avulso-corte-unhas-global')) byId('avulso-corte-unhas-global').checked = !!d.avulsoCorteUnhas;
+  // seção global de serviços avulsos foi removida
 
         // dispatch change/input to update any dependent UI
         document.querySelectorAll('#form-agendar input, #form-agendar select, #form-agendar textarea').forEach(el=>{
@@ -1041,11 +1079,11 @@
         itensLista: listagem() || '',
         nome: (els.recebedor.value||'').trim() || '',
         telefone: (els.tel.value||'').trim() || '',
-  enderecoCompleto: (geo && geo.address && geo.address.display) || (els.endereco.value||'').trim() || '',
-  lat: geo? geo.lat.toFixed(6) : '',
-  lng: geo? geo.lng.toFixed(6) : '',
-  accuracy: geo? fmtAcc(geo.accuracy) : '',
-  timestamp: geo? fmtDT(geo.timestamp) : '',
+        enderecoCompleto: (geo && geo.address && geo.address.display) || (els.endereco.value||'').trim() || '',
+        lat: geo? geo.lat.toFixed(6) : '',
+        lng: geo? geo.lng.toFixed(6) : '',
+        accuracy: geo? fmtAcc(geo.accuracy) : '',
+        timestamp: geo? fmtDT(geo.timestamp) : '',
         observacoes: (els.obs.value||'').trim() || ''
       };
       return tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map));
@@ -1106,24 +1144,24 @@
     });
 
     function resumoBanho(){
-      const modalidade = ($("input[name='modalidade']:checked")||{}).value || '-';
+      const modalidade = ($("input[name='modalidade']:checked")||{}).value || '';
       const geoO = Geo.get('origem') || Geo.get('origem2');
       const geoD = Geo.get('destino') || Geo.get('destino2');
       const map = {
         modalidade,
-        petNome: (byId('petNome')?.value||'').trim() || '-',
-        tutorNome: (byId('tutorNome')?.value||'').trim() || '-',
-        tutorTelefone: (byId('tutorTelefone')?.value||'').trim() || '-',
-        origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem')?.value||'').trim() || '-',
-        destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino')?.value||'').trim() || '-',
-        origemLat: geoO? geoO.lat.toFixed(6) : '-',
-        origemLng: geoO? geoO.lng.toFixed(6) : '-',
-        destinoLat: geoD? geoD.lat.toFixed(6) : '-',
-        destinoLng: geoD? geoD.lng.toFixed(6) : '-',
-        horario: fmtDT(byId('horario')?.value||'') || '-',
-        observacoes: (byId('obs')?.value||'').trim() || '-'
+        petNome: (byId('petNome')?.value||'').trim() || '',
+        tutorNome: (byId('tutorNome')?.value||'').trim() || '',
+        tutorTelefone: (byId('tutorTelefone')?.value||'').trim() || '',
+        origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem')?.value||'').trim() || '',
+        destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino')?.value||'').trim() || '',
+        origemLat: geoO? geoO.lat.toFixed(6) : '',
+        origemLng: geoO? geoO.lng.toFixed(6) : '',
+        destinoLat: geoD? geoD.lat.toFixed(6) : '',
+        destinoLng: geoD? geoD.lng.toFixed(6) : '',
+        horario: fmtDT(byId('horario')?.value||'') || '',
+        observacoes: (byId('obs')?.value||'').trim() || ''
       };
-  return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiBanho, map));
+      return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiBanho, map));
     }
 
     function resumoAgendado(){
@@ -1132,18 +1170,18 @@
       const contato = (byId('contato2')?.value||'').trim();
       const [tutorNome, tutorTelefone] = contato.split(/•|\||-/).map(s=>s&&s.trim()) || ['',''];
       const map = {
-  origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem2')?.value||'').trim() || '-',
-  destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino2')?.value||'').trim() || '-',
-        origemLat: geoO? geoO.lat.toFixed(6) : '-',
-        origemLng: geoO? geoO.lng.toFixed(6) : '-',
-        destinoLat: geoD? geoD.lat.toFixed(6) : '-',
-        destinoLng: geoD? geoD.lng.toFixed(6) : '-',
-        horario: fmtDT(byId('horario2')?.value||'') || '-',
-        tutorNome: tutorNome||'-',
-        tutorTelefone: (tutorTelefone||'').trim() || '-',
-        observacoes: (byId('obs2')?.value||'').trim() || '-'
+        origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem2')?.value||'').trim() || '',
+        destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino2')?.value||'').trim() || '',
+        origemLat: geoO? geoO.lat.toFixed(6) : '',
+        origemLng: geoO? geoO.lng.toFixed(6) : '',
+        destinoLat: geoD? geoD.lat.toFixed(6) : '',
+        destinoLng: geoD? geoD.lng.toFixed(6) : '',
+        horario: fmtDT(byId('horario2')?.value||'') || '',
+        tutorNome: tutorNome||'',
+        tutorTelefone: (tutorTelefone||'').trim() || '',
+        observacoes: (byId('obs2')?.value||'').trim() || ''
       };
-  return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiAgendado, map));
+      return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiAgendado, map));
     }
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }

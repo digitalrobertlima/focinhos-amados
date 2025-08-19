@@ -7,9 +7,15 @@
     "preview": "python -m http.server 8080",
     "test:flows": "node tools/test-full-flows.js",
     "test:a11y": "node tools/test-accessibility.js",
-    "test:matrix": "node tools/test-matrix.js"
+  "test:matrix": "node tools/test-matrix.js",
+  "test:flows:ui": "cross-env HEADFUL=1 SLOW_MS=80 node tools/test-full-flows.js",
+  "test:matrix:ui": "cross-env HEADFUL=1 SLOW_MS=80 node tools/test-matrix.js",
+  "test:flows:ui:fast": "cross-env HEADFUL=1 SLOW_MS=0 node tools/test-full-flows.js",
+  "test:matrix:ui:fast": "cross-env HEADFUL=1 SLOW_MS=0 node tools/test-matrix.js",
+  "test:all:fast": "npm run test:flows && npm run test:matrix"
   },
   "devDependencies": {
-    "puppeteer": "^24.16.2"
+  "puppeteer": "^24.16.2",
+  "cross-env": "^7.0.3"
   }
 }

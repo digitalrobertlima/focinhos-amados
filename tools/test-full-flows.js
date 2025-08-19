@@ -23,8 +23,9 @@ function serve() {
 }
 
 async function safeLaunch(){
+  const headful = /^(1|true|yes)$/i.test(process.env.HEADFUL||'');
   const slow = parseInt(process.env.SLOW_MS || '0', 10) || 0;
-  try{ return await puppeteer.launch({args:['--no-sandbox','--disable-setuid-sandbox'], timeout:60000, headless: true, slowMo: slow}); }
+  try{ return await puppeteer.launch({args:['--no-sandbox','--disable-setuid-sandbox'], timeout:60000, headless: !headful, slowMo: slow}); }
   catch(e){
     const possible = [
       'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -33,7 +34,7 @@ async function safeLaunch(){
     ];
     const found = possible.find(p=> fs.existsSync(p));
     if(!found) throw e;
-  return await puppeteer.launch({executablePath: found, args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu'], timeout:60000, headless: true, slowMo: slow});
+  return await puppeteer.launch({executablePath: found, args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu'], timeout:60000, headless: !headful, slowMo: slow});
   }
 }
 
@@ -44,6 +45,19 @@ function mockGeolocation(page){
     navigator.geolocation.getCurrentPosition = function(success, err){ try{ success(mockPos); }catch(e){ if(err) err(e); } };
     navigator.geolocation.watchPosition = function(success, err){ try{ success(mockPos); }catch(e){ if(err) err(e); } return 1; };
     navigator.geolocation.clearWatch = function(){ return; };
+
+    // speed up: stub reverse geocode fetch to avoid network latency
+    const origFetch = window.fetch ? window.fetch.bind(window) : null;
+    window.fetch = (url, opts)=>{
+      try{
+        const s = String(url||'');
+        if(s.includes('nominatim.openstreetmap.org/reverse')){
+          const payload = { display_name: 'Rua Padre José Maurício, Belo Horizonte, MG, Brasil', address: { road: 'Rua Padre José Maurício' } };
+          return Promise.resolve({ ok: true, json: async ()=> payload });
+        }
+      }catch(_){}
+      return origFetch ? origFetch(url, opts) : Promise.reject(new Error('fetch-not-available'));
+    };
   });
 }
 
