@@ -126,6 +126,44 @@
     return out;
   }
 
+  // ===== Emoji compatibility (fallback to ASCII when device likely lacks glyphs) =====
+  function shouldUsePlainText(){
+    try{
+      // Explicit overrides first
+      const url = new URL(location.href);
+      const q = url.searchParams.get('emoji');
+      if(q === '0') return true;
+      if(q === '1') return false;
+      const ls = localStorage.getItem('focinhos:disableEmoji');
+      if(ls === '1') return true;
+      // Config hint
+      if(window.CONFIG?.ui?.preferPlainTextMessages) return true;
+      // Rough UA heuristic: Android < 8 tends to miss newer emoji
+      const m = navigator.userAgent.match(/Android\s(\d+)(?:\.(\d+))?/i);
+      if(m){ const major = parseInt(m[1]||'0',10); if(major && major < 8) return true; }
+    }catch(e){}
+    return false;
+  }
+  const EMOJI_MAP = new Map(Object.entries({
+    '📅':'[Agenda]','🐾':'[Pets]','⏰':'[Quando]','👤':'[Contato]','🚕':'[Táxi]',
+    '📍':'[Local]','📝':'[Obs]','🏪':'[Loja]','📦':'[Delivery]','🚦':'[Modalidade]'
+  }));
+  function stripEmojis(s){
+    if(!s) return s;
+    let out = s;
+    EMOJI_MAP.forEach((rep, emo)=>{ out = out.split(emo).join(rep); });
+    return out;
+  }
+  function addVS16IfNeeded(s){
+    if(!s) return s; const VS16='\uFE0F';
+    // Apply to a small set that benefits from emoji presentation on some platforms
+    return s
+      .replace(/⏰(?!\uFE0F)/g, '⏰\uFE0F');
+  }
+  function processMessageForPlatform(s){
+    try{ return shouldUsePlainText() ? stripEmojis(s) : addVS16IfNeeded(s); }catch(_){ return s; }
+  }
+
   // ===== Utilities: clipboard copy + attach copy button =====
   function copyToClipboard(text){
     if(!text) return Promise.resolve();
@@ -288,7 +326,7 @@
       const telefone = (byId('tel')?.value|| byId('tutorTelefone')?.value || '').trim();
       const observacoes = (byId('obs')?.value || byId('observacoes')?.value || '').trim();
       const map = { itensLista: items, nome, telefone, observacoes };
-      return tidyMessage(interpolate(tpl, map));
+      return processMessageForPlatform(tidyMessage(interpolate(tpl, map)));
     }
 
     function createPanel(){
@@ -746,7 +784,7 @@
   console.debug('[agendar] resumoTexto result preview', { petsLista: map.petsLista && map.petsLista.slice(0,80) });
       let raw = interpolate(tpl, map);
   // Serviços avulsos removidos (não há seção global)
-      return tidyMessage(raw);
+  return processMessageForPlatform(tidyMessage(raw));
     }
 
     // When a reverse-geocode result is available, show a confirmation helper that
@@ -838,6 +876,8 @@
     function validar(){
   console.debug('[agendar] validar start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
       let ok = true;
+  // Reset toast before validations to avoid an empty green bar
+  try{ const t = byId('agendar-err'); if(t){ t.textContent=''; t.classList.remove('error'); } }catch(e){}
       const pets = readPetsFromDOM();
       if(pets.length===0){ const t = byId('agendar-err'); t.classList.add('error'); t.textContent='Adicione ao menos um pet.'; ok=false; }
       // verificar campos obrigatórios em cada pet
@@ -907,7 +947,8 @@
       const note = document.createElement('p');
       note.id = '__agendar-delivery-note';
       note.className = 'muted';
-      note.style.marginTop = '6px';
+  // spacing handled by CSS (.actions .muted)
+  try{ note.style.removeProperty('margin-top'); }catch(_){ note.style.marginTop = ''; }
       note.textContent = 'Se precisar de delivery, conclua este agendamento e depois volte ao site para combinar pelo Delivery.';
       summaryActions.appendChild(note);
     }
@@ -1141,7 +1182,7 @@
         timestamp: geo? fmtDT(geo.timestamp) : '',
         observacoes: (els.obs.value||'').trim() || ''
       };
-      return tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map));
+  return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map)));
     }
 
     function validar(){
@@ -1216,7 +1257,7 @@
         horario: fmtDT(byId('horario')?.value||'') || '',
         observacoes: (byId('obs')?.value||'').trim() || ''
       };
-      return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiBanho, map));
+  return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.taxiBanho, map)));
     }
 
     function resumoAgendado(){
@@ -1236,7 +1277,7 @@
         tutorTelefone: (tutorTelefone||'').trim() || '',
         observacoes: (byId('obs2')?.value||'').trim() || ''
       };
-      return tidyMessage(interpolate(window.CONFIG.waTemplates.taxiAgendado, map));
+  return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.taxiAgendado, map)));
     }
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }
@@ -1340,7 +1381,7 @@
           const telefone = (byId('tel')?.value|| byId('tutorTelefone')?.value || '').trim();
           const observacoes = (byId('obs')?.value || byId('observacoes')?.value || '').trim();
           const map = { itensLista: items, nome, telefone, observacoes };
-          return tidyMessage(interpolate(tpl, map));
+          return processMessageForPlatform(tidyMessage(interpolate(tpl, map)));
         }
         copyBtn.addEventListener('click', async ()=>{
           try{
@@ -1378,6 +1419,13 @@
     // Load dynamic config first (network-first). If fetch fails, fall back to any inline `window.CONFIG`.
     (async ()=>{
       try{
+        // Persist emoji override from URL if present (emoji=0|1)
+        try{
+          const u = new URL(location.href);
+          const em = u.searchParams.get('emoji');
+          if(em === '0'){ localStorage.setItem('focinhos:disableEmoji','1'); }
+          else if(em === '1'){ localStorage.setItem('focinhos:disableEmoji','0'); }
+        }catch(_){}
         // Use relative path so it works on GitHub Pages subpaths too
         const resp = await fetch('./config.json', { cache: 'no-store' });
         if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }

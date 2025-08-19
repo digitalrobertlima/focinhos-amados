@@ -22,8 +22,10 @@ window.CONFIG = {
   },
 
   ui: {
-    showDirectWhatsOnHome: false, // manter false — WhatsApp só no fim dos fluxos
-    brand: "#029935", danger: "#FE0000", text: "#030302", muted: "#666666", bg: "#FFFCFE"
+  showDirectWhatsOnHome: false, // manter false — WhatsApp só no fim dos fluxos
+  brand: "#029935", danger: "#FE0000", text: "#030302", muted: "#666666", bg: "#FFFCFE",
+  // Se true, os cabeçalhos de mensagens usam rótulos ASCII em vez de emoji para máxima compatibilidade
+  preferPlainTextMessages: false
   },
 
   geoloc: {

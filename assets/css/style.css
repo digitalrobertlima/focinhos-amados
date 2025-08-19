@@ -10,7 +10,7 @@
 
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 img{max-width:100%;height:auto;display:block}
 a{color:var(--brand);text-decoration:none}
 a:hover{text-decoration:underline}
@@ -32,7 +32,7 @@ a:hover{text-decoration:underline}
 .nav__drawer a:hover{background:#f7f7f7}
 
 .hero{padding-block:20px}
-.hero__title{font-size:var(--fs-900);line-height:1.35;margin:0 0 8px}
+.hero__title{font-size:clamp(1.75rem, 1.2rem + 2.6vw, 2.25rem);line-height:1.25;margin:0 0 8px;text-wrap:balance}
 .hero__sub{margin:0 0 12px;color:var(--muted)}
 .hero__actions{display:flex;flex-wrap:wrap;gap:8px}
 .hero__hint{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:var(--fs-400);margin-top:8px}
@@ -57,7 +57,7 @@ a:hover{text-decoration:underline}
 .card--service .btn{margin-top:8px}
 .card--summary .note{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border:1px dashed var(--border);border-radius:var(--radius-300);padding:12px;background:#fff;white-space:pre-wrap}
 
-.section__title{font-size:var(--fs-800);margin:12px 0}
+.section__title{font-size:clamp(1.25rem, 1.05rem + 1.2vw, 1.6rem);line-height:1.25;margin:12px 0;text-wrap:balance}
 
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:stretch}
 @media(min-width:760px){.gallery{grid-template-columns:repeat(6,1fr)}}
@@ -104,6 +104,7 @@ a:hover{text-decoration:underline}
 .upsell summary{cursor:pointer}
 
 .toast{margin-top:8px;padding:10px;border-radius:12px;background:var(--brand-100);border:1px dashed var(--brand)}
+.toast:empty{display:none}
 .toast.error{background:var(--danger-050);border-color:var(--danger);color:var(--danger-700)}
 .notice{padding:10px;border-radius:12px;background:var(--brand-100);border:1px solid var(--brand)}
 
@@ -246,3 +247,10 @@ section{ margin:16px 0; }
 
 /* Tiny tap feedback for quick actions */
 .btn.clicked{ transform:scale(0.98); transition:transform .12s ease; }
+
+/* --- Actions harmony: consistent visual rhythm & hierarchy --- */
+/* Grid layout: primary CTA spans full width; secondary actions share two columns */
+.actions{ display:grid; grid-template-columns:1fr; gap:8px; align-items:stretch; }
+@media(min-width:600px){ .actions{ grid-template-columns:repeat(2, 1fr); } }
+.actions .btn--primary{ grid-column:1 / -1; }
+.actions .muted{ grid-column:1 / -1; margin-top:2px; }
