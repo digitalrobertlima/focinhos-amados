@@ -167,7 +167,7 @@ Feito com 💚 para **Focinhos Amados (BH)** — publicação sem dor de cabeça
 
 ## Changes made (quick cleanup)
 
-- Removed empty file `assets/js/images.js` (unused).
+- Arquivo vazio removido `assets/js/images.js` (unused).
 - Removed generated reports `checks.json` and `download_report.json` from the repo.
 - Updated `sw.js` to remove a reference to `assets/img/generic-placeholder.svg` which didn't exist (prevents SW install failures).
 
