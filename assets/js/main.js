@@ -1140,6 +1140,12 @@
         const petBlocks = Array.from(petsContainer.querySelectorAll('.pet'));
         pets.forEach((p, idx)=>{
           const el = petBlocks[idx]; if(!el) return;
+          // Backward-compat: map deprecated perfume option to new ones
+          const mapPerfume = (v)=>{
+            const s = String(v||'');
+            if(/perfume\s*marcante/i.test(s)) return 'perfume de impacto';
+            return s;
+          };
           if(idx===0){
             if(byId('petNome')) byId('petNome').value = p.nome||'';
             if(byId('especie')) byId('especie').value = p.especie||'';
@@ -1163,7 +1169,7 @@
           setChk('srv-tosa', p.srvTosa);
           setVal('tosaTipo', p.tosaTipo||'');
           setChk('srv-ozonio', p.ozonio);
-          setVal('perfume', p.perfume||'');
+          setVal('perfume', mapPerfume(p.perfume)||'');
           setVal('acessorio', p.acessorio||'');
           setChk('escovacao', p.escovacao);
           setChk('hidratacao', p.hidratacao);
