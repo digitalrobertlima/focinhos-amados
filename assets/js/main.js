@@ -1306,7 +1306,38 @@
 
   try{ attachCopyButton(els.btnWA && els.btnWA.parentNode || document.body, '__delivery-copy-msg', resumoTexto); }catch(e){ console.warn('attach copy (delivery) failed', e); }
   // react to external cart changes
-  window.addEventListener('focinhos:cart:changed', ()=>{ cart = getCartFromStorage(); renderCart(); });
+  window.addEventListener('focinhos:cart:changed', ()=>{ cart = getCartFromStorage(); renderCart(); try{ autoUpdateResumo(); }catch(e){} });
+
+    // Auto-update summary when form is complete (silent validation)
+    function canAutoSummarize(){
+      try{
+        const c = getCartFromStorage();
+        if(!c || c.length===0) return false;
+        if(!(els.recebedor && (els.recebedor.value||'').trim())) return false;
+        if(!(els.tel && isTelBR(els.tel.value))) return false;
+        const requiredFilled = [els.rua, els.numero, els.bairro, els.cep].every(el=> !!el && (el.value||'').trim());
+        if(!requiredFilled) return false;
+        return true;
+      }catch(_){ return false; }
+    }
+
+    const autoUpdateResumo = debounce(()=>{
+      try{
+        if(!els.preResumo) return;
+        if(canAutoSummarize()){
+          const txt = resumoTexto();
+          els.preResumo.textContent = txt;
+          try{ if(els.btnWA) els.btnWA.href = waLink(txt); }catch(e){}
+        }
+      }catch(e){ /* silent */ }
+    }, 300);
+
+    // Bind auto-update on inputs
+    try{
+      const formEl = byId('form-delivery') || document.querySelector('form');
+      if(formEl){ formEl.addEventListener('input', autoUpdateResumo, { passive:true }); formEl.addEventListener('change', autoUpdateResumo, { passive:true }); }
+      setTimeout(autoUpdateResumo, 50);
+    }catch(e){ /* ignore */ }
 
     // Save minimal delivery draft (address/contact) on changes
     try{
@@ -1459,6 +1490,49 @@
     });
 
   try{ attachCopyButton(R.btnWA && R.btnWA.parentNode || document.body, '__taxi-copy-msg', resumo); }catch(e){ console.warn('attach copy (taxi) failed', e); }
+
+    // Auto-update summary for Taxi when complete (silent validation)
+    function canAutoSummarizeTaxi(){
+      try{
+        const isBanho = R.tipoBanho && R.tipoBanho.checked;
+        if(isBanho){
+          const modalidade = ($("input[name='modalidade']:checked")||{}).value || '';
+          if(!modalidade) return false;
+          if(!(byId('petNome') && (byId('petNome').value||'').trim())) return false;
+          if(!(byId('tutorNome') && (byId('tutorNome').value||'').trim())) return false;
+          if(!(byId('tutorTelefone') && isTelBR(byId('tutorTelefone').value))) return false;
+          function filled(prefix){ const ids=['rua','numero','bairro','cep'].map(s=> `${prefix}-${s}`); return ids.every(id=> { const el=byId(id); return !!el && (el.value||'').trim(); }); }
+          if(modalidade === 'Buscar e entregar'){ if(!filled('origem') || !filled('destino')) return false; }
+          else if(modalidade === 'Buscar apenas'){ if(!filled('origem')) return false; }
+          else if(modalidade === 'Entregar apenas'){ if(!filled('destino')) return false; }
+          return true;
+        } else { // Agendado livre
+          function filled(prefix){ const ids=['rua','numero','bairro','cep'].map(s=> `${prefix}-${s}`); return ids.every(id=> { const el=byId(id); return !!el && (el.value||'').trim(); }); }
+          if(!filled('origem2') || !filled('destino2')) return false;
+          const contatoEl = byId('contato2'); if(!(contatoEl && isTelBR(contatoEl.value))) return false;
+          return true;
+        }
+      }catch(_){ return false; }
+    }
+
+    const autoUpdateTaxiResumo = debounce(()=>{
+      try{
+        if(!R.resumo) return;
+        if(canAutoSummarizeTaxi()){
+          const txt = resumo();
+          R.resumo.textContent = txt;
+          try{ if(R.btnWA) R.btnWA.href = waLink(txt); }catch(e){}
+        }
+      }catch(e){ /* silent */ }
+    }, 300);
+
+    try{
+      const formEl = byId('form-taxi') || document.querySelector('form');
+      if(formEl){ formEl.addEventListener('input', autoUpdateTaxiResumo, { passive:true }); formEl.addEventListener('change', autoUpdateTaxiResumo, { passive:true }); }
+      // also on section toggle
+      [R.tipoBanho, R.tipoAgendado].forEach(el=> el && el.addEventListener('change', autoUpdateTaxiResumo, { passive:true }));
+      setTimeout(autoUpdateTaxiResumo, 50);
+    }catch(e){ /* ignore */ }
   }
 
   // ===== SW Register =====
