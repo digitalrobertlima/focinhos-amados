@@ -734,10 +734,44 @@
   // Sem botões de geo na UI
 
     // Toggle localizacao fields
+    function ensureReqMarker(labelEl, on){
+      if(!labelEl) return;
+      let star = labelEl.querySelector('span.req');
+      if(on){
+        if(!star){ star = document.createElement('span'); star.className='req'; star.textContent='*'; labelEl.appendChild(document.createTextNode(' ')); labelEl.appendChild(star); }
+      } else {
+        if(star){ star.parentNode && star.parentNode.removeChild(star); }
+      }
+    }
+    function toggleAddrRequired(prefix, on){
+      ['rua','numero','bairro','cep'].forEach(s=>{
+        const id = `${prefix}-${s}`;
+        const inp = byId(id);
+        if(inp){ if(on){ inp.setAttribute('aria-required','true'); } else { inp.removeAttribute('aria-required'); } }
+        const lbl = document.querySelector(`label[for="${id}"]`);
+        ensureReqMarker(lbl, on);
+      });
+    }
     function updateLocalizacaoFields(){
       const sel = document.querySelector("input[name='modalidadeLocalizacao']:checked").value;
-      fieldOrigem.classList.toggle('hide', !(sel==='taxi-both' || sel==='taxi-pickup'));
-      fieldDestino.classList.toggle('hide', !(sel==='taxi-both' || sel==='taxi-dropoff'));
+      const showOrigem = (sel==='taxi-both' || sel==='taxi-pickup');
+      const showDestino = (sel==='taxi-both' || sel==='taxi-dropoff');
+      fieldOrigem.classList.toggle('hide', !showOrigem);
+      fieldDestino.classList.toggle('hide', !showDestino);
+      // dynamic required markers per modalidade
+      if(sel === 'taxi-both'){
+        toggleAddrRequired('origem', true);
+        toggleAddrRequired('destino', true);
+      } else if(sel === 'taxi-pickup'){
+        toggleAddrRequired('origem', true);
+        toggleAddrRequired('destino', false);
+      } else if(sel === 'taxi-dropoff'){
+        toggleAddrRequired('origem', false);
+        toggleAddrRequired('destino', true);
+      } else { // loja
+        toggleAddrRequired('origem', false);
+        toggleAddrRequired('destino', false);
+      }
     }
     modalidadeEls.forEach(r=> on(r,'change', updateLocalizacaoFields));
     updateLocalizacaoFields();
