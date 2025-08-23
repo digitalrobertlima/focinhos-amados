@@ -749,12 +749,23 @@
       return list.join(', ');
     }
 
+    // Map modalidade (agendar) code to user-friendly PT label for WhatsApp
+    function labelModalidadeAgendar(code){
+      switch(String(code||'loja')){
+        case 'taxi-both': return 'Táxi Dog (Buscar e Levar)';
+        case 'taxi-pickup': return 'Táxi Dog (Somente Buscar)';
+        case 'taxi-dropoff': return 'Táxi Dog (Somente Levar)';
+        case 'loja':
+        default: return 'Levarei na loja';
+      }
+    }
+
     function resumoTexto(){
     console.debug('[agendar] resumoTexto start', { petIndexCounter, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
       const geoDefault = Geo.get('default');
       const pets = readPetsFromDOM();
       // formatar lista de pets (omitindo campos vazios ou '-')
-      const petsTxt = pets.map((p, i)=>{
+  const petsTxt = pets.map((p, i)=>{
         const valOk = (v)=> !!v && String(v).trim() !== '-' && String(v).trim() !== '';
         const details = [];
         if(valOk(p.especie)) details.push(`Espécie: ${p.especie}`);
@@ -776,8 +787,9 @@
         const head = `Pet ${i+1}: ${p.nome || ''}`.trim();
         if(details.length>0) return `${head} • ${details.join(' • ')}`; else return head;
       }).filter(Boolean).join('\n');
-      // Localização
-  const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
+  // Localização
+  const modalidadeCode = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
+  const modalidade = labelModalidadeAgendar(modalidadeCode);
   const origemAddr = ['origem-rua','origem-numero','origem-bairro','origem-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
   const destinoAddr = ['destino-rua','destino-numero','destino-bairro','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
 
@@ -793,7 +805,7 @@
         janela: f.janela.value || '',
         tutorNome: f.tutorNome.value.trim() || '',
         tutorTelefone: f.tutorTelefone.value.trim() || '',
-        modalidade: modalidade || '',
+  modalidade: modalidade || '',
         enderecoLoja: window.CONFIG?.business?.addressLine || '',
   origemEndereco: origemAddr || '',
   destinoEndereco: destinoAddr || '',
@@ -1293,8 +1305,18 @@
 
   // Sem botões de geo
 
+    function labelModalidadeTaxi(code){
+      switch(String(code||'')){
+        case 'Buscar apenas': return 'Táxi Dog (Buscar apenas)';
+        case 'Entregar apenas': return 'Táxi Dog (Entregar apenas)';
+        case 'Buscar e entregar': return 'Táxi Dog (Buscar e entregar)';
+        default: return '';
+      }
+    }
+
     function resumoBanho(){
-      const modalidade = ($("input[name='modalidade']:checked")||{}).value || '';
+      const modalidadeCode = ($("input[name='modalidade']:checked")||{}).value || '';
+      const modalidade = labelModalidadeTaxi(modalidadeCode);
       const geo = Geo.get('default');
       const map = {
         modalidade,
