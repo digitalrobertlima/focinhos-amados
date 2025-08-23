@@ -1631,6 +1631,110 @@
     }
   }
 
+  // ===== PWA Install Prompt (Android + iOS A2HS) =====
+  function initInstallPrompt(){
+    try{
+      const KEY = 'focinhos:installPrompt:v1';
+      const getState = ()=>{ try{ return JSON.parse(localStorage.getItem(KEY) || '{}'); }catch(_){ return {}; } };
+      const setState = (patch)=>{ try{ const cur = getState(); localStorage.setItem(KEY, JSON.stringify(Object.assign({}, cur, patch))); }catch(_){ } };
+
+      const isStandalone = ()=>{
+        try{ if(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true; }catch(_){ }
+        try{ if('standalone' in navigator && navigator.standalone) return true; }catch(_){ }
+        return false;
+      };
+
+      const isiOS = ()=> /iP(hone|ad|od)/i.test(navigator.userAgent);
+      const isSafari = ()=> /Safari/i.test(navigator.userAgent) && !/CriOS|FxiOS|EdgiOS/i.test(navigator.userAgent);
+      const isAndroid = ()=> /Android/i.test(navigator.userAgent);
+      const isMobile = ()=> /Android|iP(hone|ad|od)/i.test(navigator.userAgent);
+
+      if(isStandalone() || !isMobile()) return; // já instalado ou desktop
+
+      let deferredPrompt = null;
+
+      function hideBanner(){ const b = document.getElementById('__install-banner'); if(b && b.parentNode){ try{ b.parentNode.removeChild(b); }catch(_){ } } }
+
+      function mkBanner({ title, body, primaryLabel, onPrimary, secondaryLabel='Agora não', onSecondary }){
+        hideBanner();
+        const wrap = document.createElement('div');
+        wrap.id = '__install-banner';
+        wrap.setAttribute('role','dialog');
+        wrap.setAttribute('aria-live','polite');
+        wrap.className = 'install-banner';
+        wrap.innerHTML = `
+          <div class="install-banner__inner">
+            <div class="install-banner__text">
+              <div class="install-banner__title">${title}</div>
+              <div class="install-banner__body">${body}</div>
+            </div>
+            <div class="install-banner__actions">
+              <button id="__ib-primary" class="btn btn--primary">${primaryLabel}</button>
+              <button id="__ib-sec" class="btn btn--ghost">${secondaryLabel}</button>
+            </div>
+          </div>`;
+        document.body.appendChild(wrap);
+        const p = document.getElementById('__ib-primary'); const s = document.getElementById('__ib-sec');
+        p && p.addEventListener('click', async ()=>{ try{ await onPrimary(); }catch(_){ } });
+        s && s.addEventListener('click', ()=>{ try{ onSecondary && onSecondary(); }catch(_){ } });
+        return wrap;
+      }
+
+      // Android/Chrome: usar beforeinstallprompt
+      window.addEventListener('beforeinstallprompt', (e)=>{
+        try{
+          e.preventDefault();
+          deferredPrompt = e;
+          const st = getState();
+          const now = Date.now();
+          const cooldownMs = 14*24*60*60*1000; // 14 dias
+          if(st.installed) return;
+          if(st.dismissedAt && (now - st.dismissedAt) < cooldownMs) return;
+          setTimeout(()=>{
+            mkBanner({
+              title: 'Instale o app',
+              body: 'Acesse mais rápido e use como aplicativo, mesmo sem abrir o navegador.',
+              primaryLabel: 'Instalar',
+              onPrimary: async ()=>{
+                try{
+                  hideBanner();
+                  await deferredPrompt.prompt();
+                  const choice = await deferredPrompt.userChoice;
+                  if(choice && choice.outcome === 'accepted'){ setState({ installed: true }); }
+                  else { setState({ dismissedAt: Date.now() }); }
+                }catch(_){ setState({ dismissedAt: Date.now() }); }
+              },
+              secondaryLabel: 'Depois',
+              onSecondary: ()=>{ hideBanner(); setState({ dismissedAt: Date.now() }); }
+            });
+          }, 3500);
+        }catch(_){ }
+      });
+
+      window.addEventListener('appinstalled', ()=>{ try{ setState({ installed: true }); hideBanner(); }catch(_){ } });
+
+      // iOS Safari: mostrar instruções de A2HS (sem beforeinstallprompt)
+      if(isiOS() && isSafari()){
+        const st = getState();
+        const now = Date.now();
+        const cooldownMs = 14*24*60*60*1000;
+        if(st.installed) return;
+        if(st.dismissedAt && (now - st.dismissedAt) < cooldownMs) return;
+        setTimeout(()=>{
+          const body = 'No iPhone/iPad: toque em Compartilhar (quadrado com seta para cima) e depois em “Adicionar à Tela de Início”.';
+          mkBanner({
+            title: 'Instale o app',
+            body,
+            primaryLabel: 'Entendi',
+            onPrimary: ()=>{ hideBanner(); setState({ dismissedAt: Date.now() }); },
+            secondaryLabel: 'Depois',
+            onSecondary: ()=>{ hideBanner(); setState({ dismissedAt: Date.now() }); }
+          });
+        }, 5000);
+      }
+    }catch(_){ }
+  }
+
   // ===== Init cart modal (header) =====
   function initCartModal(){
     // open modal showing current cart
@@ -1727,7 +1831,7 @@
         if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }
       }catch(e){ console.warn('config.json fetch failed, using inline CONFIG if present', e); }
       // Run each init inside try/catch so a failure in one doesn't stop others
-  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initCartPanel, initCartModal, initSW].forEach(fn=>{
+  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initCartPanel, initCartModal, initInstallPrompt, initSW].forEach(fn=>{
         try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
       });
       try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }

@@ -259,3 +259,12 @@ section{ margin:16px 0; }
 @media(min-width:600px){ .actions{ grid-template-columns:repeat(2, 1fr); } }
 .actions .btn--primary{ grid-column:1 / -1; }
 .actions .muted{ grid-column:1 / -1; margin-top:2px; }
+
+/* PWA install banner (brand aligned) */
+.install-banner{position:fixed;left:12px;right:12px;bottom:12px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-400);box-shadow:var(--shadow-md);padding:12px;z-index:2000;animation:snk-in .18s ease-out}
+.install-banner__inner{display:flex;gap:10px;align-items:flex-start}
+.install-banner__text{flex:1 1 auto}
+.install-banner__title{font-weight:700;margin-bottom:4px}
+.install-banner__body{color:var(--muted)}
+.install-banner__actions{flex:0 0 auto;display:flex;gap:8px;align-items:center}
+@media(max-width:420px){ .install-banner__actions .btn{ padding:8px 10px; font-size:14px; } }
