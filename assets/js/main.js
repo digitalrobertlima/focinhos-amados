@@ -1141,6 +1141,53 @@
 
     // Restore immediately on init
     restoreAgendarDraft();
+
+    // Auto-update summary when form is complete (silent validation)
+    function canAutoSummarize(){
+      try{
+        const pets = readPetsFromDOM();
+        if(!pets || pets.length===0) return false;
+        // required fields per pet
+        for(const p of pets){ if(!(p && p.nome && p.especie && p.porte)) return false; }
+        // contact
+        if(!(f.tutorNome && (f.tutorNome.value||'').trim())) return false;
+        if(!(f.tutorTelefone && isTelBR(f.tutorTelefone.value))) return false;
+        // when
+        if(!(f.dataPreferida && (f.dataPreferida.value||'').trim())) return false;
+        if(!(f.janela && (f.janela.value||'').trim())) return false;
+        // at least one service across pets
+        const hasAnyService = pets.some(p=> p && (p.srvBanho || p.srvTosa || p.ozonio || p.escovacao || p.hidratacao || p.corteUnhas || p.limpezaOuvido));
+        if(!hasAnyService) return false;
+        // address requirements per modalidade
+        const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
+        function filledPrefix(prefix){
+          const ids = ['rua','numero','bairro','cep'].map(s=> `${prefix}-${s}`);
+          return ids.every(id=> { const el = byId(id); return !!el && (el.value||'').trim().length>0; });
+        }
+        if(modalidade === 'taxi-both'){ if(!filledPrefix('origem') || !filledPrefix('destino')) return false; }
+        else if(modalidade === 'taxi-pickup'){ if(!filledPrefix('origem')) return false; }
+        else if(modalidade === 'taxi-dropoff'){ if(!filledPrefix('destino')) return false; }
+        return true;
+      }catch(_){ return false; }
+    }
+
+    const autoUpdateResumo = debounce(()=>{
+      try{
+        if(!preResumo) return;
+        if(canAutoSummarize()){
+          const txt = resumoTexto();
+          preResumo.textContent = txt;
+          try{ if(btnWA) btnWA.href = waLink(txt); }catch(e){}
+        }
+      }catch(e){ /* silent */ }
+    }, 350);
+
+    try{
+      const formEl = byId('form-agendar');
+      if(formEl){ formEl.addEventListener('input', autoUpdateResumo, { passive:true }); formEl.addEventListener('change', autoUpdateResumo, { passive:true }); }
+      // run once after restore
+      setTimeout(autoUpdateResumo, 50);
+    }catch(e){ /* ignore */ }
   }
 
   // ====== Fluxo: DELIVERY ======
