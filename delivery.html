@@ -76,11 +76,7 @@
 
     <section class="card">
       <h2 class="card__title">📦 Endereço & contato</h2>
-      <div class="actions">
-        <button id="btn-use-geo" class="btn btn--ghost" type="button">📍 Usar minha localização</button>
-        <span id="geo-badge" class="badge" aria-live="polite"></span>
-      </div>
-      <div class="grid grid--3" style="margin-top:8px">
+      <div class="grid grid--2" style="margin-top:8px">
         <div class="field">
           <label for="recebedor">Nome do recebedor <span class="req">*</span></label>
           <input id="recebedor" class="input" required autocomplete="name">
@@ -91,9 +87,29 @@
           <input id="tel" class="input" inputmode="tel" required autocomplete="tel">
           <small id="err-tel" class="help" hidden></small>
         </div>
+      </div>
+      <div class="grid grid--3" style="margin-top:8px">
         <div class="field">
-          <label for="endereco">Endereço completo</label>
-          <input id="endereco" class="input" placeholder="Rua, número, bairro, complemento" autocomplete="street-address">
+          <label for="end-rua">Rua <span class="req">*</span></label>
+          <input id="end-rua" class="input" autocomplete="address-line1">
+          <small id="err-end-rua" class="help" hidden></small>
+        </div>
+        <div class="field">
+          <label for="end-numero">Nº <span class="req">*</span></label>
+          <input id="end-numero" class="input" inputmode="numeric" autocomplete="address-line2">
+          <small id="err-end-numero" class="help" hidden></small>
+        </div>
+        <div class="field">
+          <label for="end-bairro">Bairro <span class="req">*</span></label>
+          <input id="end-bairro" class="input" autocomplete="address-level2">
+          <small id="err-end-bairro" class="help" hidden></small>
+        </div>
+      </div>
+      <div class="grid grid--3" style="margin-top:8px">
+        <div class="field">
+          <label for="end-cep">CEP <span class="req">*</span></label>
+          <input id="end-cep" class="input" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000">
+          <small id="err-end-cep" class="help" hidden></small>
         </div>
       </div>
       <div class="field">

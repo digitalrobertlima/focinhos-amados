@@ -47,7 +47,7 @@ window.CONFIG = {
       "Hidratação de pelagem",
       "Corte de unhas",
       "Limpeza de ouvido",
-      "Tratamento de hálito (espuma)"
+      "Higienização bucal"
     ]
   },
 

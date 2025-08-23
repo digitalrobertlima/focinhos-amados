@@ -77,14 +77,26 @@
 
         <div class="grid grid--2">
           <div class="field">
-            <label for="origem">Endereço de origem</label>
-            <input id="origem" class="input" placeholder="Rua, número, bairro">
-            <div class="actions"><button class="btn btn--ghost" type="button" data-geo="origem">📍 Usar minha localização</button><span class="badge" id="geo-origem" aria-live="polite"></span></div>
+            <label>Endereço de origem</label>
+            <div class="grid grid--3">
+              <div class="field"><label for="origem-rua">Rua <span class="req">*</span></label><input id="origem-rua" class="input"></div>
+              <div class="field"><label for="origem-numero">Nº <span class="req">*</span></label><input id="origem-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="origem-bairro">Bairro <span class="req">*</span></label><input id="origem-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="origem-cep">CEP <span class="req">*</span></label><input id="origem-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
           </div>
           <div class="field">
-            <label for="destino">Endereço de destino (opcional)</label>
-            <input id="destino" class="input" placeholder="Rua, número, bairro">
-            <div class="actions"><button class="btn btn--ghost" type="button" data-geo="destino">📍 Usar minha localização</button><span class="badge" id="geo-destino" aria-live="polite"></span></div>
+            <label>Endereço de destino (opcional)</label>
+            <div class="grid grid--3">
+              <div class="field"><label for="destino-rua">Rua</label><input id="destino-rua" class="input"></div>
+              <div class="field"><label for="destino-numero">Nº</label><input id="destino-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="destino-bairro">Bairro</label><input id="destino-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="destino-cep">CEP</label><input id="destino-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
           </div>
         </div>
 
@@ -103,14 +115,26 @@
         <h2 class="card__title">Agendado (livre)</h2>
         <div class="grid grid--2">
           <div class="field">
-            <label for="origem2">Origem</label>
-            <input id="origem2" class="input" placeholder="Rua, número, bairro">
-            <div class="actions"><button class="btn btn--ghost" type="button" data-geo="origem2">📍 Usar minha localização</button><span class="badge" id="geo-origem2" aria-live="polite"></span></div>
+            <label>Origem</label>
+            <div class="grid grid--3">
+              <div class="field"><label for="origem2-rua">Rua</label><input id="origem2-rua" class="input"></div>
+              <div class="field"><label for="origem2-numero">Nº</label><input id="origem2-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="origem2-bairro">Bairro</label><input id="origem2-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="origem2-cep">CEP</label><input id="origem2-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
           </div>
           <div class="field">
-            <label for="destino2">Destino</label>
-            <input id="destino2" class="input" placeholder="Rua, número, bairro">
-            <div class="actions"><button class="btn btn--ghost" type="button" data-geo="destino2">📍 Usar minha localização</button><span class="badge" id="geo-destino2" aria-live="polite"></span></div>
+            <label>Destino</label>
+            <div class="grid grid--3">
+              <div class="field"><label for="destino2-rua">Rua</label><input id="destino2-rua" class="input"></div>
+              <div class="field"><label for="destino2-numero">Nº</label><input id="destino2-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="destino2-bairro">Bairro</label><input id="destino2-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="destino2-cep">CEP</label><input id="destino2-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
           </div>
         </div>
         <div class="grid grid--2">

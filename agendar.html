@@ -107,15 +107,14 @@
                   <label>Tipo de tosa (opcional)</label>
                   <select class="select" data-role="tosaTipo">
                     <option value="">Selecione…</option>
-                      <option>Higiênica</option>
-                      <option>Na tesoura (+R$15,00)</option>
-                      <option>Na máquina (valor padrão)</option>
+            <option>Higiênica</option>
+            <option>Na tesoura</option>
+            <option>Na máquina</option>
                   </select>
                 </div>
               </div>
                 <div class="grid grid--3" style="margin-top:6px">
-                  <label class="check"><input type="checkbox" data-role="srv-ozonio"> <span>Banho de ozônio (+R$5,00)</span></label>
-                  <label class="check"><input type="checkbox" data-role="srv-melaleuca"> <span>Shampoo de melaleuca (+R$5,00)</span></label>
+          <label class="check"><input type="checkbox" data-role="srv-ozonio"> <span>Banho de ozônio</span></label>
                 </div>
                 <div class="grid grid--3" style="margin-top:6px">
                   <div class="field">
@@ -133,10 +132,10 @@
                       <option>Gravata</option>
                     </select>
                   </div>
-                  <label class="check"><input type="checkbox" data-role="escovacao"> <span>Espuma dental para tártaro (+R$7,00)</span></label>
+                  <label class="check"><input type="checkbox" data-role="escovacao"> <span>Higienização bucal</span></label>
                 </div>
                 <div class="grid grid--3" style="margin-top:6px">
-                  <label class="check"><input type="checkbox" data-role="hidratacao"> <span>Hidratação (+R$30,00)</span></label>
+                  <label class="check"><input type="checkbox" data-role="hidratacao"> <span>Hidratação</span></label>
                   <label class="check"><input type="checkbox" data-role="corte-unhas"> <span>Corte de unhas</span></label>
                   <label class="check"><input type="checkbox" data-role="limpeza-ouvido"> <span>Limpeza de ouvido</span></label>
                 </div>
@@ -213,14 +212,13 @@
                   <select class="select" data-role="tosaTipo">
                     <option value="">Selecione…</option>
                     <option>Higiênica</option>
-                    <option>Na tesoura (+R$15,00)</option>
-                    <option>Na máquina (valor padrão)</option>
+          <option>Na tesoura</option>
+          <option>Na máquina</option>
                   </select>
                 </div>
               </div>
               <div class="grid grid--3" style="margin-top:6px">
-                <label class="check"><input type="checkbox" data-role="srv-ozonio"> <span>Banho de ozônio (+R$5,00)</span></label>
-                <label class="check"><input type="checkbox" data-role="srv-melaleuca"> <span>Shampoo de melaleuca (+R$5,00)</span></label>
+        <label class="check"><input type="checkbox" data-role="srv-ozonio"> <span>Banho de ozônio</span></label>
               </div>
               <div class="grid grid--3" style="margin-top:6px">
                 <div class="field">
@@ -238,10 +236,10 @@
                     <option>Gravata</option>
                   </select>
                 </div>
-                <label class="check"><input type="checkbox" data-role="escovacao"> <span>Espuma dental para tártaro (+R$7,00)</span></label>
+                <label class="check"><input type="checkbox" data-role="escovacao"> <span>Higienização bucal</span></label>
               </div>
               <div class="grid grid--3" style="margin-top:6px">
-                <label class="check"><input type="checkbox" data-role="hidratacao"> <span>Hidratação (+R$30,00)</span></label>
+                <label class="check"><input type="checkbox" data-role="hidratacao"> <span>Hidratação</span></label>
                 <label class="check"><input type="checkbox" data-role="corte-unhas"> <span>Corte de unhas</span></label>
                 <label class="check"><input type="checkbox" data-role="limpeza-ouvido"> <span>Limpeza de ouvido</span></label>
               </div>
@@ -304,31 +302,34 @@
           </div>
         </div>
 
-        <div class="actions" style="margin-top:8px">
-          <button id="btn-use-geo" class="btn btn--ghost" type="button" data-geo="default">📍 Usar minha localização</button>
-          <span class="badge" id="geo-badge" aria-live="polite"></span>
-        </div>
+        
 
         <div id="localizacao-fields" style="margin-top:8px">
           <div id="field-origem" class="grid grid--2 hide">
             <div class="field">
-              <label for="origem">Endereço de Origem</label>
-              <input id="origem" class="input" placeholder="Rua, número, bairro, complemento">
-            </div>
-            <div class="field" style="align-self:end">
-              <button type="button" class="btn btn--ghost" data-geo="origem">📍 Usar minha localização</button>
-              <span class="badge" id="geo-origem" aria-live="polite"></span>
+              <label>Endereço de Origem</label>
+              <div class="grid grid--3">
+                <div class="field"><label for="origem-rua">Rua <span class="req">*</span></label><input id="origem-rua" class="input"></div>
+                <div class="field"><label for="origem-numero">Nº <span class="req">*</span></label><input id="origem-numero" class="input" inputmode="numeric"></div>
+                <div class="field"><label for="origem-bairro">Bairro <span class="req">*</span></label><input id="origem-bairro" class="input"></div>
+              </div>
+              <div class="grid grid--3" style="margin-top:6px">
+                <div class="field"><label for="origem-cep">CEP <span class="req">*</span></label><input id="origem-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+              </div>
             </div>
           </div>
 
           <div id="field-destino" class="grid grid--2 hide">
             <div class="field">
-              <label for="destino">Endereço de Destino</label>
-              <input id="destino" class="input" placeholder="Rua, número, bairro, complemento">
-            </div>
-            <div class="field" style="align-self:end">
-              <button type="button" class="btn btn--ghost" data-geo="destino">📍 Usar minha localização</button>
-              <span class="badge" id="geo-destino" aria-live="polite"></span>
+              <label>Endereço de Destino</label>
+              <div class="grid grid--3">
+                <div class="field"><label for="destino-rua">Rua</label><input id="destino-rua" class="input"></div>
+                <div class="field"><label for="destino-numero">Nº</label><input id="destino-numero" class="input" inputmode="numeric"></div>
+                <div class="field"><label for="destino-bairro">Bairro</label><input id="destino-bairro" class="input"></div>
+              </div>
+              <div class="grid grid--3" style="margin-top:6px">
+                <div class="field"><label for="destino-cep">CEP</label><input id="destino-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+              </div>
             </div>
           </div>
         </div>

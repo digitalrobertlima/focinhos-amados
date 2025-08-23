@@ -529,12 +529,7 @@
           };
           const best = state.best[key];
           if(!best || r.accuracy < best.accuracy){ state.best[key] = r; }
-          const b = badge || byId(key.startsWith('origem')? 'geo-origem' : key.startsWith('destino')? 'geo-destino' : 'geo-badge');
-          if(b){
-            const d = new Date(state.best[key].timestamp);
-            const when = isNaN(d.getTime()) ? '' : `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-            b.textContent = `~${fmtAcc(state.best[key].accuracy)}m @ ${when}`;
-          }
+          // Sem badge na UI
           // If we don't have a resolved address yet, try to fetch one in background
           (async ()=>{
             try{
@@ -566,8 +561,7 @@
           }
         },
         (err)=>{
-          const b = badge || byId('geo-badge');
-          if(b){ b.textContent = '🔒 Permissão negada ou indisponível'; }
+          // Sem badge na UI
           stop(key);
         },
         opts
@@ -610,8 +604,7 @@
       // todos os serviços/preferências são por pet agora
       dataPreferida: byId('dataPreferida'), janela: byId('janela')
     };
-  const btnGeo = byId('btn-use-geo');
-  const badge = byId('geo-badge');
+  // geolocalização inicia automaticamente; sem botões na UI
     const btnResumo = byId('btn-ver-resumo');
     const preResumo = byId('agendar-resumo');
     const btnWA = byId('btn-wa');
@@ -623,16 +616,7 @@
     const fieldOrigem = byId('field-origem');
     const fieldDestino = byId('field-destino');
 
-    // Geo: botão geral e por campo (origem/destino)
-    if(btnGeo) on(btnGeo,'click', ()=> Geo.start('default', badge));
-    try{
-      $$('button[data-geo]')
-        .forEach(b=> on(b,'click', ()=>{
-          const key = b.getAttribute('data-geo');
-          const bEl = byId('geo-' + key);
-          Geo.start(key, bEl);
-        }));
-    }catch(e){ console.warn('[agendar] bind per-field geo failed', e); }
+  // Sem botões de geo na UI
 
   // Controle de pets: cria um array de pets com base no DOM; suportar múltiplos pets dinâmicos
   // Use a robust counter: start at current count so new pets get unique indexes
@@ -659,7 +643,6 @@
           srvTosa: getChk('srv-tosa'),
           tosaTipo: getVal('tosaTipo'),
           ozonio: getChk('srv-ozonio'),
-          melaleuca: getChk('srv-melaleuca'),
           perfume: getVal('perfume'),
           acessorio: getVal('acessorio'),
           escovacao: getChk('escovacao'),
@@ -748,15 +731,7 @@
   // Cart upsell removed: 'Ver carrinho' button disabled to restore original menu layout.
   // If you later want to re-enable a cart upsell, reintroduce a lightweight control here.
 
-    on(btnGeo,'click', ()=> Geo.start('default', badge));
-    // Geo buttons for origem/destino
-    $$('button[data-geo]').forEach(btn=>{
-      on(btn,'click', ()=>{
-        const key = btn.getAttribute('data-geo');
-        const badgeEl = byId('geo-'+key) || badge;
-        Geo.start(key, badgeEl);
-      });
-    });
+  // Sem botões de geo na UI
 
     // Toggle localizacao fields
     function updateLocalizacaoFields(){
@@ -790,12 +765,11 @@
         const perPetServ = [];
         if(p.srvBanho) perPetServ.push('Banho');
         if(p.srvTosa) perPetServ.push('Tosa' + (p.tosaTipo? ` (${p.tosaTipo})` : ''));
-        if(p.ozonio) perPetServ.push('Banho de ozônio (+R$5,00)');
-        if(p.melaleuca) perPetServ.push('Shampoo de melaleuca (+R$5,00)');
+  if(p.ozonio) perPetServ.push('Banho de ozônio');
         if(valOk(p.perfume)) perPetServ.push(`Perfume: ${p.perfume}`);
         if(valOk(p.acessorio)) perPetServ.push(`Acessório: ${p.acessorio}`);
-        if(p.escovacao) perPetServ.push('Espuma dental para tártaro (+R$7,00)');
-        if(p.hidratacao) perPetServ.push('Hidratação (+R$30,00)');
+  if(p.escovacao) perPetServ.push('Higienização bucal');
+  if(p.hidratacao) perPetServ.push('Hidratação');
         if(p.corteUnhas) perPetServ.push('Corte de unhas');
         if(p.limpezaOuvido) perPetServ.push('Limpeza de ouvido');
         if(perPetServ.length) details.push(`Serviços: ${perPetServ.join(', ')}`);
@@ -803,13 +777,9 @@
         if(details.length>0) return `${head} • ${details.join(' • ')}`; else return head;
       }).filter(Boolean).join('\n');
       // Localização
-      const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
-      const geoO = Geo.get('origem');
-      const geoD = Geo.get('destino');
-  const origemInputAddr = (byId('origem')?.value||'').trim() || '';
-  const destinoInputAddr = (byId('destino')?.value||'').trim() || '';
-  const origemAddr = (geoO && geoO.address && geoO.address.display) || (Geo.get('default') && Geo.get('default').address && Geo.get('default').address.display) || origemInputAddr || '';
-  const destinoAddr = (geoD && geoD.address && geoD.address.display) || (Geo.get('default') && Geo.get('default').address && Geo.get('default').address.display) || destinoInputAddr || '';
+  const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
+  const origemAddr = ['origem-rua','origem-numero','origem-bairro','origem-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
+  const destinoAddr = ['destino-rua','destino-numero','destino-bairro','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
 
       // Use empty strings as fallback so tidyMessage can remove empty sections
       const map = {
@@ -827,14 +797,14 @@
         enderecoLoja: window.CONFIG?.business?.addressLine || '',
   origemEndereco: origemAddr || '',
   destinoEndereco: destinoAddr || '',
-  origemLat: geoO? geoO.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
-  origemLng: geoO? geoO.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
-  destinoLat: geoD? geoD.lat.toFixed(6) : (geoDefault? geoDefault.lat.toFixed(6) : ''),
-  destinoLng: geoD? geoD.lng.toFixed(6) : (geoDefault? geoDefault.lng.toFixed(6) : ''),
-        origemAccuracy: geoO? fmtAcc(geoO.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : ''),
-        destinoAccuracy: geoD? fmtAcc(geoD.accuracy) : (geoDefault? fmtAcc(geoDefault.accuracy) : ''),
-        origemTimestamp: geoO? fmtDT(geoO.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : ''),
-        destinoTimestamp: geoD? fmtDT(geoD.timestamp) : (geoDefault? fmtDT(geoDefault.timestamp) : ''),
+  origemLat: geoDefault? geoDefault.lat.toFixed(6) : '',
+  origemLng: geoDefault? geoDefault.lng.toFixed(6) : '',
+  destinoLat: geoDefault? geoDefault.lat.toFixed(6) : '',
+  destinoLng: geoDefault? geoDefault.lng.toFixed(6) : '',
+        origemAccuracy: geoDefault? fmtAcc(geoDefault.accuracy) : '',
+        destinoAccuracy: geoDefault? fmtAcc(geoDefault.accuracy) : '',
+        origemTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
+        destinoTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
         observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || ''
       };
       const tpl = window.CONFIG.waTemplates.agendar;
@@ -848,6 +818,9 @@
     // lets the user edit the street before confirming. Confirmation stores the
     // CURRENT input value, not the suggested value.
     window.addEventListener('focinhos:geo:address:resolved', (ev)=>{
+    // Requisito: não preencher endereço automaticamente; apenas coletar coordenadas.
+    // Ignorar sugestões de endereço do GPS.
+    return;
       try{
         const key = ev?.detail?.key || 'default';
         const addr = ev?.detail?.address?.display || '';
@@ -957,18 +930,24 @@
         ok = false;
       } else { byId('agendar-err').textContent=''; byId('agendar-err').classList.remove('error'); }
 
-      // Validação por modalidade de localização
+      // Validação por modalidade de localização — exigir Rua, Nº, Bairro e CEP
       const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
-      const geoO = Geo.get('origem');
-      const geoD = Geo.get('destino');
+      function reqAddr(prefix){
+        const rua = byId(prefix+'-rua'); const numero = byId(prefix+'-numero'); const bairro = byId(prefix+'-bairro'); const cep = byId(prefix+'-cep');
+        let lok = true;
+        lok &= required(rua, 'Informe a rua.');
+        lok &= required(numero, 'Informe o número.');
+        lok &= required(bairro, 'Informe o bairro.');
+        lok &= required(cep, 'Informe o CEP.');
+        return !!lok;
+      }
       if(modalidade==='taxi-both'){
-        // exigir origem e destino (ou geolocalização)
-        if(!geoO && !(byId('origem')?.value||'').trim()){ setErr(byId('origem'),'Informe o endereço de origem ou compartilhe a localização.'); ok=false; } else clearErr(byId('origem'));
-        if(!geoD && !(byId('destino')?.value||'').trim()){ setErr(byId('destino'),'Informe o endereço de destino ou compartilhe a localização.'); ok=false; } else clearErr(byId('destino'));
+        ok &= reqAddr('origem');
+        ok &= reqAddr('destino');
       } else if(modalidade==='taxi-pickup'){
-        if(!geoO && !(byId('origem')?.value||'').trim()){ setErr(byId('origem'),'Informe o endereço de origem ou compartilhe a localização.'); ok=false; } else clearErr(byId('origem'));
+        ok &= reqAddr('origem');
       } else if(modalidade==='taxi-dropoff'){
-        if(!geoD && !(byId('destino')?.value||'').trim()){ setErr(byId('destino'),'Informe o endereço de destino ou compartilhe a localização.'); ok=false; } else clearErr(byId('destino'));
+        ok &= reqAddr('destino');
       }
       // Se loja, não requer endereço
   console.debug('[agendar] validar result', ok);
@@ -1054,10 +1033,14 @@
           dataPreferida: byId('dataPreferida')?.value || '',
           janela: byId('janela')?.value || '',
           modalidade,
-          origem: byId('origem')?.value || '',
+          origemRua: byId('origem-rua')?.value || '',
           origemNumero: byId('origem-numero')?.value || '',
-          destino: byId('destino')?.value || '',
-          destinoNumero: byId('destino-numero')?.value || ''
+          origemBairro: byId('origem-bairro')?.value || '',
+          origemCep: byId('origem-cep')?.value || '',
+          destinoRua: byId('destino-rua')?.value || '',
+          destinoNumero: byId('destino-numero')?.value || '',
+          destinoBairro: byId('destino-bairro')?.value || '',
+          destinoCep: byId('destino-cep')?.value || ''
         };
         localStorage.setItem(AGENDAR_DRAFT_KEY, JSON.stringify(draft));
       }catch(e){ console.warn('saveAgendarDraft failed', e); }
@@ -1103,7 +1086,6 @@
           setChk('srv-tosa', p.srvTosa);
           setVal('tosaTipo', p.tosaTipo||'');
           setChk('srv-ozonio', p.ozonio);
-          setChk('srv-melaleuca', p.melaleuca);
           setVal('perfume', p.perfume||'');
           setVal('acessorio', p.acessorio||'');
           setChk('escovacao', p.escovacao);
@@ -1121,18 +1103,15 @@
           const r = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']")).find(x=> x.value === d.modalidade);
           if(r){ r.checked = true; updateLocalizacaoFields(); }
         }
-        if(byId('origem')) byId('origem').value = d.origem||'';
-        if(d.origemNumero){
-          let num = byId('origem-numero');
-          if(!num){ num = document.createElement('input'); num.id='origem-numero'; num.className='input'; num.placeholder='Nº'; num.style.marginTop='6px'; num.inputMode='numeric'; byId('origem').parentNode.insertBefore(num, byId('origem').nextSibling); }
-          num.value = d.origemNumero;
-        }
-        if(byId('destino')) byId('destino').value = d.destino||'';
-        if(d.destinoNumero){
-          let num2 = byId('destino-numero');
-          if(!num2){ num2 = document.createElement('input'); num2.id='destino-numero'; num2.className='input'; num2.placeholder='Nº'; num2.style.marginTop='6px'; num2.inputMode='numeric'; byId('destino').parentNode.insertBefore(num2, byId('destino').nextSibling); }
-          num2.value = d.destinoNumero;
-        }
+  // restore address fields (new structure)
+  if(byId('origem-rua')) byId('origem-rua').value = d.origemRua||'';
+  if(byId('origem-numero')) byId('origem-numero').value = d.origemNumero||'';
+  if(byId('origem-bairro')) byId('origem-bairro').value = d.origemBairro||'';
+  if(byId('origem-cep')) byId('origem-cep').value = d.origemCep||'';
+  if(byId('destino-rua')) byId('destino-rua').value = d.destinoRua||'';
+  if(byId('destino-numero')) byId('destino-numero').value = d.destinoNumero||'';
+  if(byId('destino-bairro')) byId('destino-bairro').value = d.destinoBairro||'';
+  if(byId('destino-cep')) byId('destino-cep').value = d.destinoCep||'';
   // seção global de serviços avulsos foi removida
 
         // dispatch change/input to update any dependent UI
@@ -1157,9 +1136,10 @@
     if(document.body.dataset.page !== 'delivery') return;
     const els = {
       produto: byId('produto'), variacao: byId('variacao'), qtd: byId('qtd'), carrinho: byId('carrinho'),
-      add: byId('btn-add-prod'), btnGeo: byId('btn-use-geo'), badge: byId('geo-badge'),
-      recebedor: byId('recebedor'), tel: byId('tel'), endereco: byId('endereco'), obs: byId('obs'),
-      preResumo: byId('delivery-resumo'), btnResumo: byId('btn-ver-resumo'), btnWA: byId('btn-wa')
+      add: byId('btn-add-prod'),
+      recebedor: byId('recebedor'), tel: byId('tel'),
+      rua: byId('end-rua'), numero: byId('end-numero'), bairro: byId('end-bairro'), cep: byId('end-cep'),
+      obs: byId('obs'), preResumo: byId('delivery-resumo'), btnResumo: byId('btn-ver-resumo'), btnWA: byId('btn-wa')
     };
   let cart = getCartFromStorage();
 
@@ -1167,11 +1147,10 @@
     try{
       const raw = localStorage.getItem('focinhos:delivery:draft');
       if(raw){ const draft = JSON.parse(raw); if(draft){
-        if(draft.endereco && !els.endereco.value) els.endereco.value = draft.endereco;
-        if(draft.numero && !byId('endereco-numero')){
-          const num = document.createElement('input'); num.id='endereco-numero'; num.className='input'; num.placeholder='Nº'; num.style.marginTop='6px'; num.inputMode='numeric'; els.endereco.parentNode.insertBefore(num, els.endereco.nextSibling);
-          if(draft.numero) num.value = draft.numero;
-        }
+        if(draft.rua && !els.rua.value) els.rua.value = draft.rua;
+        if(draft.numero && !els.numero.value) els.numero.value = draft.numero;
+        if(draft.bairro && !els.bairro.value) els.bairro.value = draft.bairro;
+        if(draft.cep && !els.cep.value) els.cep.value = draft.cep;
         if(draft.recebedor && !els.recebedor.value) els.recebedor.value = draft.recebedor;
         if(draft.tel && !els.tel.value) els.tel.value = draft.tel;
         if(draft.observacoes && !els.obs.value) els.obs.value = draft.observacoes;
@@ -1224,7 +1203,7 @@
       renderCart();
     });
 
-    on(els.btnGeo,'click', ()=> Geo.start('default', els.badge));
+  // Sem botão de geo; geoloc inicia globalmente no boot
 
     function resumoTexto(){
       const geo = Geo.get('default');
@@ -1232,7 +1211,7 @@
         itensLista: listagem() || '',
         nome: (els.recebedor.value||'').trim() || '',
         telefone: (els.tel.value||'').trim() || '',
-        enderecoCompleto: (geo && geo.address && geo.address.display) || (els.endereco.value||'').trim() || '',
+  enderecoCompleto: [els.rua?.value, els.numero?.value, els.bairro?.value, els.cep?.value].map(s=> (s||'').trim()).filter(Boolean).join(', '),
         lat: geo? geo.lat.toFixed(6) : '',
         lng: geo? geo.lng.toFixed(6) : '',
         accuracy: geo? fmtAcc(geo.accuracy) : '',
@@ -1245,13 +1224,14 @@
     function validar(){
       let ok = true;
   if(cart.length===0){ ok=false; alert('Adicione pelo menos um produto.'); }
-      ok &= required(els.recebedor, 'Informe o nome do recebedor.');
-      ok &= required(els.tel, 'Informe um telefone válido.');
+  ok &= required(els.recebedor, 'Informe o nome do recebedor.');
+  ok &= required(els.tel, 'Informe um telefone válido.');
       if(ok && !isTelBR(els.tel.value)){ setErr(els.tel,'Informe um telefone válido.'); ok=false; }
-  // require endereco and número if endereco provided and no precise geo
-  const numEl = byId('endereco-numero');
-  if(!Geo.get('default') && !(els.endereco.value||'').trim()){ setErr(els.endereco,'Informe o endereço ou compartilhe sua localização.'); ok=false; } else clearErr(els.endereco);
-  if((els.endereco.value||'').trim() && (!numEl || !(numEl.value||'').trim())){ if(numEl) setErr(numEl,'Informe o número da residência.'); else setErr(els.endereco,'Informe também o número da residência.'); ok=false; } else if(numEl){ clearErr(numEl); }
+  // exigir Rua, Nº, Bairro e CEP
+  ok &= required(els.rua, 'Informe a rua.');
+  ok &= required(els.numero, 'Informe o número.');
+  ok &= required(els.bairro, 'Informe o bairro.');
+  ok &= required(els.cep, 'Informe o CEP.');
       return !!ok;
     }
 
@@ -1268,6 +1248,30 @@
   try{ attachCopyButton(els.btnWA && els.btnWA.parentNode || document.body, '__delivery-copy-msg', resumoTexto); }catch(e){ console.warn('attach copy (delivery) failed', e); }
   // react to external cart changes
   window.addEventListener('focinhos:cart:changed', ()=>{ cart = getCartFromStorage(); renderCart(); });
+
+    // Save minimal delivery draft (address/contact) on changes
+    try{
+      const DELIV_DRAFT_KEY = 'focinhos:delivery:draft';
+      const saveDraft = debounce(()=>{
+        try{
+          const d = {
+            rua: els.rua?.value || '',
+            numero: els.numero?.value || '',
+            bairro: els.bairro?.value || '',
+            cep: els.cep?.value || '',
+            recebedor: els.recebedor?.value || '',
+            tel: els.tel?.value || '',
+            observacoes: els.obs?.value || ''
+          };
+          localStorage.setItem(DELIV_DRAFT_KEY, JSON.stringify(d));
+        }catch(e){ /* ignore */ }
+      }, 300);
+      ['recebedor','tel','end-rua','end-numero','end-bairro','end-cep','obs'].forEach(id=>{
+        const el = byId(id); if(!el) return;
+        el.addEventListener('input', saveDraft, { passive:true });
+        el.addEventListener('change', saveDraft, { passive:true });
+      });
+    }catch(e){ console.warn('delivery draft save bind failed', e); }
   }
 
   // ====== Fluxo: TÁXI ======
@@ -1287,30 +1291,22 @@
     $$("input[name='tipo']").forEach(r=> on(r,'change', toggleSections));
     toggleSections();
 
-    // Botões de geo por campo
-    $$('button[data-geo]').forEach(btn=>{
-      on(btn,'click', ()=>{
-        const key = btn.getAttribute('data-geo');
-        const badge = byId('geo-'+key);
-        Geo.start(key, badge);
-      });
-    });
+  // Sem botões de geo
 
     function resumoBanho(){
       const modalidade = ($("input[name='modalidade']:checked")||{}).value || '';
-      const geoO = Geo.get('origem') || Geo.get('origem2');
-      const geoD = Geo.get('destino') || Geo.get('destino2');
+      const geo = Geo.get('default');
       const map = {
         modalidade,
         petNome: (byId('petNome')?.value||'').trim() || '',
         tutorNome: (byId('tutorNome')?.value||'').trim() || '',
         tutorTelefone: (byId('tutorTelefone')?.value||'').trim() || '',
-        origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem')?.value||'').trim() || '',
-        destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino')?.value||'').trim() || '',
-        origemLat: geoO? geoO.lat.toFixed(6) : '',
-        origemLng: geoO? geoO.lng.toFixed(6) : '',
-        destinoLat: geoD? geoD.lat.toFixed(6) : '',
-        destinoLng: geoD? geoD.lng.toFixed(6) : '',
+        origemEndereco: ['origem-rua','origem-numero','origem-bairro','origem-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+        destinoEndereco: ['destino-rua','destino-numero','destino-bairro','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+        origemLat: geo? geo.lat.toFixed(6) : '',
+        origemLng: geo? geo.lng.toFixed(6) : '',
+        destinoLat: geo? geo.lat.toFixed(6) : '',
+        destinoLng: geo? geo.lng.toFixed(6) : '',
         horario: fmtDT(byId('horario')?.value||'') || '',
         observacoes: (byId('obs')?.value||'').trim() || ''
       };
@@ -1318,17 +1314,16 @@
     }
 
     function resumoAgendado(){
-      const geoO = Geo.get('origem2');
-      const geoD = Geo.get('destino2');
+      const geo = Geo.get('default');
       const contato = (byId('contato2')?.value||'').trim();
       const [tutorNome, tutorTelefone] = contato.split(/•|\||-/).map(s=>s&&s.trim()) || ['',''];
       const map = {
-        origemEndereco: (geoO && geoO.address && geoO.address.display) || (byId('origem2')?.value||'').trim() || '',
-        destinoEndereco: (geoD && geoD.address && geoD.address.display) || (byId('destino2')?.value||'').trim() || '',
-        origemLat: geoO? geoO.lat.toFixed(6) : '',
-        origemLng: geoO? geoO.lng.toFixed(6) : '',
-        destinoLat: geoD? geoD.lat.toFixed(6) : '',
-        destinoLng: geoD? geoD.lng.toFixed(6) : '',
+        origemEndereco: ['origem2-rua','origem2-numero','origem2-bairro','origem2-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+        destinoEndereco: ['destino2-rua','destino2-numero','destino2-bairro','destino2-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+        origemLat: geo? geo.lat.toFixed(6) : '',
+        origemLng: geo? geo.lng.toFixed(6) : '',
+        destinoLat: geo? geo.lat.toFixed(6) : '',
+        destinoLng: geo? geo.lng.toFixed(6) : '',
         horario: fmtDT(byId('horario2')?.value||'') || '',
         tutorNome: tutorNome||'',
         tutorTelefone: (tutorTelefone||'').trim() || '',
@@ -1339,8 +1334,55 @@
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }
     on(R.btnResumo,'click', ()=>{ if(R.resumo) R.resumo.textContent = resumo(); });
+
+    // Validation helpers
+    function reqAddr(prefix){
+      let ok = true;
+      ok &= required(byId(prefix+'-rua'), 'Informe a rua.');
+      ok &= required(byId(prefix+'-numero'), 'Informe o número.');
+      ok &= required(byId(prefix+'-bairro'), 'Informe o bairro.');
+      ok &= required(byId(prefix+'-cep'), 'Informe o CEP.');
+      return !!ok;
+    }
+
+    function validarTaxi(){
+      let ok = true;
+      const toast = byId('taxi-err'); if(toast){ toast.textContent=''; toast.classList.remove('error'); }
+      const isBanho = R.tipoBanho.checked;
+      if(isBanho){
+        const modalidade = ($("input[name='modalidade']:checked")||{}).value || '';
+        ok &= required(byId('petNome'), 'Informe o nome do pet.');
+        ok &= required(byId('tutorNome'), 'Informe o nome do tutor.');
+        ok &= required(byId('tutorTelefone'), 'Informe um telefone válido.');
+        if(ok && !isTelBR(byId('tutorTelefone').value)){ setErr(byId('tutorTelefone'),'Informe um telefone válido.'); ok=false; }
+        if(!modalidade){ ok=false; if(toast){ toast.classList.add('error'); toast.textContent='Selecione a modalidade (Buscar/Entregar/Buscar e entregar).'; } }
+        if(modalidade === 'Buscar e entregar'){
+          ok &= reqAddr('origem');
+          ok &= reqAddr('destino');
+        } else if(modalidade === 'Buscar apenas'){
+          ok &= reqAddr('origem');
+        } else if(modalidade === 'Entregar apenas'){
+          ok &= reqAddr('destino');
+        }
+      } else {
+        // Agendado (livre): exigir endereço completo de origem e destino, e um contato com telefone válido
+        ok &= reqAddr('origem2');
+        ok &= reqAddr('destino2');
+        const contatoEl = byId('contato2');
+        ok &= required(contatoEl, 'Informe um contato (nome e telefone).');
+        const hasTel = isTelBR(contatoEl.value);
+        if(ok && !hasTel){ setErr(contatoEl, 'Informe um telefone válido no contato.'); ok=false; }
+      }
+      if(!ok && toast){ toast.classList.add('error'); if(!toast.textContent) toast.textContent = 'Preencha os campos obrigatórios.'; toast.scrollIntoView({behavior:'smooth', block:'center'}); }
+      return !!ok;
+    }
+
     on(R.btnWA,'click', (e)=>{
       e.preventDefault();
+      if(!validarTaxi()){
+        try{ const firstInvalid = document.querySelector('[aria-invalid="true"]'); if(firstInvalid && firstInvalid.focus) firstInvalid.focus(); }catch(_){ }
+        return;
+      }
       const url = waLink(resumo());
       try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
       window.open(url, '_blank');
@@ -1492,6 +1534,8 @@
         try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
       });
       try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
+  // Auto-start geolocation to capture coordinates silently
+  try{ Geo.start('default'); }catch(e){}
     })();
     // Global error handler to help identificar erros em produção/local
     window.addEventListener('error', (ev)=>{
