@@ -855,9 +855,40 @@
       };
       const tpl = window.CONFIG.waTemplates.agendar;
   console.debug('[agendar] resumoTexto result preview', { petsLista: map.petsLista && map.petsLista.slice(0,80) });
+
+      // Para modalidade "loja", substituir os blocos de Origem/Destino por uma única linha de localização
+      if(modalidadeCode === 'loja'){
+        const coords = (map.origemLat && map.origemLng) ? `${map.origemLat},${map.origemLng}` : '';
+        // Monta uma mensagem compacta reusando as mesmas seções principais
+        const rawLoja = [
+          '📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)',
+          '',
+          '🐾 *Pets*',
+          map.petsLista,
+          '',
+          '⏰ *Quando*',
+          `${map.dataPreferida}${map.janela ? ' • Janela: ' + map.janela : ''}`,
+          '',
+          '👤 *Tutor*',
+          `${map.tutorNome}${map.tutorTelefone ? ' • 📞 ' + map.tutorTelefone : ''}`,
+          '',
+          '🚕 *Modalidade de localização*',
+          map.modalidade,
+          '',
+          '📍 Localização do solicitante: ' + coords,
+          '',
+          '📝 *Observações gerais*',
+          map.observacoes,
+          '',
+          '🏪 *Loja física*',
+          map.enderecoLoja
+        ].join('\n');
+        return processMessageForPlatform(tidyMessage(rawLoja));
+      }
+
       let raw = interpolate(tpl, map);
-  // Serviços avulsos removidos (não há seção global)
-  return processMessageForPlatform(tidyMessage(raw));
+      // Serviços avulsos removidos (não há seção global)
+      return processMessageForPlatform(tidyMessage(raw));
     }
 
     // When a reverse-geocode result is available, show a confirmation helper that
@@ -1282,17 +1313,6 @@
   cart.push({nome, variacao, qtd});
   saveCartToStorage(cart);
       els.produto.value=''; els.variacao.value=''; els.qtd.value='1';
-      renderCart();
-    });
-
-    on(els.carrinho,'click', (e)=>{
-      const t = e.target.closest('button');
-      if(!t) return;
-      const idx = +t.dataset.idx; const act = t.dataset.act;
-      if(act==='inc') cart[idx].qtd++;
-      if(act==='dec') cart[idx].qtd = Math.max(1, cart[idx].qtd-1);
-      if(act==='rm') cart.splice(idx,1);
-  saveCartToStorage(cart);
       renderCart();
     });
 
