@@ -933,12 +933,12 @@
       if(ok && !isTelBR(f.tutorTelefone.value)) { setErr(f.tutorTelefone,'Informe um telefone válido.'); ok=false; }
       ok &= required(f.dataPreferida,'Escolha a data.');
       ok &= required(f.janela,'Selecione a janela.');
-      // Pelo menos 1 serviço (por pet: Banho ou Tosa)
-      const hasAnyPerPetService = pets.some(p=> p && (p.srvBanho || p.srvTosa));
-      if(!hasAnyPerPetService){
+      // Pelo menos 1 serviço (qualquer um: Banho, Tosa, Ozônio, Higienização bucal, Hidratação, Corte de unhas, Limpeza de ouvido)
+      const hasAnyService = pets.some(p=> p && (p.srvBanho || p.srvTosa || p.ozonio || p.escovacao || p.hidratacao || p.corteUnhas || p.limpezaOuvido));
+      if(!hasAnyService){
         const toast = byId('agendar-err');
         toast.classList.add('error');
-        toast.textContent = 'Selecione pelo menos um serviço por pet (Banho e/ou Tosa).';
+        toast.textContent = 'Selecione pelo menos um serviço.';
         ok = false;
       } else { byId('agendar-err').textContent=''; byId('agendar-err').classList.remove('error'); }
 
