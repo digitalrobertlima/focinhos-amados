@@ -50,13 +50,17 @@
   "appVersion": "v0.1.8",
 
   "waTemplates": {
-  "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Janela: {janela}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}\n\n🚕 *Modalidade de localização*\n{modalidade}\n\n📍 *Origem*\n{origemEndereco}\nGeo: {origemLat},{origemLng}\nPrecisão: {origemAccuracy}m @ {origemTimestamp}\n\n📍 *Destino*\n{destinoEndereco}\nGeo: {destinoLat},{destinoLng}\nPrecisão: {destinoAccuracy}m @ {destinoTimestamp}\n\n📝 *Observações gerais*\n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
+  "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Janela: {janela}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}\n\n🚕 *Modalidade de localização*\n{modalidade}\n\n📍 *Onde buscar o pet?*\n{origemEndereco}\n\n📍 *Onde entregar o pet?*\n{destinoEndereco}\n\n📝 *Observações gerais*\n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
+  "agendarTracking": "\n—\nTracking\nOrigem: {origemLat},{origemLng} • ±{origemAccuracy}m @ {origemTimestamp}\nDestino: {destinoLat},{destinoLng} • ±{destinoAccuracy}m @ {destinoTimestamp}",
 
-    "delivery": "📦 *DELIVERY* — FOCINHOS AMADOS (BH)\n\n📋 *Itens*  \n{itensLista}\n\n👤 *Recebedor*  \n{nome} • 📞 {telefone}\n\n📍 *Endereço*  \n{enderecoCompleto}  \nGeo: {lat},{lng}  \nPrecisão: {accuracy}m @ {timestamp}\n\n📝 *Observações*  \n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
+  "delivery": "📦 *DELIVERY* — FOCINHOS AMADOS (BH)\n\n📋 *Itens*  \n{itensLista}\n\n👤 *Recebedor*  \n{nome} • 📞 {telefone}\n\n📍 *Endereço*  \n{enderecoCompleto}  \n\n📝 *Observações*  \n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
+  "deliveryTracking": "\n—\nTracking\nEntrega: {lat},{lng} • ±{accuracy}m @ {timestamp}",
 
-    "taxiBanho": "🚕 *TÁXI DOG — BANHO/TOSA* (BH)\n\n🚦 *Modalidade*  \n{modalidade}\n\n🐾 *Pet*  \n{petNome}  \n\n👤 *Tutor*  \n{tutorNome} • 📞 {tutorTelefone}\n\n📍 *Origem*  \n{origemEndereco}  \nGeo: {origemLat},{origemLng}\n\n📍 *Destino*  \n{destinoEndereco}  \nGeo: {destinoLat},{destinoLng}\n\n⏰ *Horário desejado*  \n{horario}\n\n📝 *Observações*  \n{observacoes}\n",
+  "taxiBanho": "🚕 *TÁXI DOG — BANHO/TOSA* (BH)\n\n🚦 *Modalidade*  \n{modalidade}\n\n🐾 *Pet*  \n{petNome}  \n\n👤 *Tutor*  \n{tutorNome} • 📞 {tutorTelefone}\n\n📍 *Onde buscar o pet?*  \n{origemEndereco}  \n\n📍 *Onde entregar o pet?*  \n{destinoEndereco}  \n\n⏰ *Horário desejado*  \n{horario}\n\n📝 *Observações*  \n{observacoes}\n",
+  "taxiBanhoTracking": "\n—\nTracking\nOrigem: {origemLat},{origemLng}\nDestino: {destinoLat},{destinoLng}",
 
-    "taxiAgendado": "🚕 *TÁXI DOG — AGENDADO* (BH)\n\n📍 *Origem*  \n{origemEndereco}  \nGeo: {origemLat},{origemLng}\n\n📍 *Destino*  \n{destinoEndereco}  \nGeo: {destinoLat},{destinoLng}\n\n⏰ *Horário desejado*  \n{horario}\n\n👤 *Contato*  \n{tutorNome} • 📞 {tutorTelefone}\n\n📝 *Observações*  \n{observacoes}\n",
+  "taxiAgendado": "🚕 *TÁXI DOG — AGENDADO* (BH)\n\n📍 *Onde buscar o pet?*  \n{origemEndereco}  \n\n📍 *Onde entregar o pet?*  \n{destinoEndereco}  \n\n⏰ *Horário desejado*  \n{horario}\n\n👤 *Contato*  \n{tutorNome} • 📞 {tutorTelefone}\n\n📝 *Observações*  \n{observacoes}\n",
+  "taxiAgendadoTracking": "\n—\nTracking\nOrigem: {origemLat},{origemLng}\nDestino: {destinoLat},{destinoLng}",
 
     "teamReply": "*Pedido recebido — Focinhos Amados (BH)*\n\n📋 *Itens*  \n{itensLista}\n\n👤 *Contato*  \n{nome} • {telefone}\n\n📝 *Observações*  \n{observacoes}\n\n—\nDetalhes e confirmações serão combinados via WhatsApp."
   }
