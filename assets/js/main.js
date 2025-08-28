@@ -11,12 +11,22 @@
   const on = (el,ev,fn)=>el&&el.addEventListener(ev,fn);
   const byId = (id)=>document.getElementById(id);
   const now = ()=>new Date();
-  const toISODate = (d)=>d instanceof Date?d.toISOString():new Date(d).toISOString();
+  // Parse date-only (YYYY-MM-DD) as local date to avoid timezone shifting to previous day
+  function parseDateLocal(v){
+    try{
+      if(typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)){
+        const [y,m,d] = v.split('-').map(n=> parseInt(n,10));
+        return new Date(y, m-1, d, 0, 0, 0, 0);
+      }
+      return (v instanceof Date) ? v : new Date(v);
+    }catch(_){ return new Date(v); }
+  }
+  const toISODate = (d)=> (d instanceof Date? d : parseDateLocal(d)).toISOString();
   // Format helpers: Brazilian standard
   function pad2(n){ return String(n).padStart(2,'0'); }
   const fmtDate = (v)=>{
     try{
-      const d = new Date(v);
+      const d = parseDateLocal(v);
       if (isNaN(d.getTime())) return '';
       const dd = pad2(d.getDate());
       const mm = pad2(d.getMonth()+1);
@@ -604,6 +614,17 @@
       // todos os serviços/preferências são por pet agora
       dataPreferida: byId('dataPreferida'), janela: byId('janela')
     };
+    // Definir data padrão como hoje (local) e impedir datas passadas
+    try{
+      if(f.dataPreferida){
+        const t = now();
+        const y = t.getFullYear(); const m = String(t.getMonth()+1).padStart(2,'0'); const d = String(t.getDate()).padStart(2,'0');
+        const todayYMD = `${y}-${m}-${d}`;
+        f.dataPreferida.setAttribute('min', todayYMD);
+        const cur = (f.dataPreferida.value||'').trim();
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(cur) || cur < todayYMD){ f.dataPreferida.value = todayYMD; }
+      }
+    }catch(_){ }
   // geolocalização inicia automaticamente; sem botões na UI
     const btnResumo = byId('btn-ver-resumo');
     const preResumo = byId('agendar-resumo');
@@ -1124,7 +1145,7 @@
     }
     const saveAgendarDraftDebounced = debounce(saveAgendarDraft, 300);
 
-    function restoreAgendarDraft(){
+  function restoreAgendarDraft(){
       try{
         const raw = localStorage.getItem(AGENDAR_DRAFT_KEY);
         if(!raw) return;
@@ -1180,7 +1201,16 @@
         // restore other fields
         if(byId('tutorNome')) byId('tutorNome').value = d.tutorNome||'';
         if(byId('tutorTelefone')) byId('tutorTelefone').value = d.tutorTelefone||'';
-        if(byId('dataPreferida')) byId('dataPreferida').value = d.dataPreferida||'';
+        if(byId('dataPreferida')){
+          const el = byId('dataPreferida');
+          const t = now();
+          const y = t.getFullYear(); const m = String(t.getMonth()+1).padStart(2,'0'); const dd = String(t.getDate()).padStart(2,'0');
+          const todayYMD = `${y}-${m}-${dd}`;
+          const v = (d.dataPreferida||'').trim();
+          const val = (/^\d{4}-\d{2}-\d{2}$/.test(v) && v >= todayYMD) ? v : todayYMD;
+          el.setAttribute('min', todayYMD);
+          el.value = val;
+        }
         if(byId('janela')) byId('janela').value = d.janela||'';
         if(typeof d.modalidade === 'string'){
           const r = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']")).find(x=> x.value === d.modalidade);
