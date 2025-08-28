@@ -66,12 +66,12 @@ window.CONFIG = {
 🚕 *Modalidade de localização*
 {modalidade}
 
-📍 *Origem*
+📍 *Onde buscar o pet?*
 {origemEndereco}
 Geo: {origemLat},{origemLng}
 Precisão: {origemAccuracy}m @ {origemTimestamp}
 
-📍 *Destino*
+📍 *Onde entregar o pet?*
 {destinoEndereco}
 Geo: {destinoLat},{destinoLng}
 Precisão: {destinoAccuracy}m @ {destinoTimestamp}
@@ -114,11 +114,11 @@ Precisão: {accuracy}m @ {timestamp}
 👤 *Tutor*  
 {tutorNome} • 📞 {tutorTelefone}
 
-📍 *Origem*  
+📍 *Onde buscar o pet?*  
 {origemEndereco}  
 Geo: {origemLat},{origemLng}
 
-📍 *Destino*  
+📍 *Onde entregar o pet?*  
 {destinoEndereco}  
 Geo: {destinoLat},{destinoLng}
 
@@ -132,11 +132,11 @@ Geo: {destinoLat},{destinoLng}
   taxiAgendado:
 `🚕 *TÁXI DOG — AGENDADO* (BH)
 
-📍 *Origem*  
+📍 *Onde buscar o pet?*  
 {origemEndereco}  
 Geo: {origemLat},{origemLng}
 
-📍 *Destino*  
+📍 *Onde entregar o pet?*  
 {destinoEndereco}  
 Geo: {destinoLat},{destinoLng}
 

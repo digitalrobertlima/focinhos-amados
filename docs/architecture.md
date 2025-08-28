@@ -18,7 +18,7 @@ Mensageria (WhatsApp)
 - Link gerado por `waLink(text) -> https://wa.me/<E164>?text=<encoded>`.
 - `tidyMessage()` sanitiza linhas vazias e seções órfãs.
 - `processMessageForPlatform()` remove emojis em devices antigos (opcionalidade via `emoji=0|1`).
-- Agendar (modo loja): substitui Origem/Destino por “Localização do solicitante: lat,lng”.
+- Agendar (modo loja): substitui “Onde buscar o pet?”/“Onde entregar o pet?” por “Localização do solicitante: lat,lng”.
 
 Geolocalização
 - Wrapper `Geo.start/get/stop` usa `watchPosition` (alta precisão), salva a “melhor” leitura e resolve endereço via Nominatim com cache local.

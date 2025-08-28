@@ -11,7 +11,7 @@ Templates disponíveis
 - `agendar`, `delivery`, `taxiBanho`, `taxiAgendado`, `teamReply`.
 
 Comportamentos especiais
-- Agendar, modalidade `loja`: a mensagem substitui os blocos “Origem” e “Destino” por uma linha única:
+- Agendar, modalidade `loja`: a mensagem substitui os blocos “Onde buscar o pet?” e “Onde entregar o pet?” por uma linha única:
   `Localização do solicitante: <lat>,<lng>`
 
 Boas práticas
