@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Táxi Dog — Focinhos Amados (BH)</title>
+  <meta name="description" content="Escolha buscar, entregar ou ida/volta agendada. Envie com coordenadas pelo WhatsApp.">
+  <meta name="theme-color" content="#029935">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <meta property="og:title" content="Táxi Dog — Focinhos Amados (BH)">
+  <meta property="og:description" content="Escolha buscar, entregar ou ida/volta agendada. Envie com coordenadas pelo WhatsApp.">
+  <meta property="og:image" content="assets/img/gallery-pet-1.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+</head>
+<body data-page="taxi">
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="./">
+  <img class="brand__logo" src="assets/img/logo.png" alt="Logotipo Focinhos Amados" width="32" height="32">
+        <span class="brand__text"><strong>Focinhos Amados</strong><small class="brand__city" data-bind="city">Belo Horizonte/MG</small></span>
+      </a>
+      <nav class="nav" aria-label="principal">
+        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
+        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
+          <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
+          <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
+          <li role="none"><a role="menuitem" href="taxi.html" aria-current="page">Táxi Dog</a></li>
+          <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
+        </ul>
+      </nav>
+      <div class="topbar__actions">
+  <!-- cart removed per UX decision -->
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo" class="container flow">
+    <h1>Táxi Dog</h1>
+  <p class="muted">Entregamos qualidade — detalhes e confirmações serão combinados com a equipe via WhatsApp.</p>
+
+    <section class="card">
+      <h2 class="card__title">O que você precisa?</h2>
+      <div class="grid grid--2">
+        <label class="radio"><input type="radio" name="tipo" value="banho" id="tipo-banho"> <span>Para Banho/Tosa</span></label>
+        <label class="radio"><input type="radio" name="tipo" value="agendado" id="tipo-agendado"> <span>Agendado (livre)</span></label>
+      </div>
+    </section>
+
+    <form id="form-taxi" novalidate>
+      <section id="sec-banho" class="card hide">
+        <h2 class="card__title">Banho/Tosa — modalidade</h2>
+        <div class="grid grid--3">
+          <label class="radio"><input type="radio" name="modalidade" value="Buscar apenas"> <span>Buscar apenas</span></label>
+          <label class="radio"><input type="radio" name="modalidade" value="Entregar apenas"> <span>Entregar apenas</span></label>
+          <label class="radio"><input type="radio" name="modalidade" value="Buscar e entregar"> <span>Buscar e entregar</span></label>
+        </div>
+
+        <div class="grid grid--3">
+          <div class="field">
+            <label for="petNome">Nome do pet</label>
+            <input id="petNome" class="input">
+          </div>
+          <div class="field">
+            <label for="tutorNome">Nome do tutor</label>
+            <input id="tutorNome" class="input">
+          </div>
+          <div class="field">
+            <label for="tutorTelefone">Telefone</label>
+            <input id="tutorTelefone" class="input" inputmode="tel">
+          </div>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="field">
+            <label>Onde buscar o pet?</label>
+            <div class="grid grid--3">
+              <div class="field"><label for="origem-rua">Rua <span class="req">*</span></label><input id="origem-rua" class="input"></div>
+              <div class="field"><label for="origem-numero">Nº <span class="req">*</span></label><input id="origem-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="origem-bairro">Bairro <span class="req">*</span></label><input id="origem-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="origem-cep">CEP <span class="req">*</span></label><input id="origem-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Onde entregar o pet? <small class="muted">(opcional)</small></label>
+            <div class="grid grid--3">
+              <div class="field"><label for="destino-rua">Rua</label><input id="destino-rua" class="input"></div>
+              <div class="field"><label for="destino-numero">Nº</label><input id="destino-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="destino-bairro">Bairro</label><input id="destino-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="destino-cep">CEP</label><input id="destino-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="horario">Horário desejado</label>
+          <input id="horario" type="datetime-local" class="input">
+        </div>
+
+        <div class="field">
+          <label for="obs">Observações</label>
+          <textarea id="obs" class="textarea" rows="3"></textarea>
+        </div>
+      </section>
+
+      <section id="sec-agendado" class="card hide">
+        <h2 class="card__title">Agendado (livre)</h2>
+        <div class="grid grid--2">
+          <div class="field">
+            <label>Onde buscar o pet?</label>
+            <div class="grid grid--3">
+              <div class="field"><label for="origem2-rua">Rua</label><input id="origem2-rua" class="input"></div>
+              <div class="field"><label for="origem2-numero">Nº</label><input id="origem2-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="origem2-bairro">Bairro</label><input id="origem2-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="origem2-cep">CEP</label><input id="origem2-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Onde entregar o pet?</label>
+            <div class="grid grid--3">
+              <div class="field"><label for="destino2-rua">Rua</label><input id="destino2-rua" class="input"></div>
+              <div class="field"><label for="destino2-numero">Nº</label><input id="destino2-numero" class="input" inputmode="numeric"></div>
+              <div class="field"><label for="destino2-bairro">Bairro</label><input id="destino2-bairro" class="input"></div>
+            </div>
+            <div class="grid grid--3" style="margin-top:6px">
+              <div class="field"><label for="destino2-cep">CEP</label><input id="destino2-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid--2">
+          <div class="field">
+            <label for="horario2">Horário desejado</label>
+            <input id="horario2" type="datetime-local" class="input">
+          </div>
+          <div class="field">
+            <label for="contato2">Contato (nome e telefone)</label>
+            <input id="contato2" class="input" placeholder="Nome • Telefone">
+          </div>
+        </div>
+        <div class="field">
+          <label for="obs2">Observações</label>
+          <textarea id="obs2" class="textarea" rows="3"></textarea>
+        </div>
+      </section>
+
+      <section class="card card--summary">
+        <h2 class="card__title">📄 Resumo</h2>
+        <pre id="taxi-resumo" class="note" aria-live="polite">Nada por aqui ainda. Preencha os campos para continuar.</pre>
+        <div class="actions">
+          <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
+          <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
+          <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+        </div>
+        <div id="taxi-err" class="toast" role="status" aria-live="polite"></div>
+      </section>
+    </form>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.8</span></span></p>
+      <a href="sobre.html">Sobre</a>
+    </div>
+  </footer>
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+  </svg>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

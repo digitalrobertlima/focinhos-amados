@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Agendar Banho & Tosa — Focinhos Amados (BH)</title>
+  <meta name="description" content="Personalize seu agendamento e confirme no WhatsApp. Opções de perfume, acessórios e tratamentos.">
+  <meta name="theme-color" content="#029935">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <meta property="og:title" content="Agendar Banho & Tosa — Focinhos Amados (BH)">
+  <meta property="og:description" content="Personalize seu agendamento e confirme no WhatsApp. Opções de perfume, acessórios e tratamentos.">
+  <meta property="og:image" content="assets/img/gallery-pet-1.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+</head>
+<body data-page="agendar" data-disable-generic-persist>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="./">
+  <img class="brand__logo" src="assets/img/logo.png" alt="Logotipo Focinhos Amados" width="32" height="32">
+        <span class="brand__text"><strong>Focinhos Amados</strong><small class="brand__city" data-bind="city">Belo Horizonte/MG</small></span>
+      </a>
+      <nav class="nav" aria-label="principal">
+        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
+        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
+          <li role="none"><a role="menuitem" href="agendar.html" aria-current="page">Agendar</a></li>
+          <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
+          <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
+          <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
+        </ul>
+      </nav>
+      <div class="topbar__actions">
+  <!-- cart removed per UX decision -->
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo" class="container flow">
+    <h1>Agendar Banho & Tosa</h1>
+  <p class="muted">Entregamos qualidade — detalhes e confirmações serão combinados com a equipe via WhatsApp.</p>
+
+    <form id="form-agendar" novalidate>
+      <section class="card">
+        <h2 class="card__title">🐾 Pet & Tutor</h2>
+        <!-- Contêiner de pets: o primeiro pet está no HTML para compatibilidade; novos pets são adicionados dinamicamente -->
+        <div id="pets">
+          <div class="pet" data-pet-index="0">
+            <div class="grid grid--2">
+              <div class="field">
+                <label for="petNome">Nome do pet <span class="req">*</span></label>
+                <input id="petNome" name="petNome" class="input" data-role="petNome" required autocomplete="off">
+                <small id="err-petNome" class="help" hidden></small>
+              </div>
+              <div class="field">
+                <label for="especie">Espécie <span class="req">*</span></label>
+                <select id="especie" name="especie" class="select" data-role="especie" required>
+                  <option value="">Selecione…</option>
+                  <option>Cão</option>
+                  <option>Gato</option>
+                  <option>Outro</option>
+                </select>
+                <small id="err-especie" class="help" hidden></small>
+              </div>
+              <div class="field">
+                <label for="porte">Porte <span class="req">*</span></label>
+                <select id="porte" name="porte" class="select" data-role="porte" required>
+                  <option value="">Selecione…</option>
+                  <option>Pequeno</option>
+                  <option>Médio</option>
+                  <option>Grande</option>
+                </select>
+                <small id="err-porte" class="help" hidden></small>
+              </div>
+              <div class="field">
+                <label for="pelagem">Pelagem</label>
+                <select id="pelagem" class="select" data-role="pelagem">
+                  <option value="">Selecione…</option>
+                  <option>Curta</option>
+                  <option>Média</option>
+                  <option>Longa</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="temperamento">Temperamento</label>
+                <select id="temperamento" class="select" data-role="temperamento">
+                  <option value="">Selecione…</option>
+                  <option>Calmo</option>
+                  <option>Ativo</option>
+                  <option>Reativo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="observacoes">Condições de saúde / observações</label>
+                <textarea id="observacoes" class="textarea" data-role="observacoes" rows="3"></textarea>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <p class="muted" style="margin:6px 0">Serviços para este pet (opcional)</p>
+              <div class="grid grid--2">
+                <div class="chips">
+                  <label class="chip"><input type="checkbox" data-role="srv-banho"> <span>Banho</span></label>
+                  <label class="chip"><input type="checkbox" data-role="hidratacao"> <span>Banho com Hidratação</span></label>
+                  <label class="chip"><input type="checkbox" data-role="srv-tosa"> <span>Tosa</span></label>
+                  <label class="chip"><input type="checkbox" data-role="srv-ozonio"> <span>Banho de ozônio</span></label>
+                  <label class="chip"><input type="checkbox" data-role="escovacao"> <span>Higienização bucal</span></label>
+                  <label class="chip"><input type="checkbox" data-role="corte-unhas"> <span>Corte de unhas</span></label>
+                  <label class="chip"><input type="checkbox" data-role="limpeza-ouvido"> <span>Limpeza de ouvido</span></label>
+                </div>
+                <div>
+                  <div class="field">
+                    <label>Tipo de tosa (opcional)</label>
+                    <select class="select" data-role="tosaTipo">
+                      <option value="">Selecione…</option>
+                      <option>Higiênica</option>
+                      <option>Na tesoura</option>
+                      <option>Na máquina</option>
+                    </select>
+                  </div>
+                  <div class="grid grid--2" style="margin-top:6px">
+                    <div class="field">
+                      <label>Perfume</label>
+                      <select class="select" data-role="perfume">
+                        <option>Sem perfume</option>
+                        <option>perfume de impacto</option>
+                        <option>perfume suave</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label>Acessório</label>
+                      <select class="select" data-role="acessorio">
+                        <option>Sem</option>
+                        <option>Laço</option>
+                        <option>Gravata</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pet__actions" style="margin-top:6px; text-align:right">
+              <button type="button" class="btn btn--ghost btn-remove-pet" aria-label="Remover este pet">Remover pet</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <button id="btn-add-pet" class="btn btn--ghost" type="button">+ Adicionar outro pet</button>
+        </div>
+
+        <!-- Template para novos pets (clonável) -->
+        <template id="tpl-pet">
+          <div class="pet" data-pet-index="__IDX__">
+            <div class="grid grid--2" style="margin-top:8px">
+              <div class="field">
+                <label for="petNome__IDX__">Nome do pet <span class="req">*</span></label>
+                <input id="petNome__IDX__" name="petNome__IDX__" class="input" data-role="petNome" autocomplete="off">
+                <small class="help" data-role="err-petNome" id="err-petNome__IDX__" hidden></small>
+              </div>
+              <div class="field">
+                <label for="especie__IDX__">Espécie <span class="req">*</span></label>
+                <select id="especie__IDX__" name="especie__IDX__" class="select" data-role="especie">
+                  <option value="">Selecione…</option>
+                  <option>Cão</option>
+                  <option>Gato</option>
+                  <option>Outro</option>
+                </select>
+                <small class="help" data-role="err-especie" id="err-especie__IDX__" hidden></small>
+              </div>
+              <div class="field">
+                <label for="porte__IDX__">Porte <span class="req">*</span></label>
+                <select id="porte__IDX__" name="porte__IDX__" class="select" data-role="porte">
+                  <option value="">Selecione…</option>
+                  <option>Pequeno</option>
+                  <option>Médio</option>
+                  <option>Grande</option>
+                </select>
+                <small class="help" data-role="err-porte" id="err-porte__IDX__" hidden></small>
+              </div>
+              <div class="field">
+                <label for="pelagem__IDX__">Pelagem</label>
+                <select id="pelagem__IDX__" name="pelagem__IDX__" class="select" data-role="pelagem">
+                  <option value="">Selecione…</option>
+                  <option>Curta</option>
+                  <option>Média</option>
+                  <option>Longa</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="temperamento__IDX__">Temperamento</label>
+                <select id="temperamento__IDX__" name="temperamento__IDX__" class="select" data-role="temperamento">
+                  <option value="">Selecione…</option>
+                  <option>Calmo</option>
+                  <option>Ativo</option>
+                  <option>Reativo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="observacoes__IDX__">Condições de saúde / observações</label>
+                <textarea id="observacoes__IDX__" name="observacoes__IDX__" class="textarea" data-role="observacoes" rows="3"></textarea>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <p class="muted" style="margin:6px 0">Serviços para este pet (opcional)</p>
+              <div class="grid grid--2">
+                <div class="chips">
+                  <label class="chip"><input type="checkbox" data-role="srv-banho"> <span>Banho</span></label>
+                  <label class="chip"><input type="checkbox" data-role="srv-tosa"> <span>Tosa</span></label>
+                  <label class="chip"><input type="checkbox" data-role="srv-ozonio"> <span>Banho de ozônio</span></label>
+                  <label class="chip"><input type="checkbox" data-role="escovacao"> <span>Higienização bucal</span></label>
+                  <label class="chip"><input type="checkbox" data-role="hidratacao"> <span>Hidratação</span></label>
+                  <label class="chip"><input type="checkbox" data-role="corte-unhas"> <span>Corte de unhas</span></label>
+                  <label class="chip"><input type="checkbox" data-role="limpeza-ouvido"> <span>Limpeza de ouvido</span></label>
+                </div>
+                <div>
+                  <div class="field">
+                    <label>Tipo de tosa (opcional)</label>
+                    <select class="select" data-role="tosaTipo">
+                      <option value="">Selecione…</option>
+                      <option>Higiênica</option>
+                      <option>Na tesoura</option>
+                      <option>Na máquina</option>
+                    </select>
+                  </div>
+                  <div class="grid grid--2" style="margin-top:6px">
+                    <div class="field">
+                      <label>Perfume</label>
+                      <select class="select" data-role="perfume">
+                        <option>Sem perfume</option>
+                        <option>perfume de impacto</option>
+                        <option>perfume suave</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label>Acessório</label>
+                      <select class="select" data-role="acessorio">
+                        <option>Sem</option>
+                        <option>Laço</option>
+                        <option>Gravata</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pet__actions" style="margin-top:6px; text-align:right">
+              <button type="button" class="btn btn--ghost btn-remove-pet" aria-label="Remover este pet">Remover pet</button>
+            </div>
+          </div>
+        </template>
+
+        <div class="grid grid--2">
+          <div class="field">
+            <label for="tutorNome">Nome do tutor <span class="req">*</span></label>
+            <input id="tutorNome" class="input" required autocomplete="name">
+            <small id="err-tutorNome" class="help" hidden></small>
+          </div>
+          <div class="field">
+            <label for="tutorTelefone">Telefone (WhatsApp) <span class="req">*</span></label>
+            <input id="tutorTelefone" class="input" inputmode="tel" required autocomplete="tel">
+            <small id="err-tutorTelefone" class="help" hidden></small>
+          </div>
+        </div>
+      </section>
+
+      
+
+  <!-- Seção de serviços globais removida: todos os serviços/preferências agora são por pet. -->
+
+      <section class="card">
+        <h2 class="card__title">🗓️ Quando</h2>
+        <div class="grid grid--3">
+          <div class="field">
+            <label for="dataPreferida">Data preferida <span class="req">*</span></label>
+            <input id="dataPreferida" type="date" class="input" required>
+            <small id="err-dataPreferida" class="help" hidden></small>
+          </div>
+          <div class="field">
+            <label for="janela">Janela de horário <span class="req">*</span></label>
+            <select id="janela" class="select" required>
+              <option value="">Selecione…</option>
+              <option>Manhã</option>
+              <option>Tarde</option>
+              <option>Outro</option>
+            </select>
+            <small id="err-janela" class="help" hidden></small>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card__title">📍 Onde</h2>
+        <div class="field">
+          <label>Localização:</label>
+          <div role="radiogroup" aria-label="Opções de localização">
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="loja" checked> <span>Vou levar o pet na loja</span></label>
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="taxi-both"> <span>Quero Táxi Dog (Buscar e Levar)</span></label>
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="taxi-pickup"> <span>Quero Táxi Dog (Somente Buscar)</span></label>
+            <label class="radio"><input type="radio" name="modalidadeLocalizacao" value="taxi-dropoff"> <span>Quero Táxi Dog (Somente Levar)</span></label>
+          </div>
+        </div>
+
+        
+
+        <div id="localizacao-fields" style="margin-top:8px">
+          <div id="field-origem" class="grid grid--2 hide">
+            <div class="field">
+              <label>Onde buscar o pet?</label>
+              <div class="grid grid--3">
+                <div class="field"><label for="origem-rua">Rua <span class="req">*</span></label><input id="origem-rua" class="input"></div>
+                <div class="field"><label for="origem-numero">Nº <span class="req">*</span></label><input id="origem-numero" class="input" inputmode="numeric"></div>
+                <div class="field"><label for="origem-bairro">Bairro <span class="req">*</span></label><input id="origem-bairro" class="input"></div>
+              </div>
+              <div class="grid grid--3" style="margin-top:6px">
+                <div class="field"><label for="origem-cep">CEP <span class="req">*</span></label><input id="origem-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="field-destino" class="grid grid--2 hide">
+            <div class="field">
+              <label>Onde entregar o pet?</label>
+              <div class="grid grid--3">
+                <div class="field"><label for="destino-rua">Rua</label><input id="destino-rua" class="input"></div>
+                <div class="field"><label for="destino-numero">Nº</label><input id="destino-numero" class="input" inputmode="numeric"></div>
+                <div class="field"><label for="destino-bairro">Bairro</label><input id="destino-bairro" class="input"></div>
+              </div>
+              <div class="grid grid--3" style="margin-top:6px">
+                <div class="field"><label for="destino-cep">CEP</label><input id="destino-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card card--summary">
+        <h2 class="card__title">📄 Resumo</h2>
+        <pre id="agendar-resumo" class="note" aria-live="polite">Nada por aqui ainda. Adicione um serviço para continuar.</pre>
+        <div class="actions">
+          <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
+          <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
+          <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+        </div>
+        <p class="muted">LGPD: Usamos seus dados apenas para atender seu pedido e combinar detalhes pelo WhatsApp.</p>
+        <div id="agendar-err" class="toast" role="status" aria-live="polite"></div>
+      </section>
+    </form>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.8</span></span></p>
+      <a href="sobre.html">Sobre</a>
+    </div>
+  </footer>
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+  </svg>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

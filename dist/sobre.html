@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sobre nós — Focinhos Amados (BH)</title>
+  <meta name="description" content="Amor, higiene e segurança em cada atendimento. Conheça a equipe e a loja.">
+  <meta name="theme-color" content="#029935">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <meta property="og:title" content="Sobre nós — Focinhos Amados (BH)">
+  <meta property="og:description" content="Amor, higiene e segurança em cada atendimento. Conheça a equipe e a loja.">
+  <meta property="og:image" content="assets/img/gallery-pet-1.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+</head>
+<body data-page="sobre">
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <header class="topbar" role="banner">
+    <div class="container topbar__inner">
+      <a class="brand" href="./">
+  <img class="brand__logo" src="assets/img/logo.png" alt="Logotipo Focinhos Amados" width="32" height="32">
+        <span class="brand__text"><strong>Focinhos Amados</strong><small class="brand__city" data-bind="city">Belo Horizonte/MG</small></span>
+      </a>
+      <nav class="nav" aria-label="principal">
+        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
+        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
+          <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
+          <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
+          <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
+          <li role="none"><a role="menuitem" href="sobre.html" aria-current="page">Sobre</a></li>
+        </ul>
+      </nav>
+      <div class="topbar__actions">
+  <!-- cart removed per UX decision -->
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo" class="container flow">
+    <h1>Sobre nós</h1>
+
+    <section class="card">
+  <h2 class="card__title">Missão & princípios</h2>
+      <p>Amor, higiene e segurança em cada atendimento. Levamos conforto para pets e tranquilidade para tutores.</p>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">Equipe</h2>
+      <p>Time experiente e apaixonado por animais. Profissionais treinados em manejo, banho e tosa humanizados.</p>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">Estrutura & cuidados</h2>
+      <p>Ambiente ventilado, higienizado e equipado. Produtos selecionados conforme necessidade do seu pet.</p>
+    </section>
+
+    <section class="card" id="endereco">
+      <h2 class="card__title">Endereço & horários</h2>
+      <p><strong data-bind="address">Av. Padre José Maurício, 572 – Nova Cintra</strong> — <span data-bind="city">Belo Horizonte/MG</span></p>
+      <p>Horários: <span data-bind="hoursLabel">Seg–Sáb 10:00–20:00 • Dom 10:00–13:00</span></p>
+      <div class="actions">
+        <a id="route-link" class="btn btn--ghost" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+      </div>
+    </section>
+
+    <section class="card" id="contato">
+      <h2 class="card__title">Canais</h2>
+      <ul class="list">
+        <li>Telefone: <span data-bind="landline">+55 31 3322-3070</span></li>
+        <li>WhatsApp: <span data-bind="waHuman">+55 31 98233-9672</span> (finalização dos fluxos)</li>
+        <li>Instagram: <a href="https://instagram.com/petshopfocinhos" target="_blank" rel="noopener">@petshopfocinhos</a></li>
+      </ul>
+    </section>
+
+    <section class="card" id="priv">
+      <h2 class="card__title">Privacidade</h2>
+      <p>Usamos seus dados apenas para atender seu pedido e combinar detalhes pelo WhatsApp.</p>
+    </section>
+
+    <section class="card" id="termos">
+      <h2 class="card__title">Termos</h2>
+      <p>Serviços e detalhes confirmados diretamente com a equipe via WhatsApp.</p>
+    </section>
+
+    <section class="card" id="faq">
+      <h2 class="card__title">FAQ — Como funciona</h2>
+      <p>Oferecemos serviços personalizados. As necessidades do seu pet (porte, pelagem, cuidados específicos) definem o atendimento ideal. Por isso, combinamos todos os detalhes diretamente com você pelo WhatsApp.</p>
+      <p>Nossa equipe responde assim que possível usando um modelo que resume seu pedido — assim garantimos precisão e qualidade no atendimento.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.8</span></span></p>
+    </div>
+  </footer>
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+  </svg>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

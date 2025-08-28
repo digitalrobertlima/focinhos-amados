@@ -1,0 +1,34 @@
+{
+  "used": [
+    "assets/img/escultura_unique.png",
+    "assets/img/favicon-16.png",
+    "assets/img/favicon-32.png",
+    "assets/img/gallery-pet-1.webp",
+    "assets/img/gallery-pet-2.webp",
+    "assets/img/gallery-pet-3.webp",
+    "assets/img/gallery-pet-4.webp",
+    "assets/img/gallery-pet-5.webp",
+    "assets/img/logo.png",
+    "assets/img/logo.svg",
+    "assets/img/pwa-192.png",
+    "assets/img/pwa-512.png",
+    "assets/img/sprite.svg"
+  ],
+  "unused": [
+    "assets/img/especial-semana.png",
+    "assets/img/favicon-16 - Copia.png",
+    "assets/img/favicon-32 - Copia.png",
+    "assets/img/forma.png",
+    "assets/img/hero.webp",
+    "assets/img/og.jpg",
+    "assets/img/paleta.png",
+    "assets/img/pwa-192 - Copia.png",
+    "assets/img/semana-teste.png"
+  ],
+  "duplicates": [
+    "assets/img/favicon-16 - Copia.png",
+    "assets/img/favicon-32 - Copia.png",
+    "assets/img/pwa-192 - Copia.png"
+  ],
+  "total": 22
+}
