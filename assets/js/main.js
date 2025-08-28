@@ -881,7 +881,7 @@
       if(modalidadeCode === 'loja'){
         const coords = (map.origemLat && map.origemLng) ? `${map.origemLat},${map.origemLng}` : '';
         // Monta uma mensagem compacta reusando as mesmas seções principais
-        const rawLoja = [
+  let rawLoja = [
           '📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)',
           '',
           '🐾 *Pets*',
@@ -904,10 +904,18 @@
           '🏪 *Loja física*',
           map.enderecoLoja
         ].join('\n');
+        try{
+          const trackTpl = window.CONFIG?.waTemplates?.agendarTracking || '';
+          if(trackTpl){ rawLoja += interpolate(trackTpl, map); }
+        }catch(_){ }
         return processMessageForPlatform(tidyMessage(rawLoja));
       }
 
       let raw = interpolate(tpl, map);
+      try{
+        const trackTpl = window.CONFIG?.waTemplates?.agendarTracking || '';
+        if(trackTpl){ raw += interpolate(trackTpl, map); }
+      }catch(_){ }
       // Serviços avulsos removidos (não há seção global)
       return processMessageForPlatform(tidyMessage(raw));
     }
@@ -1367,7 +1375,12 @@
         timestamp: geo? fmtDT(geo.timestamp) : '',
         observacoes: (els.obs.value||'').trim() || ''
       };
-  return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map)));
+  try{
+    let raw = interpolate(window.CONFIG.waTemplates.delivery, map);
+    const trackTpl = window.CONFIG?.waTemplates?.deliveryTracking || '';
+    if(trackTpl){ raw += interpolate(trackTpl, map); }
+    return processMessageForPlatform(tidyMessage(raw));
+  }catch(_){ return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map))); }
     }
 
     function validar(){
@@ -1500,7 +1513,12 @@
         horario: fmtDT(byId('horario')?.value||'') || '',
         observacoes: (byId('obs')?.value||'').trim() || ''
       };
-  return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.taxiBanho, map)));
+  try{
+    let raw = interpolate(window.CONFIG.waTemplates.taxiBanho, map);
+    const trackTpl = window.CONFIG?.waTemplates?.taxiBanhoTracking || '';
+    if(trackTpl){ raw += interpolate(trackTpl, map); }
+    return processMessageForPlatform(tidyMessage(raw));
+  }catch(_){ return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.taxiBanho, map))); }
     }
 
     function resumoAgendado(){
@@ -1519,7 +1537,12 @@
         tutorTelefone: (tutorTelefone||'').trim() || '',
         observacoes: (byId('obs2')?.value||'').trim() || ''
       };
-  return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.taxiAgendado, map)));
+  try{
+    let raw = interpolate(window.CONFIG.waTemplates.taxiAgendado, map);
+    const trackTpl = window.CONFIG?.waTemplates?.taxiAgendadoTracking || '';
+    if(trackTpl){ raw += interpolate(trackTpl, map); }
+    return processMessageForPlatform(tidyMessage(raw));
+  }catch(_){ return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.taxiAgendado, map))); }
     }
 
     function resumo(){ return byId('tipo-banho').checked ? resumoBanho() : resumoAgendado(); }

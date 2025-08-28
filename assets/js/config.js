@@ -68,19 +68,19 @@ window.CONFIG = {
 
 📍 *Onde buscar o pet?*
 {origemEndereco}
-Geo: {origemLat},{origemLng}
-Precisão: {origemAccuracy}m @ {origemTimestamp}
 
 📍 *Onde entregar o pet?*
 {destinoEndereco}
-Geo: {destinoLat},{destinoLng}
-Precisão: {destinoAccuracy}m @ {destinoTimestamp}
 
 📝 *Observações gerais*
 {observacoes}
 
 🏪 *Loja física*
 {enderecoLoja}`,
+
+  // Tracking técnico (apêndice) para o template Agendar
+  agendarTracking:
+`\n—\nTracking\nOrigem: {origemLat},{origemLng} • ±{origemAccuracy}m @ {origemTimestamp}\nDestino: {destinoLat},{destinoLng} • ±{destinoAccuracy}m @ {destinoTimestamp}`,
 
     delivery:
 `📦 *DELIVERY* — FOCINHOS AMADOS (BH)
@@ -93,14 +93,16 @@ Precisão: {destinoAccuracy}m @ {destinoTimestamp}
 
 📍 *Endereço*  
 {enderecoCompleto}  
-Geo: {lat},{lng}  
-Precisão: {accuracy}m @ {timestamp}
 
 📝 *Observações*  
 {observacoes}
 
 🏪 *Loja física*
 {enderecoLoja}`,
+
+  // Tracking técnico (apêndice) para o template Delivery
+  deliveryTracking:
+`\n—\nTracking\nEntrega: {lat},{lng} • ±{accuracy}m @ {timestamp}`,
 
     taxiBanho:
 `🚕 *TÁXI DOG — BANHO/TOSA* (BH)
@@ -116,11 +118,9 @@ Precisão: {accuracy}m @ {timestamp}
 
 📍 *Onde buscar o pet?*  
 {origemEndereco}  
-Geo: {origemLat},{origemLng}
 
 📍 *Onde entregar o pet?*  
 {destinoEndereco}  
-Geo: {destinoLat},{destinoLng}
 
 ⏰ *Horário desejado*  
 {horario}
@@ -129,16 +129,18 @@ Geo: {destinoLat},{destinoLng}
 {observacoes}
 `,
 
+  // Tracking técnico (apêndice) para o template Táxi Banho/Tosa
+  taxiBanhoTracking:
+`\n—\nTracking\nOrigem: {origemLat},{origemLng}\nDestino: {destinoLat},{destinoLng}`,
+
   taxiAgendado:
 `🚕 *TÁXI DOG — AGENDADO* (BH)
 
 📍 *Onde buscar o pet?*  
 {origemEndereco}  
-Geo: {origemLat},{origemLng}
 
 📍 *Onde entregar o pet?*  
 {destinoEndereco}  
-Geo: {destinoLat},{destinoLng}
 
 ⏰ *Horário desejado*  
 {horario}
@@ -148,7 +150,11 @@ Geo: {destinoLat},{destinoLng}
 
 📝 *Observações*  
 {observacoes}
-`
+`,
+
+  // Tracking técnico (apêndice) para o template Táxi Agendado
+  taxiAgendadoTracking:
+`\n—\nTracking\nOrigem: {origemLat},{origemLng}\nDestino: {destinoLat},{destinoLng}`
   ,
   // Template para equipe agilizar respostas de confirmação (modelo de mensagem)
   teamReply: `*Pedido recebido — Focinhos Amados (BH)*
