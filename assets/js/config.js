@@ -2,7 +2,7 @@
    Editável pelo cliente. Disponível em window.CONFIG */
 
 window.CONFIG = {
-  appVersion: "v0.1.7",
+  appVersion: "v0.1.8",
   business: {
     name: "Focinhos Amados",
     city: "Belo Horizonte/MG",

@@ -1,6 +1,6 @@
 {
   "name": "focinhos-amados",
-  "version": "0.1.0",
+  "version": "0.1.8",
   "description": "Site estático PWA leve para Focinhos Amados (BH)",
   "private": true,
   "scripts": {
@@ -14,7 +14,8 @@
   "test:matrix:ui:fast": "cross-env HEADFUL=1 SLOW_MS=0 node tools/test-matrix.js",
   "test:all:fast": "npm run test:flows && npm run test:matrix",
   "scan:unused": "node tools/find-unreferenced.js",
-  "build:dist": "node tools/build-dist.js"
+  "build:dist": "node tools/build-dist.js",
+  "set:version": "node tools/set-version.js"
   },
   "devDependencies": {
   "puppeteer": "^24.16.2",
