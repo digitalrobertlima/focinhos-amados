@@ -196,3 +196,11 @@ Small helper UI to generate patches/snippets without Node:
 - `tools/interactive-menu.js` — script Node (opcional) caso prefira rodar localmente com Node.js.
 
 Use the web menu to produce files and then copie-os manualmente para os caminhos correspondentes do repositório.
+
+## Deploy (DigitalOcean App Platform)
+
+- Output directory: `dist`
+- Build command: `npm ci && npm run build:dist`
+- App spec: see `.do/app.yaml` (configures repo, branch, build, and output_dir).
+
+If you deploy via DO’s detected settings and see: “could not find the output directory”, point the Output Directory to `dist` or enable the provided `.do/app.yaml` in App Spec mode.
