@@ -47,7 +47,7 @@
     ]
   },
 
-  "appVersion": "0.1.6",
+  "appVersion": "v0.1.7",
 
   "waTemplates": {
   "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Janela: {janela}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}\n\n🚕 *Modalidade de localização*\n{modalidade}\n\n📍 *Origem*\n{origemEndereco}\nGeo: {origemLat},{origemLng}\nPrecisão: {origemAccuracy}m @ {origemTimestamp}\n\n📍 *Destino*\n{destinoEndereco}\nGeo: {destinoLat},{destinoLng}\nPrecisão: {destinoAccuracy}m @ {destinoTimestamp}\n\n📝 *Observações gerais*\n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
