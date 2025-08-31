@@ -845,8 +845,8 @@
   // Localização
   const modalidadeCode = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
   const modalidade = labelModalidadeAgendar(modalidadeCode);
-  const origemAddr = ['origem-rua','origem-numero','origem-bairro','origem-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
-  const destinoAddr = ['destino-rua','destino-numero','destino-bairro','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
+  const origemAddr = ['origem-rua','origem-numero','origem-bairro','origem-complemento','origem-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
+  const destinoAddr = ['destino-rua','destino-numero','destino-bairro','destino-complemento','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
 
       // Use empty strings as fallback so tidyMessage can remove empty sections
       const map = {
@@ -1039,13 +1039,14 @@
       // Validação por modalidade de localização — exigir Rua, Nº, Bairro e CEP
       const modalidade = (document.querySelector("input[name='modalidadeLocalizacao']:checked")||{}).value || 'loja';
       function reqAddr(prefix){
-        const rua = byId(prefix+'-rua'); const numero = byId(prefix+'-numero'); const bairro = byId(prefix+'-bairro'); const cep = byId(prefix+'-cep');
-        let lok = true;
-        lok &= required(rua, 'Informe a rua.');
-        lok &= required(numero, 'Informe o número.');
-        lok &= required(bairro, 'Informe o bairro.');
-        lok &= required(cep, 'Informe o CEP.');
-        return !!lok;
+  const rua = byId(prefix+'-rua'); const numero = byId(prefix+'-numero'); const bairro = byId(prefix+'-bairro'); const complemento = byId(prefix+'-complemento'); const cep = byId(prefix+'-cep');
+  let lok = true;
+  lok &= required(rua, 'Informe a rua.');
+  lok &= required(numero, 'Informe o número.');
+  lok &= required(bairro, 'Informe o bairro.');
+  lok &= required(complemento, 'Informe o complemento.');
+  lok &= required(cep, 'Informe o CEP.');
+  return !!lok;
       }
       if(modalidade==='taxi-both'){
         ok &= reqAddr('origem');
@@ -1368,7 +1369,7 @@
         itensLista: listagem() || '',
         nome: (els.recebedor.value||'').trim() || '',
         telefone: (els.tel.value||'').trim() || '',
-  enderecoCompleto: [els.rua?.value, els.numero?.value, els.bairro?.value, els.cep?.value].map(s=> (s||'').trim()).filter(Boolean).join(', '),
+  enderecoCompleto: [els.rua?.value, els.numero?.value, els.bairro?.value, byId('endereco-complemento')?.value, els.cep?.value].map(s=> (s||'').trim()).filter(Boolean).join(', '),
         lat: geo? geo.lat.toFixed(6) : '',
         lng: geo? geo.lng.toFixed(6) : '',
         accuracy: geo? fmtAcc(geo.accuracy) : '',
@@ -1393,6 +1394,7 @@
   ok &= required(els.rua, 'Informe a rua.');
   ok &= required(els.numero, 'Informe o número.');
   ok &= required(els.bairro, 'Informe o bairro.');
+  ok &= required(byId('endereco-complemento'), 'Informe o complemento.');
   ok &= required(els.cep, 'Informe o CEP.');
       return !!ok;
     }
@@ -1504,8 +1506,8 @@
         petNome: (byId('petNome')?.value||'').trim() || '',
         tutorNome: (byId('tutorNome')?.value||'').trim() || '',
         tutorTelefone: (byId('tutorTelefone')?.value||'').trim() || '',
-        origemEndereco: ['origem-rua','origem-numero','origem-bairro','origem-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
-        destinoEndereco: ['destino-rua','destino-numero','destino-bairro','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+  origemEndereco: ['origem-rua','origem-numero','origem-bairro','origem-complemento','origem-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+  destinoEndereco: ['destino-rua','destino-numero','destino-bairro','destino-complemento','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
         origemLat: geo? geo.lat.toFixed(6) : '',
         origemLng: geo? geo.lng.toFixed(6) : '',
         destinoLat: geo? geo.lat.toFixed(6) : '',
@@ -1526,8 +1528,8 @@
       const contato = (byId('contato2')?.value||'').trim();
       const [tutorNome, tutorTelefone] = contato.split(/•|\||-/).map(s=>s&&s.trim()) || ['',''];
       const map = {
-        origemEndereco: ['origem2-rua','origem2-numero','origem2-bairro','origem2-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
-        destinoEndereco: ['destino2-rua','destino2-numero','destino2-bairro','destino2-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+  origemEndereco: ['origem2-rua','origem2-numero','origem2-bairro','origem2-complemento','origem2-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
+  destinoEndereco: ['destino2-rua','destino2-numero','destino2-bairro','destino2-complemento','destino2-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', '),
         origemLat: geo? geo.lat.toFixed(6) : '',
         origemLng: geo? geo.lng.toFixed(6) : '',
         destinoLat: geo? geo.lat.toFixed(6) : '',
@@ -1551,10 +1553,11 @@
     // Validation helpers
     function reqAddr(prefix){
       let ok = true;
-      ok &= required(byId(prefix+'-rua'), 'Informe a rua.');
-      ok &= required(byId(prefix+'-numero'), 'Informe o número.');
-      ok &= required(byId(prefix+'-bairro'), 'Informe o bairro.');
-      ok &= required(byId(prefix+'-cep'), 'Informe o CEP.');
+  ok &= required(byId(prefix+'-rua'), 'Informe a rua.');
+  ok &= required(byId(prefix+'-numero'), 'Informe o número.');
+  ok &= required(byId(prefix+'-bairro'), 'Informe o bairro.');
+  ok &= required(byId(prefix+'-complemento'), 'Informe o complemento.');
+  ok &= required(byId(prefix+'-cep'), 'Informe o CEP.');
       return !!ok;
     }
 
