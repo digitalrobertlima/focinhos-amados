@@ -1,5 +1,11 @@
 # Changelog
 #
+## [0.1.10] - 2025-08-31
+### Changed
+- Atualização forçada de versão para 0.1.10 em todos os arquivos críticos do app (package.json, dist/package.json, config.json, manifest, service worker, .do/app.yaml).
+- Garantida consistência de versão entre build, deploy e arquivos finais.
+- Correção de estrutura JSON e automação do fluxo de release.
+
 ## [0.1.9] - 2025-08-31
 ### Added
 - Todos os fluxos de endereço (Delivery, Táxi Dog, Agendar) agora incluem campo de complemento (apartamento, bloco, etc.) na interface e nas mensagens do WhatsApp.
