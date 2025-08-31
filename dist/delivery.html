@@ -78,12 +78,8 @@
       <h2 class="card__title">📦 Endereço & contato</h2>
       <div class="grid grid--2" style="margin-top:8px">
         <div class="field">
-            <label for="endereco">Endereço completo</label>
-            <input id="endereco" class="input" placeholder="Rua, número, bairro" autocomplete="street-address">
-          </div>
-          <div class="field">
-            <label for="endereco-complemento">Complemento (apto, bloco, sala...)</label>
-            <input id="endereco-complemento" class="input" placeholder="Apartamento, bloco, sala, etc." autocomplete="address-line2">
+          <label for="recebedor">Nome do recebedor <span class="req">*</span></label>
+          <input id="recebedor" class="input" required autocomplete="name">
           <small id="err-recebedor" class="help" hidden></small>
         </div>
         <div class="field">

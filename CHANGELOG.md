@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.6] - 2025-08-23
+### Fixed
+- Agendar (opção loja): mensagem do WhatsApp agora inclui apenas “Localização do solicitante: lat,lng” (removidos blocos Origem/Destino nessa modalidade).
+- Delivery: corrigido incremento duplo nos botões de quantidade (+/–) removendo handler duplicado.
+
+### Docs
+- Documentação profissional adicionada em `docs/` (arquitetura, desenvolvimento, testes, release, templates de WhatsApp, geolocalização e acessibilidade). Links no README principal.
+
 ## [0.1.2] - 2025-08-19
 ### Added
 - Home: Indicador de status com ponto colorido (verde/brilho para “Aberto agora”; vermelho para “Fechado” com mensagem “Abre às HH:MM”). Atualiza automaticamente a cada minuto.

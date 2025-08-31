@@ -1,0 +1,15 @@
+# DigitalOcean App Platform spec for static site
+# This config ensures the build outputs to dist/ and is served correctly.
+
+name: focinhos-amados
+static_sites:
+  - name: web
+    github:
+      repo: digitalrobertlima/focinhos-amados
+      branch: v0.1.8
+      deploy_on_push: true
+    source_dir: "/"
+    build_command: "npm ci && npm run build:dist"
+    output_dir: "dist"
+    routes:
+      - path: "/"
