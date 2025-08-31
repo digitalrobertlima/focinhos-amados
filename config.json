@@ -31,7 +31,6 @@
     "waitMs": 40000,
     "requiredPrecisionM": 20
   },
-
   "suggestions": {
     "products": [
       "QUATREE GOURMET ADULTOS 1kg",
@@ -46,9 +45,7 @@
       "Higienização bucal"
     ]
   },
-
-  "appVersion": "v0.1.9",
-
+  "appVersion": "v0.1.10",
   "waTemplates": {
   "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Janela: {janela}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}\n\n🚕 *Modalidade de localização*\n{modalidade}\n\n📍 *Onde buscar o pet?*\n{origemEndereco}\n\n📍 *Onde entregar o pet?*\n{destinoEndereco}\n\n📝 *Observações gerais*\n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}",
   "agendarTracking": "\n—\nTracking\nOrigem: {origemLat},{origemLng} • ±{origemAccuracy}m @ {origemTimestamp}\nDestino: {destinoLat},{destinoLng} • ±{destinoAccuracy}m @ {destinoTimestamp}",
