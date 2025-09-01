@@ -2,8 +2,8 @@
    Editável pelo cliente. Disponível em window.CONFIG */
 
 window.CONFIG = {
-  appVersion: "v0.1.11",
-  appVersion: "v0.1.11",
+  appVersion: "v0.1.12-pre",
+  appVersion: "v0.1.12-pre",
 
   business: {
     name: "Focinhos Amados",

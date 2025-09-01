@@ -1,7 +1,7 @@
 # Publicação e Releases
 
 Branching sugerido
-- `v0.1-LTS` — estável (deploy do GitHub Pages).
+- `v0.1.x` — estável (deploy do GitHub Pages).
 - `feature/*` — desenvolvimento de features.
 - `hotfix/*` — correções rápidas.
 
@@ -13,5 +13,5 @@ Checklist de release
 5. Para forçar atualização do SW em clientes, incremente versão de cache ou appVersion e faça commit.
 
 GitHub Pages
-- Source: Deploy from a branch → `v0.1-LTS` / root.
+- Source: Deploy from a branch → `v0.1.x` / root.
 - Atualize `robots.txt` e `sitemap.xml` com a URL final do site.

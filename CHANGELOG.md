@@ -5,17 +5,17 @@
 - Atualização forçada de versão para 0.1.10 em todos os arquivos críticos do app (package.json, dist/package.json, config.json, manifest, service worker, .do/app.yaml).
 - Garantida consistência de versão entre build, deploy e arquivos finais.
 - Correção de estrutura JSON e automação do fluxo de release.
-
-## [0.1.9] - 2025-08-31
-### Added
 - Todos os fluxos de endereço (Delivery, Táxi Dog, Agendar) agora incluem campo de complemento (apartamento, bloco, etc.) na interface e nas mensagens do WhatsApp.
+## [0.1.12-pre] - 2025-09-01
+### Pre-release
+- Versão de pré-release para validação final antes do lançamento estável.
+- Atualização de versionamento e documentação.
+- Testes automatizados recomendados antes do release final.
+
 ### Changed
 - Validação e coleta do complemento de endereço garantidas em todos os fluxos, inclusive Taxi Dog no Agendar.
-### Fixed
 - Correção final: campo complemento presente em todos os formulários e lógicas de endereço, conforme revisão de QA.
-
 All notable changes to this project will be documented in this file.
-
 ## [0.1.6] - 2025-08-23
 ### Fixed
 - Agendar (opção loja): mensagem do WhatsApp agora inclui apenas “Localização do solicitante: lat,lng” (removidos blocos Origem/Destino nessa modalidade).
