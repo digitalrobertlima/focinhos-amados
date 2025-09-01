@@ -1,20 +1,31 @@
+
 # Templates de WhatsApp
 
-Local: `config.json → waTemplates`
+## Localização dos Templates
 
-Placeholders
-- Chaves `{nome}` são substituídas via `interpolate()` em `main.js`.
-- `tidyMessage()` remove linhas vazias e seções sem conteúdo.
-- `processMessageForPlatform()` pode remover emojis quando necessário.
+- Os templates de mensagens estão definidos em `config.json > waTemplates`.
 
-Templates disponíveis
+## Placeholders Dinâmicos
+
+- Chaves entre `{}` são substituídas automaticamente via função `interpolate()` em `main.js`.
+- Função `tidyMessage()` remove linhas vazias e seções sem conteúdo.
+- Função `processMessageForPlatform()` pode remover emojis para compatibilidade com dispositivos antigos.
+
+## Templates Disponíveis
+
 - `agendar`, `delivery`, `taxiBanho`, `taxiAgendado`, `teamReply`.
 
-Comportamentos especiais
-- Agendar, modalidade `loja`: a mensagem substitui os blocos “Onde buscar o pet?” e “Onde entregar o pet?” por uma linha única:
+## Comportamentos Especiais
+
+- No fluxo de agendamento, modalidade loja, a mensagem substitui os blocos de endereço por:
   `Localização do solicitante: <lat>,<lng>`
 
-Boas práticas
-- Prefira frases curtas, labels claras e consistentes.
-- Evite links longos no corpo; deixe a equipe compartilhar quando necessário.
-- Mantenha o telefone em E.164 no `config.json.phones.whatsappE164` para compatibilidade com `wa.me`.
+## Boas Práticas
+
+- Utilize frases curtas, labels claras e consistentes.
+- Evite links longos no corpo da mensagem; compartilhe separadamente quando necessário.
+- Mantenha o telefone em formato E.164 em `config.json.phones.whatsappE164` para garantir compatibilidade com `wa.me`.
+
+---
+
+Essas diretrizes garantem mensagens claras, funcionais e compatíveis com todos os dispositivos e plataformas.

@@ -1,14 +1,22 @@
+
 # Acessibilidade
 
-Diretrizes
-- Labels associadas a inputs; não depender apenas de placeholders.
-- Estados de erro com `aria-invalid` e mensagens de ajuda visíveis.
-- Foco sempre visível; Escape fecha drawer/modais.
-- Diálogo do carrinho: `role="dialog"`, trap de foco simples e botão fechar.
+## Diretrizes Gerais
 
-Checks automatizados
-- `npm run test:a11y` executa verificação básica em páginas chaves.
+- Labels sempre associadas a inputs; nunca dependa apenas de placeholders.
+- Estados de erro devem utilizar `aria-invalid` e apresentar mensagens de ajuda visíveis e acessíveis.
+- Foco visível em todos os elementos interativos; Escape fecha drawers e modais.
+- Diálogo do carrinho implementado com `role="dialog"`, trap de foco e botão de fechar acessível.
 
-Testes manuais
-- Navegação por teclado completa (Tab/Shift+Tab) e leitura por leitor de telas.
-- Contraste de cores de acordo com WCAG AA.
+## Checks Automatizados
+
+- Script `npm run test:a11y` executa verificação básica de acessibilidade nas páginas principais.
+
+## Testes Manuais
+
+- Navegação por teclado completa (Tab/Shift+Tab), leitura por leitores de tela.
+- Contraste de cores conforme padrão WCAG AA.
+
+---
+
+Essas práticas garantem que o app seja utilizável por todos, promovendo inclusão e conformidade com padrões internacionais de acessibilidade.
