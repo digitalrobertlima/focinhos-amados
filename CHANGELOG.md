@@ -1,5 +1,9 @@
 # Changelog
 #
+## [0.1.11] - 2025-09-01
+### Changed
+- Atualização de versão para 0.1.11 em todos os arquivos críticos do app (package.json, config.json, manifest, service worker, .do/app.yaml).
+
 ## [0.1.10] - 2025-08-31
 ### Changed
 - Atualização forçada de versão para 0.1.10 em todos os arquivos críticos do app (package.json, dist/package.json, config.json, manifest, service worker, .do/app.yaml).

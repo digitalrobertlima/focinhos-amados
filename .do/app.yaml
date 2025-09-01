@@ -6,7 +6,7 @@ static_sites:
   - name: web
     github:
       repo: digitalrobertlima/focinhos-amados
-  branch: v0.1.10
+  branch: v0.1.11
       deploy_on_push: true
     source_dir: "/"
     build_command: "npm ci && npm run build:dist"
