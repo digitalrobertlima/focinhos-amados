@@ -187,4 +187,4 @@ self.addEventListener('fetch', (e) => { ... });
 ---
 
 > Documentação mantida por desenvolvedor contratado. Última atualização: 2025-09-01.
->>>>>>> v0.1.11
+
