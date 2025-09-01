@@ -1,4 +1,18 @@
 # Changelog
+#
+## [0.1.11] - 2025-09-01
+### Changed
+- Atualização forçada de versão para 0.1.10 em todos os arquivos críticos do app (package.json, dist/package.json, config.json, manifest, service worker, .do/app.yaml).
+- Garantida consistência de versão entre build, deploy e arquivos finais.
+- Correção de estrutura JSON e automação do fluxo de release.
+
+## [0.1.9] - 2025-08-31
+### Added
+- Todos os fluxos de endereço (Delivery, Táxi Dog, Agendar) agora incluem campo de complemento (apartamento, bloco, etc.) na interface e nas mensagens do WhatsApp.
+### Changed
+- Validação e coleta do complemento de endereço garantidas em todos os fluxos, inclusive Taxi Dog no Agendar.
+### Fixed
+- Correção final: campo complemento presente em todos os formulários e lógicas de endereço, conforme revisão de QA.
 
 All notable changes to this project will be documented in this file.
 
