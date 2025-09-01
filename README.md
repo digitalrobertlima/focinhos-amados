@@ -6,7 +6,6 @@ Focinhos Amados é um Progressive Web App (PWA) para agendamento de serviços, d
 
 ## Visão Geral
 Focinhos Amados é um Progressive Web App (PWA) para agendamento de serviços, delivery e Táxi Dog, focado em experiência mobile, performance, acessibilidade e integração com WhatsApp.
-// ...existing code...
 
 ---
 
@@ -64,7 +63,6 @@ Focinhos Amados é um Progressive Web App (PWA) para agendamento de serviços, d
 ---
 
 ## Manutenção e Boas Práticas
-// ...existing code...
 ## Manutenção e Boas Práticas
 - **Versão:** Sempre atualize a versão do Service Worker e do manifest ao modificar arquivos estáticos.
 - **Cache:** Use query param `?v=` para bust de cache em deploys.
