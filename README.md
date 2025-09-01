@@ -98,4 +98,86 @@ Focinhos Amados é um Progressive Web App (PWA) para agendamento de serviços, d
 
 ---
 
+## Comentários Inline — Exemplos Profissionais
+
+### HTML
+```html
+<!-- Topbar: navegação principal, inclui menu e ações rápidas -->
+<header class="topbar" role="banner"> ... </header>
+```
+
+### CSS
+```css
+/* Grid responsivo para galeria de pets */
+.gallery { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+```
+
+### JavaScript
+```js
+// Atualiza status de funcionamento (aberto/fechado) na home
+function updateStatus() { ... }
+```
+
+### Service Worker
+```js
+// Network-first para HTML, fallback offline
+self.addEventListener('fetch', (e) => { ... });
+```
+
+---
+
+## Deploy
+- Recomenda-se GitHub Pages ou servidor HTTPS.
+- Para publicar:
+  ```bash
+  git push origin <branch>
+  # Configure GitHub Pages para servir a partir da branch principal ou pasta /docs
+  ```
+- Sempre valide o funcionamento offline e instalação PWA após deploy.
+
+---
+
+## Configuração
+- **config.json:** Edite dados do negócio, horários, templates e cores conforme necessidade.
+- **manifest.webmanifest:** Atualize nome, ícones, cores e versão ao modificar assets ou branding.
+- **sw.js:** Atualize versão e assets para garantir cache correto.
+
+---
+
+## Contribuição
+- Padronize mensagens de commit: `tipo: descrição curta` (ex: `fix: corrige bug no agendamento`).
+- Pull Requests devem ser revisados por outro desenvolvedor.
+- Teste flows, acessibilidade e offline antes de aprovar PRs.
+- Documente decisões técnicas relevantes nos arquivos alterados.
+
+---
+
+## Comandos Úteis
+- Instalar dependências (se houver):
+  ```bash
+  npm install
+  ```
+- Rodar preview local:
+  ```bash
+  python -m http.server 8080
+  ```
+- Testar flows:
+  ```bash
+  npm run test:flows
+  npm run test:a11y
+  npm run test:matrix
+  ```
+- Commit e push:
+  ```bash
+  git add .
+  git commit -m "docs: atualização de documentação"
+  git push
+  ```
+
+---
+
+> Documentação mantida por desenvolvedor contratado. Última atualização: 2025-09-01.
+
+---
+
 > Documentação mantida por desenvolvedor contratado. Última atualização: 2025-09-01.
