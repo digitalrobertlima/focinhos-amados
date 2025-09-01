@@ -63,17 +63,8 @@ Focinhos Amados é um Progressive Web App (PWA) para agendamento de serviços, d
 
 ---
 
-<<<<<<< HEAD
-Use the web menu to produce files and then copie-os manualmente para os caminhos correspondentes do repositório.
-
-## Deploy (DigitalOcean App Platform)
-
-- Output directory: `dist`
-- Build command: `npm ci && npm run build:dist`
-- App spec: see `.do/app.yaml` (configures repo, branch, build, and output_dir).
-
-If you deploy via DO’s detected settings and see: “could not find the output directory”, point the Output Directory to `dist` or enable the provided `.do/app.yaml` in App Spec mode.
-=======
+## Manutenção e Boas Práticas
+// ...existing code...
 ## Manutenção e Boas Práticas
 - **Versão:** Sempre atualize a versão do Service Worker e do manifest ao modificar arquivos estáticos.
 - **Cache:** Use query param `?v=` para bust de cache em deploys.
