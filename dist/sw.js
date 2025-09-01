@@ -2,11 +2,9 @@
 // Derive version from sw.js?v=... to bust CDN caches per deploy
 const SW_URL = new URL(self.location.href);
 const V = SW_URL.searchParams.get('v') || '';
-<<<<<<< HEAD
-const SW_VERSION = `fa-${V || '0.1.8'}`;
-=======
 const SW_VERSION = `fa-${V || '0.1.11'}`;
->>>>>>> v0.1.11
+const SW_VERSION = `fa-${V || '0.1.11'}`;
+// ...existing code...
 const STATIC_CACHE = `fa-static-${SW_VERSION}`;
 const q = V ? (`?v=${V}`) : '';
 const STATIC_ASSETS = [
