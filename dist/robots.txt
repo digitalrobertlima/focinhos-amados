@@ -1,8 +1,0 @@
-User-agent: *
-Allow: /
-
-# Opcional: ajuste se precisar bloquear algo específico
-# Disallow: /assets/
-
-# Sitemap (GitHub Pages)
-Sitemap: https://digitalrobertlima.github.io/focinhos-amados/sitemap.xml

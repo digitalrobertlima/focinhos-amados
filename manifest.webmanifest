@@ -2,7 +2,7 @@
   "name": "Focinhos Amados",
   "short_name": "Pet Shop",
   "description": "PWA leve para agendamentos, delivery e Táxi Dog - Focinhos Amados (BH)",
-    "version": "0.1.10",
+  "version": "0.1.11",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",

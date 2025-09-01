@@ -1,9 +1,0 @@
-node_modules/
-.DS_Store
-*.log
-checks.json
-download_report.json
-/.vscode/
-/.idea/
-*.local
-/.cache/
