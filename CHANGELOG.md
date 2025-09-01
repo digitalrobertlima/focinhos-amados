@@ -3,6 +3,10 @@
 ## [0.1.11] - 2025-09-01
 ### Changed
 - Atualização de versão para 0.1.11 em todos os arquivos críticos do app (package.json, config.json, manifest, service worker, .do/app.yaml).
+- Documentação técnica revisada e padronizada profissionalmente em toda a pasta `docs/`.
+- Remoção de arquivos desnecessários e relatórios gerados (`checks.json`, `download_report.json`, `unused_report.json`, imagens duplicadas e não utilizadas, ferramentas auxiliares e releases antigos).
+- Limpeza da pasta de build/output (`dist/`) e organização do repositório para produção mínima.
+- Preparação de Pull Request para merge na branch principal, garantindo consistência e qualidade.
 
 ## [0.1.10] - 2025-08-31
 ### Changed
