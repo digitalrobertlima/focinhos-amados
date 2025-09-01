@@ -4,7 +4,7 @@
 window.CONFIG = {
   appVersion: "v0.1.11",
   appVersion: "v0.1.11",
-// ...existing code...
+
   business: {
     name: "Focinhos Amados",
     city: "Belo Horizonte/MG",
