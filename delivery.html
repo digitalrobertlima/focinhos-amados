@@ -93,7 +93,13 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
 
     <section class="card">
       <h2 class="card__title">📦 Endereço & contato</h2>
+      <button type="button" class="btn btn--small" id="btn-use-geo" style="margin-bottom: 8px;">📍 Usar minha localização</button>
       <div class="grid grid--2" style="margin-top:8px">
+        <div class="field">
+            <label for="recebedor">Quem recebe <span class="req">*</span></label>
+            <input id="recebedor" class="input" required autocomplete="name">
+            <small id="err-recebedor" class="help" hidden></small>
+          </div>
         <div class="field">
             <label for="endereco">Endereço completo</label>
             <input id="endereco" class="input" placeholder="Rua, número, bairro" autocomplete="street-address">
@@ -101,8 +107,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
           <div class="field">
             <label for="endereco-complemento">Complemento (apto, bloco, sala...)</label>
             <input id="endereco-complemento" class="input" placeholder="Apartamento, bloco, sala, etc." autocomplete="address-line2">
-          <small id="err-recebedor" class="help" hidden></small>
-        </div>
+          </div>
         <div class="field">
           <label for="tel">Telefone (WhatsApp) <span class="req">*</span></label>
           <input id="tel" class="input" inputmode="tel" required autocomplete="tel">

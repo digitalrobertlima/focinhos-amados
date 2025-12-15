@@ -110,6 +110,14 @@ async function ensureWaIntercept(page){
     await page.click('#btn-use-geo');
     await page.type('#recebedor','Maria');
     await page.type('#tel','31988887777');
+    // fill all required address fields
+    await page.type('#end-rua','Rua Teste');
+    await page.type('#end-numero','123');
+    await page.type('#end-bairro','Centro');
+    await page.type('#endereco-complemento','Apt 456');
+    await page.type('#end-cep','30140071');
+    await page.click('#btn-ver-resumo');
+    await page.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('QUATREE'), {timeout:3000});
     await ensureWaIntercept(page);
     await page.click('#btn-wa');
     const wa = await page.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
@@ -123,14 +131,14 @@ async function ensureWaIntercept(page){
     await page.click('#btn-add-prod');
     await page.type('#recebedor','Joana');
     await page.type('#tel','31977776666');
-    await page.type('#endereco','Rua Teste');
-    // ensure number field exists
-    await page.evaluate(()=>{
-      if(!document.getElementById('endereco-numero')){
-        const num = document.createElement('input'); num.id='endereco-numero'; document.getElementById('endereco').parentNode.appendChild(num);
-      }
-    });
-    await page.type('#endereco-numero','123');
+    // fill all required address fields
+    await page.type('#end-rua','Rua Teste');
+    await page.type('#end-numero','456');
+    await page.type('#end-bairro','Bairro Teste');
+    await page.type('#endereco-complemento','Apt 789');
+    await page.type('#end-cep','30140072');
+    await page.click('#btn-ver-resumo');
+    await page.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('PIPICAT'), {timeout:3000});
     await ensureWaIntercept(page);
     await page.click('#btn-wa');
     const wa = await page.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
@@ -209,12 +217,26 @@ async function ensureWaIntercept(page){
     await page.type('#tutorTelefone','31977776666');
     await page.type('#dataPreferida', new Date(Date.now()+86400000).toISOString().slice(0,10));
     await page.select('#janela','Tarde');
-  await page.click('[data-role="srv-banho"]');
-  // switch to taxi-both
+    await page.click('[data-role="srv-banho"]');
+    // switch to taxi-both
     await page.evaluate(()=>{ const r = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']")).find(x=> x.value==='taxi-both'); if(r){ r.click(); }});
-  // trigger geo for both fields
-  await page.click('button[data-geo="origem"]');
-  await page.click('button[data-geo="destino"]');
+    // trigger geo for both fields
+    await page.click('button[data-geo="origem"]');
+    await page.click('button[data-geo="destino"]');
+    // fill required address fields for origem
+    await page.type('#origem-rua','Rua Origem');
+    await page.type('#origem-numero','100');
+    await page.type('#origem-bairro','Centro');
+    await page.type('#origem-complemento','Apt 1');
+    await page.type('#origem-cep','30140071');
+    // fill required address fields for destino
+    await page.type('#destino-rua','Rua Destino');
+    await page.type('#destino-numero','200');
+    await page.type('#destino-bairro','Savassi');
+    await page.type('#destino-complemento','Apt 2');
+    await page.type('#destino-cep','30140072');
+    await page.click('#btn-ver-resumo');
+    await page.waitForFunction(()=> document.getElementById('agendar-resumo') && document.getElementById('agendar-resumo').textContent.includes('Bob'), {timeout:3000});
     await ensureWaIntercept(page);
     await page.click('#btn-wa');
     const wa = await page.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
@@ -229,6 +251,20 @@ async function ensureWaIntercept(page){
     await page.type('#petNome','Nick');
     await page.type('#tutorNome','Ana');
     await page.type('#tutorTelefone','31966665555');
+    // select modalidade 
+    await page.evaluate(()=>{ const r = Array.from(document.querySelectorAll("input[name='modalidade']")).find(x=> x.value==='Buscar e entregar'); if(r){ r.click(); }});
+    // fill origem fields
+    await page.type('#origem-rua','Rua Origem');
+    await page.type('#origem-numero','100');
+    await page.type('#origem-bairro','Centro');
+    await page.type('#origem-complemento','Apt 1');
+    await page.type('#origem-cep','30140071');
+    // fill destino fields
+    await page.type('#destino-rua','Rua Destino');
+    await page.type('#destino-numero','200');
+    await page.type('#destino-bairro','Savassi');
+    await page.type('#destino-complemento','Apt 2');
+    await page.type('#destino-cep','30140072');
     await page.click('#btn-ver-resumo');
     await page.waitForFunction(()=> (document.getElementById('taxi-resumo')||{}).textContent.includes('Nick'), {timeout:3000});
     await ensureWaIntercept(page);
@@ -241,8 +277,19 @@ async function ensureWaIntercept(page){
   await record('taxi:agendado summary+wa', async ()=>{
     await page.goto(`http://localhost:${port}/taxi.html`, {waitUntil:'networkidle2'});
     await page.click('#tipo-agendado');
-    await page.type('#origem2','Rua X, 1');
-    await page.type('#destino2','Rua Y, 2');
+    // fill origem2 fields
+    await page.type('#origem2-rua','Rua X');
+    await page.type('#origem2-numero','1');
+    await page.type('#origem2-bairro','Centro');
+    await page.type('#origem2-complemento','Apt 1');
+    await page.type('#origem2-cep','30140071');
+    // fill destino2 fields
+    await page.type('#destino2-rua','Rua Y');
+    await page.type('#destino2-numero','2');
+    await page.type('#destino2-bairro','Savassi');
+    await page.type('#destino2-complemento','Apt 2');
+    await page.type('#destino2-cep','30140072');
+    // fill contact
     await page.type('#contato2','Paulo • 31955554444');
     const dt = new Date(Date.now()+3600*1000).toISOString().slice(0,16);
     await page.evaluate((d)=> document.getElementById('horario2').value = d, dt);

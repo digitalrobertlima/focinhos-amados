@@ -45,8 +45,11 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
           <strong>Focinhos Amados</strong>
           <small class="brand__city" data-bind="city">Belo Horizonte/MG</small>
         </span>
-          <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.20</span></span>
-          <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
+      </a>
+      <nav class="nav" aria-label="principal">
+        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
+        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
+          <li role="none"><a role="menuitem" href="agendar.html" aria-current="page">Agendar</a></li>
           <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
           <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
           <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
@@ -78,7 +81,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
         <span id="status-text" class="muted" aria-live="polite"></span>
         <span class="sr-only">•</span>
         <svg aria-hidden="true" class="icon"><use href="#i-clock"/></svg>
-        <span data-bind="hoursLabel">Seg–Sáb 10:00–20:00 • Dom 10:00–13:00</span>
+        <span data-bind="hoursLabel">Seg–Sáb 10:30–20:00 • Dom 10:30–13:00</span>
       </p>
     </section>
 
@@ -136,9 +139,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
       <p>
         <strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span>
         • <a id="route-link-foot" href="#" rel="noopener" target="_blank">🗺️ Ver rota no Google Maps</a>
-
-          <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.20</span></span>
-          <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.20</span></span>
+        <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.20</span></span>
       </p>
       <nav class="footer__nav" aria-label="rodapé">
         <a href="sobre.html#priv">Privacidade</a>
@@ -182,7 +183,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
     },
     "telephone":"+55 31 3322-3070",
     "areaServed":"Belo Horizonte",
-    "openingHours":["Mo-Sa 10:00-20:00","Su 10:00-13:00"],
+    "openingHours":["Mo-Sa 10:30-20:00","Su 10:30-13:00"],
     "url":"./",
     "sameAs":["https://instagram.com/petshopfocinhos"]
   }

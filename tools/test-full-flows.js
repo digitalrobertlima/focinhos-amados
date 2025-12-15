@@ -135,6 +135,20 @@ function mockGeolocation(page){
     await p.type('#petNome','Bolinha');
     await p.type('#tutorNome','Ana');
     await p.type('#tutorTelefone','31966665555');
+    // select modalidade 
+    await p.evaluate(()=>{ const r = Array.from(document.querySelectorAll("input[name='modalidade']")).find(x=> x.value==='Buscar e entregar'); if(r){ r.click(); }});
+    // fill origem fields
+    await p.type('#origem-rua','Rua Origem');
+    await p.type('#origem-numero','100');
+    await p.type('#origem-bairro','Centro');
+    await p.type('#origem-complemento','Apt 1');
+    await p.type('#origem-cep','30140071');
+    // fill destino fields
+    await p.type('#destino-rua','Rua Destino');
+    await p.type('#destino-numero','200');
+    await p.type('#destino-bairro','Savassi');
+    await p.type('#destino-complemento','Apt 2');
+    await p.type('#destino-cep','30140072');
     await p.click('#btn-ver-resumo');
     await p.waitForFunction(()=> document.getElementById('taxi-resumo') && document.getElementById('taxi-resumo').textContent.includes('Bolinha'), {timeout:3000});
     await p.evaluate(()=>{ window.__lastWindowOpen = null; window.open = (u)=>{ window.__lastWindowOpen = u; return { focus: ()=>{} }; }; });
@@ -146,8 +160,19 @@ function mockGeolocation(page){
   await run('taxi - agendado mode', async (p)=>{
     await p.goto(`http://localhost:${port}/taxi.html`, {waitUntil:'networkidle2'});
     await p.click('#tipo-agendado');
-    await p.type('#origem2','Rua A, 1');
-    await p.type('#destino2','Rua B, 2');
+    // fill origem2 fields
+    await p.type('#origem2-rua','Rua A');
+    await p.type('#origem2-numero','1');
+    await p.type('#origem2-bairro','Centro');
+    await p.type('#origem2-complemento','Apt 1');
+    await p.type('#origem2-cep','30140071');
+    // fill destino2 fields
+    await p.type('#destino2-rua','Rua B');
+    await p.type('#destino2-numero','2');
+    await p.type('#destino2-bairro','Savassi');
+    await p.type('#destino2-complemento','Apt 2');
+    await p.type('#destino2-cep','30140072');
+    // fill contact
     await p.type('#contato2','Paulo • 31955554444');
     // set horario2 to future datetime (ISO local)
     const dt = new Date(Date.now()+3600*1000).toISOString().slice(0,16);
