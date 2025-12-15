@@ -233,9 +233,14 @@
   }
   function addVS16IfNeeded(s){
     if(!s) return s; const VS16='\uFE0F';
-    // Apply to a small set that benefits from emoji presentation on some platforms
-    return s
-      .replace(/⏰(?!\uFE0F)/g, '⏰\uFE0F');
+    // Apply VS16 (emoji variation selector) to known emoji glyphs so platforms
+    // that require explicit emoji presentation render them correctly in WhatsApp.
+    try{
+      EMOJI_MAP.forEach((rep, emo)=>{
+        try{ s = s.replace(new RegExp(emo + '(?!\\uFE0F)','g'), emo + VS16); }catch(_){ /* noop on invalid regex */ }
+      });
+    }catch(_){ }
+    return s;
   }
   function processMessageForPlatform(s){
     try{ return shouldUsePlainText() ? stripEmojis(s) : addVS16IfNeeded(s); }catch(_){ return s; }
@@ -864,6 +869,62 @@
     modalidadeEls.forEach(r=> on(r,'change', updateLocalizacaoFields));
     updateLocalizacaoFields();
 
+  // Botões de "Usar minha localização" (agendar)
+  // Bind em botões com atributo data-geo (data-geo="origem" | "destino")
+  try{
+    const geoButtons = Array.from(document.querySelectorAll('button[data-geo]'));
+    geoButtons.forEach(btn=>{
+      const key = btn.getAttribute('data-geo');
+      on(btn,'click', (e)=>{
+        e.preventDefault();
+        try{
+          btn.textContent = '⏳ Capturando...';
+          // Start a dedicated watch for this key and pass the button as badge so Geo can update label
+          Geo.start(key, btn);
+          // one-time listener to apply resolved address/coords to the corresponding fields
+          const handler = (ev)=>{
+            try{
+              const k = ev?.detail?.key;
+              if(k !== key) return;
+              const addrObj = ev?.detail?.address;
+              const best = Geo.get(key);
+              const prefix = (k === 'default') ? 'end' : k; // map key to form prefix
+              const ruaEl = byId(prefix + '-rua');
+              const cepEl = byId(prefix + '-cep');
+              if(addrObj && ruaEl && (ruaEl.value||'').trim() === ''){
+                // prefer structured parts when available, fallback to display
+                const d = addrObj.details || {};
+                const road = d.road || d.pedestrian || d.cycleway || '';
+                const housen = d.house_number || '';
+                const display = addrObj.display || '';
+                ruaEl.value = (road ? (road + (housen ? (', ' + housen) : '')) : display) || '';
+                try{ ruaEl.dispatchEvent(new Event('input',{bubbles:true})); ruaEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
+              }
+              if(addrObj && cepEl && (cepEl.value||'').trim() === '' && addrObj.details && addrObj.details.postcode){ cepEl.value = addrObj.details.postcode; try{ cepEl.dispatchEvent(new Event('input',{bubbles:true})); cepEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
+              // store coords on the rua element for later use
+              if(best && ruaEl){ ruaEl.dataset.geoLat = String(best.lat); ruaEl.dataset.geoLng = String(best.lng); ruaEl.dataset.geoAcc = String(best.accuracy || ''); }
+              // restore button label to a short form
+              try{
+                if(addrObj && addrObj.display){ const short = String(addrObj.display).split(',').slice(0,3).join(', '); btn.textContent = '📍 ' + short; }
+                else btn.textContent = '📍 Usar minha localização';
+              }catch(_){ btn.textContent = '📍 Usar minha localização'; }
+            }catch(e){ console.warn('apply geo (agendar) failed', e); }
+            // remove listener after first call
+            try{ window.removeEventListener('focinhos:geo:address:resolved', handler); }catch(_){ }
+          };
+          window.addEventListener('focinhos:geo:address:resolved', handler);
+          // also set a fallback timeout in case reverseGeocode didn't resolve
+          setTimeout(()=>{
+            try{
+              const best = Geo.get(key);
+              if(!best){ /* still no position */ btn.textContent = '📍 Captura falhou'; setTimeout(()=> btn.textContent = '📍 Usar minha localização', 1800); }
+            }catch(_){}
+          }, (window.CONFIG?.geoloc?.waitMs || 40000) + 1200);
+        }catch(err){ console.warn('geo btn click failed', err); btn.textContent = '📍 Usar minha localização'; }
+      });
+    });
+  }catch(e){ console.warn('bind geo buttons (agendar) failed', e); }
+
   function getServicosGlobaisLista(){
       // Mantido apenas para compat; hoje não há serviços globais.
       const list = [];
@@ -1434,7 +1495,47 @@
       renderCart();
     });
 
-  // Sem botão de geo; geoloc inicia globalmente no boot
+  // Botão de "Usar minha localização" (delivery)
+  try{
+    const btnUseGeo = byId('btn-use-geo');
+    if(btnUseGeo){
+      on(btnUseGeo,'click', (e)=>{
+        e.preventDefault();
+        try{
+          btnUseGeo.textContent = '⏳ Capturando...';
+          // start a dedicated watch keyed as 'default' and pass button as badge so Geo can update it
+          Geo.start('default', btnUseGeo);
+          // one-time listener to apply resolved address
+          const handler = (ev)=>{
+            try{
+              const k = ev?.detail?.key || 'default';
+              if(k !== 'default') return;
+              const addrObj = ev?.detail?.address;
+              const best = Geo.get('default');
+              const ruaEl = byId('end-rua');
+              const cepEl = byId('end-cep');
+              if(addrObj && ruaEl && (ruaEl.value||'').trim() === ''){
+                const d = addrObj.details || {};
+                const road = d.road || d.pedestrian || d.cycleway || '';
+                const housen = d.house_number || '';
+                const display = addrObj.display || '';
+                ruaEl.value = (road ? (road + (housen ? (', ' + housen) : '')) : display) || '';
+                try{ ruaEl.dispatchEvent(new Event('input',{bubbles:true})); ruaEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
+              }
+              if(addrObj && cepEl && (cepEl.value||'').trim() === '' && addrObj.details && addrObj.details.postcode){ cepEl.value = addrObj.details.postcode; try{ cepEl.dispatchEvent(new Event('input',{bubbles:true})); cepEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
+              if(best && ruaEl){ ruaEl.dataset.geoLat = String(best.lat); ruaEl.dataset.geoLng = String(best.lng); ruaEl.dataset.geoAcc = String(best.accuracy || ''); }
+              try{ if(addrObj && addrObj.display){ const short = String(addrObj.display).split(',').slice(0,3).join(', '); btnUseGeo.textContent = '📍 ' + short; } else btnUseGeo.textContent = '📍 Usar minha localização'; }catch(_){ btnUseGeo.textContent = '📍 Usar minha localização'; }
+            }catch(e){ console.warn('apply geo (delivery) failed', e); }
+            try{ window.removeEventListener('focinhos:geo:address:resolved', handler); }catch(_){ }
+          };
+          window.addEventListener('focinhos:geo:address:resolved', handler);
+          setTimeout(()=>{
+            try{ const best = Geo.get('default'); if(!best){ btnUseGeo.textContent = '📍 Captura falhou'; setTimeout(()=> btnUseGeo.textContent = '📍 Usar minha localização', 1800); } }catch(_){}
+          }, (window.CONFIG?.geoloc?.waitMs || 40000) + 1200);
+        }catch(err){ console.warn('btn-use-geo click failed', err); btnUseGeo.textContent = '📍 Usar minha localização'; }
+      });
+    }
+  }catch(e){ console.warn('bind btn-use-geo failed', e); }
 
     function resumoTexto(){
       const geo = Geo.get('default');
