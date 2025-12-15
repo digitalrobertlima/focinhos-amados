@@ -93,20 +93,13 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
 
     <section class="card">
       <h2 class="card__title">📦 Endereço & contato</h2>
+      <button type="button" class="btn btn--small" id="btn-use-geo" style="margin-bottom: 8px;">📍 Usar minha localização</button>
       <div class="grid grid--2" style="margin-top:8px">
         <div class="field">
-            <label for="endereco">Endereço completo</label>
-            <input id="endereco" class="input" placeholder="Rua, número, bairro" autocomplete="street-address">
-          </div>
-          <div class="field">
-            <label for="endereco-complemento">Complemento (apto, bloco, sala...)</label>
-            <input id="endereco-complemento" class="input" placeholder="Apartamento, bloco, sala, etc." autocomplete="address-line2">
-          <small id="err-recebedor" class="help" hidden></small>
-        </div>
-        <div class="field">
-          <label for="tel">Telefone (WhatsApp) <span class="req">*</span></label>
-          <input id="tel" class="input" inputmode="tel" required autocomplete="tel">
-          <small id="err-tel" class="help" hidden></small>
+          <label for="end-cep">CEP <span class="req">*</span></label>
+          <input id="end-cep" class="input" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000">
+          <small id="end-cep-error" class="help" style="display:none"></small>
+          <small id="end-cep-loading" class="help" style="display:none; color:#0099ff;">Buscando CEP...</small>
         </div>
       </div>
       <div class="grid grid--3" style="margin-top:8px">
@@ -126,14 +119,23 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
           <small id="err-end-bairro" class="help" hidden></small>
         </div>
       </div>
-      <div class="grid grid--3" style="margin-top:8px">
+      <div class="grid grid--2" style="margin-top:8px">
         <div class="field">
-          <label for="end-cep">CEP <span class="req">*</span></label>
-          <input id="end-cep" class="input" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000">
-          <small id="err-end-cep" class="help" hidden></small>
+          <label for="endereco-complemento">Complemento (apto, bloco, sala...)</label>
+          <input id="endereco-complemento" class="input" placeholder="Apartamento, bloco, sala, etc." autocomplete="address-line2">
         </div>
+        <div class="field">
+            <label for="recebedor">Quem recebe <span class="req">*</span></label>
+            <input id="recebedor" class="input" required autocomplete="name">
+            <small id="err-recebedor" class="help" hidden></small>
+          </div>
       </div>
-      <div class="field">
+      <div class="field" style="margin-top:8px">
+        <label for="tel">Telefone (WhatsApp) <span class="req">*</span></label>
+        <input id="tel" class="input" inputmode="tel" required autocomplete="tel">
+        <small id="err-tel" class="help" hidden></small>
+      </div>
+      <div class="field" style="margin-top:8px">
         <label for="obs">Observações</label>
         <textarea id="obs" class="textarea" rows="3" placeholder="Portaria, bloco, substitutos…"></textarea>
       </div>

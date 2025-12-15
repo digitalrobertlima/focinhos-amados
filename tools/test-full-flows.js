@@ -117,9 +117,16 @@ function mockGeolocation(page){
     await p.type('#variacao','1kg');
     await p.click('#btn-add-prod');
     await p.waitForFunction(()=> document.querySelectorAll('#carrinho li').length>0, {timeout:3000});
+    // Fill address fields starting with CEP
+    await p.type('#end-cep','30140071');
+    // Wait a bit for CEP lookup, then fill remaining fields
+    await p.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
+    await p.type('#end-rua','Rua Teste');
+    await p.type('#end-numero','123');
+    await p.type('#end-bairro','Centro');
+    await p.type('#endereco-complemento','Apt 456');
     await p.type('#recebedor','Maria');
     await p.type('#tel','31977776666');
-    await p.type('#endereco','Av Teste, 123');
     await p.click('#btn-ver-resumo');
     await p.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('GOLDEN'), {timeout:3000});
     await p.click('#btn-wa');
@@ -137,18 +144,20 @@ function mockGeolocation(page){
     await p.type('#tutorTelefone','31966665555');
     // select modalidade 
     await p.evaluate(()=>{ const r = Array.from(document.querySelectorAll("input[name='modalidade']")).find(x=> x.value==='Buscar e entregar'); if(r){ r.click(); }});
-    // fill origem fields
+    // fill origem fields starting with CEP
+    await p.type('#origem-cep','30140071');
+    await p.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await p.type('#origem-rua','Rua Origem');
     await p.type('#origem-numero','100');
     await p.type('#origem-bairro','Centro');
     await p.type('#origem-complemento','Apt 1');
-    await p.type('#origem-cep','30140071');
-    // fill destino fields
+    // fill destino fields starting with CEP
+    await p.type('#destino-cep','30140072');
+    await p.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await p.type('#destino-rua','Rua Destino');
     await p.type('#destino-numero','200');
     await p.type('#destino-bairro','Savassi');
     await p.type('#destino-complemento','Apt 2');
-    await p.type('#destino-cep','30140072');
     await p.click('#btn-ver-resumo');
     await p.waitForFunction(()=> document.getElementById('taxi-resumo') && document.getElementById('taxi-resumo').textContent.includes('Bolinha'), {timeout:3000});
     await p.evaluate(()=>{ window.__lastWindowOpen = null; window.open = (u)=>{ window.__lastWindowOpen = u; return { focus: ()=>{} }; }; });
@@ -160,18 +169,20 @@ function mockGeolocation(page){
   await run('taxi - agendado mode', async (p)=>{
     await p.goto(`http://localhost:${port}/taxi.html`, {waitUntil:'networkidle2'});
     await p.click('#tipo-agendado');
-    // fill origem2 fields
+    // fill origem2 fields starting with CEP
+    await p.type('#origem2-cep','30140071');
+    await p.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await p.type('#origem2-rua','Rua A');
     await p.type('#origem2-numero','1');
     await p.type('#origem2-bairro','Centro');
     await p.type('#origem2-complemento','Apt 1');
-    await p.type('#origem2-cep','30140071');
-    // fill destino2 fields
+    // fill destino2 fields starting with CEP
+    await p.type('#destino2-cep','30140072');
+    await p.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await p.type('#destino2-rua','Rua B');
     await p.type('#destino2-numero','2');
     await p.type('#destino2-bairro','Savassi');
     await p.type('#destino2-complemento','Apt 2');
-    await p.type('#destino2-cep','30140072');
     // fill contact
     await p.type('#contato2','Paulo • 31955554444');
     // set horario2 to future datetime (ISO local)

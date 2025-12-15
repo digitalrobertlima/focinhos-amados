@@ -110,12 +110,14 @@ async function ensureWaIntercept(page){
     await page.click('#btn-use-geo');
     await page.type('#recebedor','Maria');
     await page.type('#tel','31988887777');
-    // fill all required address fields
+    // fill all required address fields starting with CEP
+    await page.type('#end-cep','30140071');
+    // Brief delay to allow CEP lookup and auto-fill
+    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await page.type('#end-rua','Rua Teste');
     await page.type('#end-numero','123');
     await page.type('#end-bairro','Centro');
     await page.type('#endereco-complemento','Apt 456');
-    await page.type('#end-cep','30140071');
     await page.click('#btn-ver-resumo');
     await page.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('QUATREE'), {timeout:3000});
     await ensureWaIntercept(page);
@@ -126,22 +128,30 @@ async function ensureWaIntercept(page){
   });
 
   await record('delivery:address+number happy (no geo)', async ()=>{
-    await page.goto(`http://localhost:${port}/delivery.html`, {waitUntil:'networkidle2'});
-    await page.type('#produto','PIPICAT CLASSIC 4kg');
-    await page.click('#btn-add-prod');
-    await page.type('#recebedor','Joana');
-    await page.type('#tel','31977776666');
-    // fill all required address fields
-    await page.type('#end-rua','Rua Teste');
-    await page.type('#end-numero','456');
-    await page.type('#end-bairro','Bairro Teste');
-    await page.type('#endereco-complemento','Apt 789');
-    await page.type('#end-cep','30140072');
-    await page.click('#btn-ver-resumo');
-    await page.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('PIPICAT'), {timeout:3000});
-    await ensureWaIntercept(page);
-    await page.click('#btn-wa');
-    const wa = await page.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
+    // Create fresh page and immediately clear localStorage
+    const freshPage = await browser.newPage();
+    await freshPage.evaluateOnNewDocument(()=> localStorage.clear());
+    mockGeolocation(freshPage);
+    
+    await freshPage.goto(`http://localhost:${port}/delivery.html`, {waitUntil:'networkidle2'});
+    await freshPage.type('#produto','PIPICAT CLASSIC 4kg');
+    await freshPage.click('#btn-add-prod');
+    await freshPage.type('#recebedor','Joana');
+    await freshPage.type('#tel','31977776666');
+    // fill all required address fields starting with CEP
+    await freshPage.type('#end-cep','30140072');
+    // Brief delay to allow CEP lookup and auto-fill
+    await freshPage.evaluate(()=> new Promise(r=> setTimeout(r, 800)));
+    await freshPage.type('#end-rua','Rua Teste');
+    await freshPage.type('#end-numero','456');
+    await freshPage.type('#end-bairro','Bairro Teste');
+    await freshPage.type('#endereco-complemento','Apt 789');
+    await freshPage.click('#btn-ver-resumo');
+    await freshPage.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('PIPICAT'), {timeout:3000});
+    await freshPage.evaluate(()=>{ window.__lastWindowOpen = null; window.open = (u)=>{ window.__lastWindowOpen = u; return { focus: ()=>{} }; }; });
+    await freshPage.click('#btn-wa');
+    const wa = await freshPage.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
+    await freshPage.close();
     if(!(wa && wa.startsWith('https://wa.me/'))) throw new Error('no wa link');
     return { wa };
   });
@@ -223,18 +233,22 @@ async function ensureWaIntercept(page){
     // trigger geo for both fields
     await page.click('button[data-geo="origem"]');
     await page.click('button[data-geo="destino"]');
-    // fill required address fields for origem
+    // fill required address fields for origem starting with CEP
+    await page.type('#origem-cep','30140071');
+    // Brief delay to allow CEP lookup and auto-fill
+    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await page.type('#origem-rua','Rua Origem');
     await page.type('#origem-numero','100');
     await page.type('#origem-bairro','Centro');
     await page.type('#origem-complemento','Apt 1');
-    await page.type('#origem-cep','30140071');
-    // fill required address fields for destino
+    // fill required address fields for destino starting with CEP
+    await page.type('#destino-cep','30140072');
+    // Brief delay to allow CEP lookup and auto-fill
+    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await page.type('#destino-rua','Rua Destino');
     await page.type('#destino-numero','200');
     await page.type('#destino-bairro','Savassi');
     await page.type('#destino-complemento','Apt 2');
-    await page.type('#destino-cep','30140072');
     await page.click('#btn-ver-resumo');
     await page.waitForFunction(()=> document.getElementById('agendar-resumo') && document.getElementById('agendar-resumo').textContent.includes('Bob'), {timeout:3000});
     await ensureWaIntercept(page);
@@ -253,18 +267,22 @@ async function ensureWaIntercept(page){
     await page.type('#tutorTelefone','31966665555');
     // select modalidade 
     await page.evaluate(()=>{ const r = Array.from(document.querySelectorAll("input[name='modalidade']")).find(x=> x.value==='Buscar e entregar'); if(r){ r.click(); }});
-    // fill origem fields
+    // fill origem fields starting with CEP
+    await page.type('#origem-cep','30140071');
+    // Brief delay to allow CEP lookup and auto-fill
+    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await page.type('#origem-rua','Rua Origem');
     await page.type('#origem-numero','100');
     await page.type('#origem-bairro','Centro');
     await page.type('#origem-complemento','Apt 1');
-    await page.type('#origem-cep','30140071');
-    // fill destino fields
+    // fill destino fields starting with CEP
+    await page.type('#destino-cep','30140072');
+    // Brief delay to allow CEP lookup and auto-fill
+    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await page.type('#destino-rua','Rua Destino');
     await page.type('#destino-numero','200');
     await page.type('#destino-bairro','Savassi');
     await page.type('#destino-complemento','Apt 2');
-    await page.type('#destino-cep','30140072');
     await page.click('#btn-ver-resumo');
     await page.waitForFunction(()=> (document.getElementById('taxi-resumo')||{}).textContent.includes('Nick'), {timeout:3000});
     await ensureWaIntercept(page);
@@ -277,18 +295,22 @@ async function ensureWaIntercept(page){
   await record('taxi:agendado summary+wa', async ()=>{
     await page.goto(`http://localhost:${port}/taxi.html`, {waitUntil:'networkidle2'});
     await page.click('#tipo-agendado');
-    // fill origem2 fields
+    // fill origem2 fields starting with CEP
+    await page.type('#origem2-cep','30140071');
+    // Brief delay to allow CEP lookup and auto-fill
+    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await page.type('#origem2-rua','Rua X');
     await page.type('#origem2-numero','1');
     await page.type('#origem2-bairro','Centro');
     await page.type('#origem2-complemento','Apt 1');
-    await page.type('#origem2-cep','30140071');
-    // fill destino2 fields
+    // fill destino2 fields starting with CEP
+    await page.type('#destino2-cep','30140072');
+    // Brief delay to allow CEP lookup and auto-fill
+    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
     await page.type('#destino2-rua','Rua Y');
     await page.type('#destino2-numero','2');
     await page.type('#destino2-bairro','Savassi');
     await page.type('#destino2-complemento','Apt 2');
-    await page.type('#destino2-cep','30140072');
     // fill contact
     await page.type('#contato2','Paulo • 31955554444');
     const dt = new Date(Date.now()+3600*1000).toISOString().slice(0,16);

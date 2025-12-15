@@ -319,21 +319,21 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
           </div>
         </div>
 
-        
-
         <div id="localizacao-fields" style="margin-top:8px">
           <div id="field-origem" class="grid grid--2 hide">
             <div class="field">
               <label>Onde buscar o pet?</label>
+              <div class="grid grid--2">
+                <div class="field"><label for="origem-cep">CEP <span class="req">*</span></label><input id="origem-cep" class="input" inputmode="numeric" placeholder="00000-000"><small id="origem-cep-error" class="help" style="display:none"></small><small id="origem-cep-loading" class="help" style="display:none; color:#0099ff;">Buscando CEP...</small></div>
+              </div>
+              <button type="button" class="btn btn--small" data-geo="origem" style="margin-top: 8px; margin-bottom: 8px;">📍 Usar minha localização</button>
               <div class="grid grid--3">
                 <div class="field"><label for="origem-rua">Rua <span class="req">*</span></label><input id="origem-rua" class="input"></div>
                 <div class="field"><label for="origem-numero">Nº <span class="req">*</span></label><input id="origem-numero" class="input" inputmode="numeric"></div>
                 <div class="field"><label for="origem-bairro">Bairro <span class="req">*</span></label><input id="origem-bairro" class="input"></div>
               </div>
-              <div class="grid grid--3" style="margin-top:6px">
-
+              <div class="grid grid--2" style="margin-top:6px">
                 <div class="field"><label for="origem-complemento">Complemento (apto, bloco, sala...)</label><input id="origem-complemento" class="input" placeholder="Apartamento, bloco, sala, etc." autocomplete="address-line2"></div>
-                <div class="field"><label for="origem-cep">CEP <span class="req">*</span></label><input id="origem-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
               </div>
             </div>
           </div>
@@ -341,17 +341,17 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
           <div id="field-destino" class="grid grid--2 hide">
             <div class="field">
               <label>Onde entregar o pet?</label>
-              <div class="grid grid--3">
-                <div class="field"><label for="destino-rua">Rua</label><input id="destino-rua" class="input"></div>
-                <div class="field"><label for="destino-numero">Nº</label><input id="destino-numero" class="input" inputmode="numeric"></div>
-                <div class="field"><label for="destino-bairro">Bairro</label><input id="destino-bairro" class="input"></div>
+              <div class="grid grid--2">
+                <div class="field"><label for="destino-cep">CEP <span class="req">*</span></label><input id="destino-cep" class="input" inputmode="numeric" placeholder="00000-000"><small id="destino-cep-error" class="help" style="display:none"></small><small id="destino-cep-loading" class="help" style="display:none; color:#0099ff;">Buscando CEP...</small></div>
               </div>
-              <div class="grid grid--3" style="margin-top:6px">
-<<<<<<< HEAD
-=======
+              <button type="button" class="btn btn--small" data-geo="destino" style="margin-top: 8px; margin-bottom: 8px;">📍 Usar minha localização</button>
+              <div class="grid grid--3">
+                <div class="field"><label for="destino-rua">Rua <span class="req">*</span></label><input id="destino-rua" class="input"></div>
+                <div class="field"><label for="destino-numero">Nº <span class="req">*</span></label><input id="destino-numero" class="input" inputmode="numeric"></div>
+                <div class="field"><label for="destino-bairro">Bairro <span class="req">*</span></label><input id="destino-bairro" class="input"></div>
+              </div>
+              <div class="grid grid--2" style="margin-top:6px">
                 <div class="field"><label for="destino-complemento">Complemento (apto, bloco, sala...)</label><input id="destino-complemento" class="input" placeholder="Apartamento, bloco, sala, etc." autocomplete="address-line2"></div>
-
-                <div class="field"><label for="destino-cep">CEP</label><input id="destino-cep" class="input" inputmode="numeric" placeholder="00000-000"></div>
               </div>
             </div>
           </div>

@@ -89,6 +89,73 @@
     return `https://wa.me/${waNum}?text=${encodeURIComponent(text||'')}`;
   }
 
+  // ===== CEP Lookup via ViaCEP =====
+  async function buscarCep(cep){
+    const cleaned = onlyDigits(cep);
+    if(cleaned.length !== 8){
+      return { erro: true, msg: 'CEP deve ter 8 dígitos' };
+    }
+    try{
+      const response = await fetch(`https://viacep.com.br/ws/${cleaned}/json/`);
+      const data = await response.json();
+      if(data.erro){
+        return { erro: true, msg: 'CEP não encontrado' };
+      }
+      return {
+        erro: false,
+        rua: data.logradouro || '',
+        bairro: data.bairro || '',
+        cidade: data.localidade || '',
+        estado: data.uf || ''
+      };
+    }catch(e){
+      return { erro: true, msg: 'Erro ao buscar CEP' };
+    }
+  }
+
+  // Preencher campos de endereço a partir dos dados do CEP
+  function preencherEnderecoCom(data, prefix){
+    if(!data || data.erro) return;
+    const el_rua = byId(`${prefix}-rua`);
+    const el_bairro = byId(`${prefix}-bairro`);
+    const el_cidade = byId(`${prefix}-cidade`);
+    const el_estado = byId(`${prefix}-estado`);
+    if(el_rua) el_rua.value = data.rua;
+    if(el_bairro) el_bairro.value = data.bairro;
+    if(el_cidade) el_cidade.value = data.cidade;
+    if(el_estado) el_estado.value = data.estado;
+  }
+
+  // Handler genérico para busca de CEP (el = input CEP, prefix = prefixo dos campos)
+  function setupCepHandler(cepInputEl, prefix){
+    if(!cepInputEl) return;
+    on(cepInputEl, 'blur', async function(){
+      const cep = this.value.trim();
+      if(!cep) return;
+      
+      const errSpan = byId(`${prefix}-cep-error`);
+      const loadingMsg = byId(`${prefix}-cep-loading`);
+      
+      // Show loading
+      if(loadingMsg) loadingMsg.style.display = 'block';
+      if(errSpan) errSpan.style.display = 'none';
+      
+      const result = await buscarCep(cep);
+      
+      if(result.erro){
+        if(errSpan){
+          errSpan.textContent = result.msg;
+          errSpan.style.display = 'block';
+        }
+        if(loadingMsg) loadingMsg.style.display = 'none';
+      }else{
+        if(loadingMsg) loadingMsg.style.display = 'none';
+        preencherEnderecoCom(result, prefix);
+        if(errSpan) errSpan.style.display = 'none';
+      }
+    });
+  }
+
   // Interpolação simples {chave}
   function interpolate(template, map){
     return template.replace(/\{(.*?)\}/g, (_,k)=> String(map[k] ?? '').trim());
@@ -1298,6 +1365,12 @@
       // run once after restore
       setTimeout(autoUpdateResumo, 50);
     }catch(e){ /* ignore */ }
+
+    // Setup CEP lookups for agendar (origem and destino)
+    try{
+      setupCepHandler(byId('origem-cep'), 'origem');
+      setupCepHandler(byId('destino-cep'), 'destino');
+    }catch(e){ console.warn('setup CEP handlers (agendar) failed', e); }
   }
 
   // ====== Fluxo: DELIVERY ======
@@ -1467,6 +1540,11 @@
         el.addEventListener('change', saveDraft, { passive:true });
       });
     }catch(e){ console.warn('delivery draft save bind failed', e); }
+
+    // Setup CEP lookup for delivery
+    try{
+      setupCepHandler(els.cep, 'end');
+    }catch(e){ console.warn('setup CEP handler (delivery) failed', e); }
   }
 
   // ====== Fluxo: TÁXI ======
@@ -1649,6 +1727,14 @@
       [R.tipoBanho, R.tipoAgendado].forEach(el=> el && el.addEventListener('change', autoUpdateTaxiResumo, { passive:true }));
       setTimeout(autoUpdateTaxiResumo, 50);
     }catch(e){ /* ignore */ }
+
+    // Setup CEP lookups for taxi (banho mode: origem/destino; agendado mode: origem2/destino2)
+    try{
+      setupCepHandler(byId('origem-cep'), 'origem');
+      setupCepHandler(byId('destino-cep'), 'destino');
+      setupCepHandler(byId('origem2-cep'), 'origem2');
+      setupCepHandler(byId('destino2-cep'), 'destino2');
+    }catch(e){ console.warn('setup CEP handlers (taxi) failed', e); }
   }
 
   // ===== SW Register =====
