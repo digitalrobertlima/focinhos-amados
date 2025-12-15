@@ -1,6 +1,6 @@
 {
   "name": "focinhos-amados",
-  "version": "0.1.12-pre",
+  "version": "0.1.20",
   "description": "Site estático PWA leve para Focinhos Amados (BH)",
   "private": true,
   "scripts": {
