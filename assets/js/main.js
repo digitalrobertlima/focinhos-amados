@@ -3,7 +3,7 @@
    - Bind de CONFIG (cidade, horários, rotas)
    - Geolocalização (watchPosition c/ melhor precisão)
    - Util: waLink(), interpolate()
-   - Fluxos: agendar, delivery, taxi (resumo + WhatsApp)
+   - Fluxos: agendar, taxi (resumo + WhatsApp)
    - SW register */
 (function(){
   const $ = (s,sc=document)=>sc.querySelector(s);
@@ -223,7 +223,7 @@
   }
   const EMOJI_MAP = new Map(Object.entries({
     '📅':'[Agenda]','🐾':'[Pets]','⏰':'[Quando]','👤':'[Contato]','🚕':'[Táxi]',
-    '📍':'[Local]','📝':'[Obs]','🏪':'[Loja]','📦':'[Delivery]','🚦':'[Modalidade]'
+    '📍':'[Local]','📝':'[Obs]','🏪':'[Loja]',''
   }));
   function stripEmojis(s){
     if(!s) return s;
@@ -394,10 +394,10 @@
     }
   }
 
-  // ===== Init cart panel (delivery) =====
+  // ===== Init cart panel =====
   function initCartPanel(){
-  // only enable cart UI on delivery page
-  if(document.body.dataset.page !== 'delivery') return;
+  // only enable cart UI if cart exists in storage
+  if(!getCartFromStorage() || getCartFromStorage().length === 0) return;
   let panel = null;
 
     function buildTeamMessage(){
@@ -517,7 +517,7 @@
     // Rotas
     const rurl = C.__format.routeUrl();
     ['route-link','route-link-foot','btn-rotas'].forEach(id=>{ const a=byId(id); if(a && rurl!=='#'){ a.href=rurl; } });
-    // Preencher datalist de produtos (delivery)
+    // Preencher datalist de produtos
     const dl = byId('lista-produtos');
     if(dl && Array.isArray(C.suggestions?.products)){
       dl.innerHTML = C.suggestions.products.map(p=>`<option value="${p}"></option>`).join('');
@@ -1224,18 +1224,6 @@
       try{ btnWA.href = url; }catch(e){}
     });
 
-  // Show delivery guidance note under actions (no add-delivery button)
-  const summaryActions = (btnWA && btnWA.parentNode) || null;
-  if(summaryActions && !byId('__agendar-delivery-note')){
-      const note = document.createElement('p');
-      note.id = '__agendar-delivery-note';
-      note.className = 'muted';
-  // spacing handled by CSS (.actions .muted)
-  try{ note.style.removeProperty('margin-top'); }catch(_){ note.style.marginTop = ''; }
-      note.textContent = 'Se precisar de delivery, conclua este agendamento e depois volte ao site para combinar pelo Delivery.';
-      summaryActions.appendChild(note);
-    }
-
   try{ attachCopyButton(btnWA && btnWA.parentNode || document.body, 'btn-copy-msg-agendar', resumoTexto); }catch(e){ console.warn('attach copy (agendar) failed', e); }
 
     // Attach quick listeners to first pet fields to help debugging focus/changes
@@ -1444,220 +1432,6 @@
       setupCepHandler(byId('origem-cep'), 'origem');
       setupCepHandler(byId('destino-cep'), 'destino');
     }catch(e){ console.warn('setup CEP handlers (agendar) failed', e); }
-  }
-
-  // ====== Fluxo: DELIVERY ======
-  function initDelivery(){
-    if(document.body.dataset.page !== 'delivery') return;
-    const els = {
-      produto: byId('produto'), variacao: byId('variacao'), qtd: byId('qtd'), carrinho: byId('carrinho'),
-      add: byId('btn-add-prod'),
-      recebedor: byId('recebedor'), tel: byId('tel'),
-      rua: byId('end-rua'), numero: byId('end-numero'), bairro: byId('end-bairro'), cep: byId('end-cep'),
-      obs: byId('obs'), preResumo: byId('delivery-resumo'), btnResumo: byId('btn-ver-resumo'), btnWA: byId('btn-wa')
-    };
-  let cart = getCartFromStorage();
-
-    // Prefill from agendar draft if present
-    try{
-      const raw = localStorage.getItem('focinhos:delivery:draft');
-      if(raw){ const draft = JSON.parse(raw); if(draft){
-        if(draft.rua && !els.rua.value) els.rua.value = draft.rua;
-        if(draft.numero && !els.numero.value) els.numero.value = draft.numero;
-        if(draft.bairro && !els.bairro.value) els.bairro.value = draft.bairro;
-        if(draft.cep && !els.cep.value) els.cep.value = draft.cep;
-        if(draft.recebedor && !els.recebedor.value) els.recebedor.value = draft.recebedor;
-        if(draft.tel && !els.tel.value) els.tel.value = draft.tel;
-        if(draft.observacoes && !els.obs.value) els.obs.value = draft.observacoes;
-      } }
-    }catch(e){ console.warn('prefill delivery draft failed', e); }
-
-    function renderCart(){
-      if(!els.carrinho) return;
-      // render items without showing prices
-      els.carrinho.innerHTML = cart.map((it,idx)=>{
-        return (`<li class="cart-item" data-idx="${idx}"><div class="cart-item__main"><strong>${it.nome}</strong>${it.variacao? ` — ${it.variacao}`:''}</div><div class="cart-item__controls"><button class="item__btn qty-dec" data-act="dec" data-idx="${idx}" aria-label="Diminuir quantidade">−</button><input class="item__qty_input" type="number" min="1" value="${it.qtd}" data-idx="${idx}" aria-label="Quantidade" /><button class="item__btn qty-inc" data-act="inc" data-idx="${idx}" aria-label="Aumentar quantidade">＋</button><button class="item__btn item__remove" data-idx="${idx}" aria-label="Remover item">remover</button></div></li>`);
-      }).join('');
-      // show notice about prices being provided via WhatsApp at checkout
-      try{
-        let note = document.getElementById('__delivery-price-note');
-  if(!note){ note = document.createElement('div'); note.id = '__delivery-price-note'; note.style.marginTop='8px'; note.className='cart-note'; note.textContent = 'Detalhes e confirmações serão combinados via WhatsApp.'; els.carrinho.parentNode.insertBefore(note, els.carrinho.nextSibling); }
-      }catch(e){}
-
-      // attach listeners
-      // attach listeners
-  els.carrinho.querySelectorAll('.qty-dec').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = Math.max(1, (c[i].qtd||1) - 1); updateCartQty(i,newQ); renderCart(); }));
-  els.carrinho.querySelectorAll('.qty-inc').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = (c[i].qtd||1) + 1; updateCartQty(i,newQ); renderCart(); }));
-      els.carrinho.querySelectorAll('.item__qty_input').forEach(inp=> inp.addEventListener('change', (e)=>{ const i = +inp.dataset.idx; const v = Math.max(1, Number(inp.value)||1); if(v<1){ inp.value = 1; } updateCartQty(i, v); renderCart(); }));
-      els.carrinho.querySelectorAll('.item__remove').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; removeCartItem(i); renderCart(); }));
-    }
-
-    function listagem(){
-      return cart.map(it=> `${it.qtd}x ${it.nome}${it.variacao? ' '+it.variacao:''}`).join('\n');
-    }
-
-    on(els.add,'click', ()=>{
-      const nome = (els.produto.value||'').trim();
-      const variacao = (els.variacao.value||'').trim();
-      const qtd = parseInt(els.qtd.value||'1',10) || 1;
-      if(!nome) return;
-  cart.push({nome, variacao, qtd});
-  saveCartToStorage(cart);
-      els.produto.value=''; els.variacao.value=''; els.qtd.value='1';
-      renderCart();
-    });
-
-  // Botão de "Usar minha localização" (delivery)
-  try{
-    const btnUseGeo = byId('btn-use-geo');
-    if(btnUseGeo){
-      on(btnUseGeo,'click', (e)=>{
-        e.preventDefault();
-        try{
-          btnUseGeo.textContent = '⏳ Capturando...';
-          // start a dedicated watch keyed as 'default' and pass button as badge so Geo can update it
-          Geo.start('default', btnUseGeo);
-          // one-time listener to apply resolved address
-          const handler = (ev)=>{
-            try{
-              const k = ev?.detail?.key || 'default';
-              if(k !== 'default') return;
-              const addrObj = ev?.detail?.address;
-              const best = Geo.get('default');
-              const ruaEl = byId('end-rua');
-              const cepEl = byId('end-cep');
-              if(addrObj && ruaEl && (ruaEl.value||'').trim() === ''){
-                const d = addrObj.details || {};
-                const road = d.road || d.pedestrian || d.cycleway || '';
-                const housen = d.house_number || '';
-                const display = addrObj.display || '';
-                ruaEl.value = (road ? (road + (housen ? (', ' + housen) : '')) : display) || '';
-                try{ ruaEl.dispatchEvent(new Event('input',{bubbles:true})); ruaEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
-              }
-              if(addrObj && cepEl && (cepEl.value||'').trim() === '' && addrObj.details && addrObj.details.postcode){ cepEl.value = addrObj.details.postcode; try{ cepEl.dispatchEvent(new Event('input',{bubbles:true})); cepEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
-              if(best && ruaEl){ ruaEl.dataset.geoLat = String(best.lat); ruaEl.dataset.geoLng = String(best.lng); ruaEl.dataset.geoAcc = String(best.accuracy || ''); }
-              try{ if(addrObj && addrObj.display){ const short = String(addrObj.display).split(',').slice(0,3).join(', '); btnUseGeo.textContent = '📍 ' + short; } else btnUseGeo.textContent = '📍 Usar minha localização'; }catch(_){ btnUseGeo.textContent = '📍 Usar minha localização'; }
-            }catch(e){ console.warn('apply geo (delivery) failed', e); }
-            try{ window.removeEventListener('focinhos:geo:address:resolved', handler); }catch(_){ }
-          };
-          window.addEventListener('focinhos:geo:address:resolved', handler);
-          setTimeout(()=>{
-            try{ const best = Geo.get('default'); if(!best){ btnUseGeo.textContent = '📍 Captura falhou'; setTimeout(()=> btnUseGeo.textContent = '📍 Usar minha localização', 1800); } }catch(_){}
-          }, (window.CONFIG?.geoloc?.waitMs || 40000) + 1200);
-        }catch(err){ console.warn('btn-use-geo click failed', err); btnUseGeo.textContent = '📍 Usar minha localização'; }
-      });
-    }
-  }catch(e){ console.warn('bind btn-use-geo failed', e); }
-
-    function resumoTexto(){
-      const geo = Geo.get('default');
-      const map = {
-        itensLista: listagem() || '',
-        nome: (els.recebedor.value||'').trim() || '',
-        telefone: (els.tel.value||'').trim() || '',
-  enderecoCompleto: [els.rua?.value, els.numero?.value, els.bairro?.value, byId('endereco-complemento')?.value, els.cep?.value].map(s=> (s||'').trim()).filter(Boolean).join(', '),
-        lat: geo? geo.lat.toFixed(6) : '',
-        lng: geo? geo.lng.toFixed(6) : '',
-        accuracy: geo? fmtAcc(geo.accuracy) : '',
-        timestamp: geo? fmtDT(geo.timestamp) : '',
-        observacoes: (els.obs.value||'').trim() || ''
-      };
-  try{
-    let raw = interpolate(window.CONFIG.waTemplates.delivery, map);
-    const trackTpl = window.CONFIG?.waTemplates?.deliveryTracking || '';
-    if(trackTpl){ raw += interpolate(trackTpl, map); }
-    return processMessageForPlatform(tidyMessage(raw));
-  }catch(_){ return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map))); }
-    }
-
-    function validar(){
-      let ok = true;
-  if(cart.length===0){ ok=false; alert('Adicione pelo menos um produto.'); }
-  ok &= required(els.recebedor, 'Informe o nome do recebedor.');
-  ok &= required(els.tel, 'Informe um telefone válido.');
-      if(ok && !isTelBR(els.tel.value)){ setErr(els.tel,'Informe um telefone válido.'); ok=false; }
-  // exigir Rua, Nº, Bairro e CEP
-  ok &= required(els.rua, 'Informe a rua.');
-  ok &= required(els.numero, 'Informe o número.');
-  ok &= required(els.bairro, 'Informe o bairro.');
-  ok &= required(byId('endereco-complemento'), 'Informe o complemento.');
-  ok &= required(els.cep, 'Informe o CEP.');
-      return !!ok;
-    }
-
-    on(els.btnResumo,'click', ()=>{ if(els.preResumo) els.preResumo.textContent = resumoTexto(); });
-    on(els.btnWA,'click', (e)=>{
-      e.preventDefault();
-      if(!validar()){ return; }
-      const url = waLink(resumoTexto());
-      try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
-      window.open(url, '_blank');
-      try{ els.btnWA.href = url; }catch(e){}
-    });
-
-  try{ attachCopyButton(els.btnWA && els.btnWA.parentNode || document.body, '__delivery-copy-msg', resumoTexto); }catch(e){ console.warn('attach copy (delivery) failed', e); }
-  // react to external cart changes
-  window.addEventListener('focinhos:cart:changed', ()=>{ cart = getCartFromStorage(); renderCart(); try{ autoUpdateResumo(); }catch(e){} });
-
-    // Auto-update summary when form is complete (silent validation)
-    function canAutoSummarize(){
-      try{
-        const c = getCartFromStorage();
-        if(!c || c.length===0) return false;
-        if(!(els.recebedor && (els.recebedor.value||'').trim())) return false;
-        if(!(els.tel && isTelBR(els.tel.value))) return false;
-        const requiredFilled = [els.rua, els.numero, els.bairro, els.cep].every(el=> !!el && (el.value||'').trim());
-        if(!requiredFilled) return false;
-        return true;
-      }catch(_){ return false; }
-    }
-
-    const autoUpdateResumo = debounce(()=>{
-      try{
-        if(!els.preResumo) return;
-        if(canAutoSummarize()){
-          const txt = resumoTexto();
-          els.preResumo.textContent = txt;
-          try{ if(els.btnWA) els.btnWA.href = waLink(txt); }catch(e){}
-        }
-      }catch(e){ /* silent */ }
-    }, 300);
-
-    // Bind auto-update on inputs
-    try{
-      const formEl = byId('form-delivery') || document.querySelector('form');
-      if(formEl){ formEl.addEventListener('input', autoUpdateResumo, { passive:true }); formEl.addEventListener('change', autoUpdateResumo, { passive:true }); }
-      setTimeout(autoUpdateResumo, 50);
-    }catch(e){ /* ignore */ }
-
-    // Save minimal delivery draft (address/contact) on changes
-    try{
-      const DELIV_DRAFT_KEY = 'focinhos:delivery:draft';
-      const saveDraft = debounce(()=>{
-        try{
-          const d = {
-            rua: els.rua?.value || '',
-            numero: els.numero?.value || '',
-            bairro: els.bairro?.value || '',
-            cep: els.cep?.value || '',
-            recebedor: els.recebedor?.value || '',
-            tel: els.tel?.value || '',
-            observacoes: els.obs?.value || ''
-          };
-          localStorage.setItem(DELIV_DRAFT_KEY, JSON.stringify(d));
-        }catch(e){ /* ignore */ }
-      }, 300);
-      ['recebedor','tel','end-rua','end-numero','end-bairro','end-cep','obs'].forEach(id=>{
-        const el = byId(id); if(!el) return;
-        el.addEventListener('input', saveDraft, { passive:true });
-        el.addEventListener('change', saveDraft, { passive:true });
-      });
-    }catch(e){ console.warn('delivery draft save bind failed', e); }
-
-    // Setup CEP lookup for delivery
-    try{
-      setupCepHandler(els.cep, 'end');
-    }catch(e){ console.warn('setup CEP handler (delivery) failed', e); }
   }
 
   // ====== Fluxo: TÁXI ======
