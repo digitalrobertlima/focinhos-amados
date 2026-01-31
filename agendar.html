@@ -56,12 +56,26 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
   </header>
 
   <main id="conteudo" class="container flow">
-    <h1>Agendar Banho & Tosa</h1>
-  <p class="muted">Entregamos qualidade — detalhes e confirmações serão combinados com a equipe via WhatsApp.</p>
+    <h1>Solicitar Agendamento</h1>
+    <p class="muted">Entregamos qualidade — detalhes e confirmações serão combinados com a equipe via WhatsApp.</p>
+
+    <!-- Banner informativo sobre o processo -->
+    <div class="card" style="background-color:#E8F5E9; border-left:4px solid #029935; padding:12px">
+      <p style="margin:0; font-size:14px; line-height:1.6">
+        <strong>ℹ️ Como funciona:</strong><br>
+        O que você preencherá aqui é uma <strong>solicitação de orçamento</strong>. 
+        Após enviar para o WhatsApp, nossa equipe analisará a disponibilidade do horário desejado, 
+        confirmará os detalhes e passará o valor do serviço. Sem compromisso — você só confirma após aprovação! ✓
+      </p>
+    </div>
 
     <form id="form-agendar" novalidate>
       <section class="card">
         <h2 class="card__title">🐾 Pet & Tutor</h2>
+        <p class="muted" style="font-size:13px; margin-bottom:8px">
+          <strong>Informações da solicitação:</strong> Preencha com os detalhes do seu pet e preferências. 
+          Usaremos essas informações para preparar o melhor orçamento e atendimento.
+        </p>
         <!-- Contêiner de pets: o primeiro pet está no HTML para compatibilidade; novos pets são adicionados dinamicamente -->
         <div id="pets">
           <div class="pet" data-pet-index="0">
@@ -305,6 +319,9 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
 
       <section class="card">
         <h2 class="card__title">🗓️ Quando</h2>
+        <p class="muted" style="font-size:13px; margin-bottom:8px">
+          <strong>Horário desejado:</strong> Esta é sua preferência. Nossa equipe confirmará a disponibilidade via WhatsApp.
+        </p>
         <div class="grid grid--3">
           <div class="field">
             <label for="dataPreferida">Data preferida <span class="req">*</span></label>
@@ -378,9 +395,36 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
       <section class="card card--summary">
         <h2 class="card__title">📄 Resumo</h2>
         <pre id="agendar-resumo" class="note" aria-live="polite">Nada por aqui ainda. Adicione um serviço para continuar.</pre>
+        
+        <!-- Timeline do processo -->
+        <div style="margin-top:16px; padding:12px; background-color:#F0F8FF; border-radius:4px">
+          <p style="margin-top:0; font-size:13px; font-weight:bold; color:#0066cc">📋 Próximos passos:</p>
+          <div style="display:flex; gap:8px; font-size:12px; color:#333">
+            <div style="text-align:center; min-width:60px">
+              <div style="background:#029935; color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto; font-weight:bold">1</div>
+              <span style="display:block; margin-top:4px">Enviar</span>
+            </div>
+            <div style="display:flex; align-items:center">→</div>
+            <div style="text-align:center; min-width:60px">
+              <div style="background:#0099ff; color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto; font-weight:bold">2</div>
+              <span style="display:block; margin-top:4px">Revisar</span>
+            </div>
+            <div style="display:flex; align-items:center">→</div>
+            <div style="text-align:center; min-width:60px">
+              <div style="background:#FFA500; color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto; font-weight:bold">3</div>
+              <span style="display:block; margin-top:4px">Orçamento</span>
+            </div>
+            <div style="display:flex; align-items:center">→</div>
+            <div style="text-align:center; min-width:60px">
+              <div style="background:#28A745; color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto; font-weight:bold">4</div>
+              <span style="display:block; margin-top:4px">Confirmado</span>
+            </div>
+          </div>
+        </div>
+        
         <div class="actions">
           <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
-          <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
+          <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener" title="Enviar solicitação de orçamento para o WhatsApp">✅ Enviar Solicitação</a>
           <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
         </div>
         <p class="muted">LGPD: Usamos seus dados apenas para atender seu pedido e combinar detalhes pelo WhatsApp.</p>
