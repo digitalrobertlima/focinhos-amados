@@ -501,6 +501,7 @@
   // ===== Bind de CONFIG em elementos =====
   function bindConfig(){
     const C = window.CONFIG;
+    console.log('[bindConfig] called. C:', !!C);
     if(!C) return;
     $$('[data-bind="city"]').forEach(el=> text(el, C.business.city));
     $$('[data-bind="hoursLabel"]').forEach(el=> text(el, C.__format.hoursLabel()));
@@ -532,12 +533,15 @@
         const txt = byId('status-text');
         if(dot && txt){
           const hours = C.business?.hours || { mon_sat:'10:00–20:00', sun:'10:00–13:00' };
+          console.log('[status] init start. dot element:', dot, 'txt element:', txt, 'hours:', hours);
           function parseRange(range){
             if(!range) return null;
-            const m = String(range).match(/^(\d{1,2}):(\d{2})\s*[–-]\s*(\d{1,2}):(\d{2})$/);
-            if(!m) return null; return { fromH:+m[1], fromM:+m[2], toH:+m[3], toM:+m[4] };
+            const m = String(range).match(/^(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})$/);
+            console.log('[status] parseRange input:', range, 'match:', m);
+            if(!m) return null; 
+            return { fromH:+m[1], fromM:+m[2], toH:+m[3], toM:+m[4] };
           }
-      function nextOpenInfo(now){
+          function nextOpenInfo(now){
             // Return {open:true} if open now; else {open:false, label:"Abre às HH:MM"}
             const d = new Date(now);
             const day = d.getDay(); // 0=Sun,1=Mon...6=Sat
@@ -551,7 +555,7 @@
             const fromMin = r.fromH*60 + r.fromM;
             const toMin = r.toH*60 + r.toM;
             if(curMin >= fromMin && curMin < toMin){
-        return { open:true, closesAt: hhmm(r.toH, r.toM) };
+              return { open:true, closesAt: hhmm(r.toH, r.toM) };
             }
             if(curMin < fromMin){
               return { open:false, label: `Abre às ${hhmm(r.fromH, r.fromM)}` };
@@ -564,12 +568,13 @@
             if(nr){ return { open:false, label:`Abre às ${hhmm(nr.fromH, nr.fromM)}` }; }
             return { open:false, label:'' };
           }
-      function updateStatus(){
+          function updateStatus(){
             const info = nextOpenInfo(new Date());
+            console.log('[status] updateStatus. info:', info);
             dot.classList.remove('is-open','is-closed');
             if(info.open){
               dot.classList.add('is-open');
-        txt.textContent = info.closesAt ? `Aberto agora — Fecha às ${info.closesAt}` : 'Aberto agora';
+              txt.textContent = info.closesAt ? `Aberto agora — Fecha às ${info.closesAt}` : 'Aberto agora';
             } else {
               dot.classList.add('is-closed');
               txt.textContent = info.label || 'Fechado';
