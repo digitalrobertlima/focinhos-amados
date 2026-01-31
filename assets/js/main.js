@@ -978,6 +978,10 @@
   const destinoAddr = ['destino-rua','destino-numero','destino-bairro','destino-complemento','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
 
       // Use empty strings as fallback so tidyMessage can remove empty sections
+      const videoLink = (byId('videoLink')?.value || '').trim();
+      const videoObs = (byId('videoObservacoes')?.value || '').trim();
+      const videoInfo = videoLink ? `Link: ${videoLink}${videoObs ? ' • ' + videoObs : ''}` : (videoObs ? videoObs : 'Será solicitado via WhatsApp');
+      
       const map = {
         petsLista: petsTxt,
   servicosLista: getServicosGlobaisLista() || '',
@@ -1001,6 +1005,7 @@
         destinoAccuracy: geoDefault? fmtAcc(geoDefault.accuracy) : '',
         origemTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
         destinoTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
+        videoInfo: videoInfo || '',
         observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || ''
       };
       const tpl = window.CONFIG.waTemplates.agendar;
@@ -1011,7 +1016,7 @@
         const coords = (map.origemLat && map.origemLng) ? `${map.origemLat},${map.origemLng}` : '';
         // Monta uma mensagem compacta reusando as mesmas seções principais
   let rawLoja = [
-          '📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)',
+          '📅 *AGENDAMENTO — SOLICITAÇÃO DE ORÇAMENTO* — FOCINHOS AMADOS (BH)',
           '',
           '🐾 *Pets*',
           map.petsLista,
@@ -1027,11 +1032,17 @@
           '',
           '📍 Localização do solicitante: ' + coords,
           '',
+          '🎥 *Vídeo do animal*',
+          map.videoInfo,
+          '',
           '📝 *Observações gerais*',
           map.observacoes,
           '',
           '🏪 *Loja física*',
-          map.enderecoLoja
+          map.enderecoLoja,
+          '',
+          '—',
+          '💡 Próximos passos: Nossa equipe verificará a disponibilidade e, se necessário, solicitará o vídeo do animal (1min30s). Após análise, enviaremos o orçamento final para confirmação.'
         ].join('\n');
         try{
           const trackTpl = window.CONFIG?.waTemplates?.agendarTracking || '';

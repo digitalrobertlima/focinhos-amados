@@ -54,7 +54,7 @@ window.CONFIG = {
   },
 
   waTemplates: {
-  agendar: `📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)
+  agendar: `📅 *AGENDAMENTO — SOLICITAÇÃO DE ORÇAMENTO* — FOCINHOS AMADOS (BH)
 
 🐾 *Pets*
 {petsLista}
@@ -77,8 +77,14 @@ window.CONFIG = {
 📝 *Observações gerais*
 {observacoes}
 
+🎥 *Vídeo do animal*
+{videoInfo}
+
 🏪 *Loja física*
-{enderecoLoja}`,
+{enderecoLoja}
+
+—
+💡 Próximos passos: Nossa equipe verificará a disponibilidade e, se necessário, solicitará o vídeo do animal (1min30s). Após análise, enviaremos o orçamento final para confirmação.`,
 
   // Tracking técnico (apêndice) para o template Agendar
   agendarTracking:

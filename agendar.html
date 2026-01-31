@@ -342,7 +342,34 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
       </section>
 
       <section class="card">
-        <h2 class="card__title">📍 Onde</h2>
+        <h2 class="card__title">🎥 Vídeo do Animal</h2>
+        <p class="muted" style="font-size:13px; margin-bottom:12px">
+          <strong>Importante:</strong> Após confirmar o agendamento, solicitaremos um vídeo curto (1min30s) para avaliar o estado do pelagem e dar o orçamento final.
+        </p>
+        
+        <div style="background-color:#FFF3E0; border-left:4px solid #FF9800; padding:12px; border-radius:4px; margin-bottom:12px">
+          <p style="margin:0 0 8px 0; font-weight:bold; font-size:13px">📹 Como gravar o vídeo (instruções):</p>
+          <ol style="margin:8px 0; padding-left:20px; font-size:12px; line-height:1.8">
+            <li><strong>Pegue o animal no colo</strong> — mostre o tamanho comparado com seu corpo</li>
+            <li><strong>Abra os pelos</strong> — verifique se há emaranhados, embolos ou nós (mostre várias regiões)</li>
+            <li><strong>Gravidade frontal</strong> — segure de frente para câmera por 15-20 segundos (para avaliar expressão e tamanho)</li>
+            <li><strong>Observações gerais</strong> — grave o comprimento da pelagem, estado geral</li>
+            <li><strong>Duração total:</strong> 1 minuto e 30 segundos (máximo 2 minutos)</li>
+          </ol>
+        </div>
+
+        <div class="grid grid--2">
+          <div class="field">
+            <label for="videoLink">Link do vídeo (opcional)</label>
+            <input id="videoLink" class="input" placeholder="https://drive.google.com/... ou WhatsApp/Telegram" data-role="videoLink">
+            <small class="muted" style="font-size:11px; display:block; margin-top:4px">Você pode compartilhar via link (Google Drive, WeTransfer, etc.) ou avisar que enviará pelo WhatsApp</small>
+          </div>
+          <div class="field">
+            <label for="videoObservacoes">Observações sobre o vídeo</label>
+            <input id="videoObservacoes" class="input" placeholder="Ex: Enviando pelo WhatsApp após agendamento" data-role="videoObservacoes">
+          </div>
+        </div>
+      </section>
         <div class="field">
           <label>Localização:</label>
           <div role="radiogroup" aria-label="Opções de localização">
