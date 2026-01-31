@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Test Add Pet Button</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .log { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Test Add Pet Button</h1>
+  <div id="test-results"></div>
+  
+  <!-- Simular a estrutura do agendar.html -->
+  <form id="form-agendar">
+    <div id="pets">
+      <div class="pet" data-pet-index="0">
+        <p>Pet 1</p>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <button id="btn-add-pet" class="btn btn--ghost" type="button">+ Adicionar outro pet</button>
+    </div>
+  </form>
+
+  <script src="assets/js/config.js"></script>
+  <script>
+    const results = document.getElementById('test-results');
+    function log(msg) {
+      const div = document.createElement('div');
+      div.className = 'log';
+      div.textContent = msg;
+      results.appendChild(div);
+      console.log(msg);
+    }
+
+    // Test 1: Check if button exists in DOM
+    const btn = document.getElementById('btn-add-pet');
+    log('Test 1 - Direct getElementById: ' + (btn ? 'FOUND' : 'NOT FOUND'));
+
+    // Test 2: Check if byId works
+    const byId = (id) => document.getElementById(id);
+    const btn2 = byId('btn-add-pet');
+    log('Test 2 - byId function: ' + (btn2 ? 'FOUND' : 'NOT FOUND'));
+
+    // Test 3: Check querySelectorAll
+    const btns = document.querySelectorAll('[id="btn-add-pet"]');
+    log('Test 3 - querySelectorAll: ' + btns.length + ' matches');
+
+    // Test 4: Check if element is in a form
+    const form = document.getElementById('form-agendar');
+    log('Test 4 - Form found: ' + (form ? 'YES' : 'NO'));
+    if (form) {
+      const btnInForm = form.querySelector('#btn-add-pet');
+      log('Test 4b - Button in form: ' + (btnInForm ? 'YES' : 'NO'));
+    }
+
+    // Test 5: Check page data attribute
+    log('Test 5 - body.dataset.page: ' + (document.body.dataset.page || 'NOT SET'));
+
+    // Test 6: Simulate initAgendar condition
+    const isAgendarPage = document.body.dataset.page === 'agendar';
+    log('Test 6 - Is agendar page: ' + isAgendarPage);
+
+    // Test 7: List all button elements
+    const allButtons = document.querySelectorAll('button');
+    log('Test 7 - Total buttons found: ' + allButtons.length);
+    allButtons.forEach((b, i) => {
+      log('  Button ' + i + ': id="' + (b.id || 'NO ID') + '", text=' + b.textContent.substring(0, 30));
+    });
+  </script>
+</body>
+</html>

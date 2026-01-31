@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Test Menu</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .nav__btn { cursor: pointer; padding: 10px; background: #029935; color: white; border: none; border-radius: 4px; }
+    .nav__drawer { list-style: none; padding: 10px; background: #f0f0f0; display: none; }
+    .nav__drawer.open { display: block; }
+    .log { background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <div id="test-results"></div>
+  
+  <button class="nav__btn">☰ Menu</button>
+  <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Agendar</a></li>
+    <li><a href="#">Táxi</a></li>
+  </ul>
+
+  <script src="assets/js/config.js"></script>
+  <script>
+    const results = document.getElementById('test-results');
+    function log(msg) {
+      const div = document.createElement('div');
+      div.className = 'log';
+      div.textContent = msg;
+      results.appendChild(div);
+      console.log(msg);
+    }
+
+    // Helper functions
+    const byId = (id) => document.getElementById(id);
+    const $$ = (s, sc = document) => Array.from(sc.querySelectorAll(s));
+    const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
+
+    // Test 1: Check if button exists
+    const btn = document.querySelector('.nav__btn');
+    log('Test 1 - Button found: ' + (btn ? 'YES' : 'NO'));
+
+    // Test 2: Check if drawer exists
+    const drawer = byId('drawer');
+    log('Test 2 - Drawer found: ' + (drawer ? 'YES' : 'NO'));
+
+    if (btn && drawer) {
+      // Test 3: Check if button is clickable
+      log('Test 3 - Button clickable: YES');
+
+      // Test 4: Simulate menu logic
+      const close = () => {
+        drawer.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        drawer.setAttribute('aria-hidden', 'true');
+        log('Menu closed');
+      };
+
+      const open = () => {
+        drawer.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        drawer.setAttribute('aria-hidden', 'false');
+        log('Menu opened');
+      };
+
+      // Add event listener
+      on(btn, 'click', () => {
+        const isOpen = drawer.classList.contains('open');
+        if (isOpen) close();
+        else open();
+        log('Button clicked - isOpen was: ' + isOpen);
+      });
+
+      log('Test 4 - Event listener attached: YES');
+
+      // Test 5: Simulate click
+      log('Test 5 - Simulating click...');
+      btn.click();
+      log('Test 5 - Click simulated');
+    } else {
+      log('ERROR: Button or drawer not found!');
+    }
+  </script>
+</body>
+</html>
