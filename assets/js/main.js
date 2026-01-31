@@ -506,7 +506,6 @@
   // ===== Bind de CONFIG em elementos =====
   function bindConfig(){
     const C = window.CONFIG;
-    console.log('[bindConfig] called. C:', !!C);
     if(!C) return;
     $$('[data-bind="city"]').forEach(el=> text(el, C.business.city));
     $$('[data-bind="hoursLabel"]').forEach(el=> text(el, C.__format.hoursLabel()));
@@ -538,11 +537,9 @@
         const txt = byId('status-text');
         if(dot && txt){
           const hours = C.business?.hours || { mon_sat:'10:00–20:00', sun:'10:00–13:00' };
-          console.log('[status] init start. dot element:', dot, 'txt element:', txt, 'hours:', hours);
           function parseRange(range){
             if(!range) return null;
             const m = String(range).match(/^(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})$/);
-            console.log('[status] parseRange input:', range, 'match:', m);
             if(!m) return null; 
             return { fromH:+m[1], fromM:+m[2], toH:+m[3], toM:+m[4] };
           }
@@ -575,7 +572,6 @@
           }
           function updateStatus(){
             const info = nextOpenInfo(new Date());
-            console.log('[status] updateStatus. info:', info);
             dot.classList.remove('is-open','is-closed');
             if(info.open){
               dot.classList.add('is-open');
@@ -684,9 +680,7 @@
 
   // ====== Fluxo: AGENDAR ======
   function initAgendar(){
-    console.log('[initAgendar] called. page:', document.body.dataset.page);
     if(document.body.dataset.page !== 'agendar') return;
-    console.log('[initAgendar] running on agendar page');
     // Elementos estáticos
     const f = {
       tutorNome: byId('tutorNome'), tutorTelefone: byId('tutorTelefone'),
@@ -711,7 +705,6 @@
   const petsContainer = byId('pets');
     const tplPet = byId('tpl-pet');
     const btnAddPet = byId('btn-add-pet');
-  console.log('[agendar] btnAddPet element:', btnAddPet, 'selector found?', !!document.getElementById('btn-add-pet'));
   console.debug('[agendar] init elements', { btnAddPet: !!btnAddPet, tplPet: !!tplPet, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
   const modalidadeEls = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']"));
     const fieldOrigem = byId('field-origem');
