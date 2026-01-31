@@ -61,6 +61,8 @@ a:hover{text-decoration:underline}
 .card__desc{margin:0;color:var(--muted)}
 .card--service .btn{margin-top:8px}
 .card--summary .note{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;border:1px dashed var(--border);border-radius:var(--radius-300);padding:12px;background:#fff;white-space:pre-wrap}
+.quote{font-style:italic;color:var(--muted);padding:12px;border-left:4px solid var(--brand);margin:12px 0}
+.quote footer{display:block;margin-top:8px;font-style:normal;font-weight:600;color:var(--text)}
 
 .section__title{font-size:clamp(1.25rem, 1.05rem + 1.2vw, 1.6rem);line-height:1.25;margin:12px 0;text-wrap:balance}
 
@@ -166,8 +168,8 @@ a:hover{text-decoration:underline}
 .btn--ghost[aria-label], .btn--primary[aria-label]{position:relative}
 
 /* Copy button specific tweaks */
-#btn-copy-msg-agendar, #__delivery-copy-msg, #__taxi-copy-msg{padding:8px 10px;font-size:14px}
-#btn-copy-msg-agendar[title], #__delivery-copy-msg[title], #__taxi-copy-msg[title]{cursor:pointer}
+#btn-copy-msg-agendar, #__taxi-copy-msg{padding:8px 10px;font-size:14px}
+#btn-copy-msg-agendar[title], #__taxi-copy-msg[title]{cursor:pointer}
 
 /* Cart controls inside modal/delivery list */
 .cart-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--border)}

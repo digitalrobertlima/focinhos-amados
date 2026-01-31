@@ -1866,7 +1866,7 @@
         if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }
       }catch(e){ console.warn('config.json fetch failed, using inline CONFIG if present', e); }
       // Run each init inside try/catch so a failure in one doesn't stop others
-  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initCartPanel, initCartModal, initInstallPrompt, initSW].forEach(fn=>{
+  [initNav, bindConfig, initAgendar, initTaxi, initCartPanel, initCartModal, initInstallPrompt, initSW].forEach(fn=>{
         try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
       });
       try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
