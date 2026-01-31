@@ -1858,7 +1858,7 @@
   }
 
   // Boot
-  document.addEventListener('DOMContentLoaded', ()=>{
+  const boot = ()=>{
     // Load dynamic config first (network-first). If fetch fails, fall back to any inline `window.CONFIG`.
     (async ()=>{
       try{
@@ -1885,7 +1885,14 @@
     window.addEventListener('error', (ev)=>{
       try{ console.error('Unhandled error:', ev.error || ev.message || ev); }catch(e){}
     });
-  });
+  };
+
+  // If DOM is ready, run boot immediately; else wait for DOMContentLoaded
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 
   // Reload the page when a new service worker takes control to ensure users get the latest UI
   if('serviceWorker' in navigator){

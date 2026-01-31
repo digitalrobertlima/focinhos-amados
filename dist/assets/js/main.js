@@ -3,7 +3,7 @@
    - Bind de CONFIG (cidade, horários, rotas)
    - Geolocalização (watchPosition c/ melhor precisão)
    - Util: waLink(), interpolate()
-   - Fluxos: agendar, delivery, taxi (resumo + WhatsApp)
+   - Fluxos: agendar, taxi (resumo + WhatsApp)
    - SW register */
 (function(){
   const $ = (s,sc=document)=>sc.querySelector(s);
@@ -223,7 +223,7 @@
   }
   const EMOJI_MAP = new Map(Object.entries({
     '📅':'[Agenda]','🐾':'[Pets]','⏰':'[Quando]','👤':'[Contato]','🚕':'[Táxi]',
-    '📍':'[Local]','📝':'[Obs]','🏪':'[Loja]','📦':'[Delivery]','🚦':'[Modalidade]'
+    '📍':'[Local]','📝':'[Obs]','🏪':'[Loja]',''
   }));
   function stripEmojis(s){
     if(!s) return s;
@@ -233,9 +233,14 @@
   }
   function addVS16IfNeeded(s){
     if(!s) return s; const VS16='\uFE0F';
-    // Apply to a small set that benefits from emoji presentation on some platforms
-    return s
-      .replace(/⏰(?!\uFE0F)/g, '⏰\uFE0F');
+    // Apply VS16 (emoji variation selector) to known emoji glyphs so platforms
+    // that require explicit emoji presentation render them correctly in WhatsApp.
+    try{
+      EMOJI_MAP.forEach((rep, emo)=>{
+        try{ s = s.replace(new RegExp(emo + '(?!\\uFE0F)','g'), emo + VS16); }catch(_){ /* noop on invalid regex */ }
+      });
+    }catch(_){ }
+    return s;
   }
   function processMessageForPlatform(s){
     try{ return shouldUsePlainText() ? stripEmojis(s) : addVS16IfNeeded(s); }catch(_){ return s; }
@@ -389,10 +394,10 @@
     }
   }
 
-  // ===== Init cart panel (delivery) =====
+  // ===== Init cart panel =====
   function initCartPanel(){
-  // only enable cart UI on delivery page
-  if(document.body.dataset.page !== 'delivery') return;
+  // only enable cart UI if cart exists in storage
+  if(!getCartFromStorage() || getCartFromStorage().length === 0) return;
   let panel = null;
 
     function buildTeamMessage(){
@@ -513,7 +518,7 @@
     // Rotas
     const rurl = C.__format.routeUrl();
     ['route-link','route-link-foot','btn-rotas'].forEach(id=>{ const a=byId(id); if(a && rurl!=='#'){ a.href=rurl; } });
-    // Preencher datalist de produtos (delivery)
+    // Preencher datalist de produtos
     const dl = byId('lista-produtos');
     if(dl && Array.isArray(C.suggestions?.products)){
       dl.innerHTML = C.suggestions.products.map(p=>`<option value="${p}"></option>`).join('');
@@ -872,6 +877,62 @@
     modalidadeEls.forEach(r=> on(r,'change', updateLocalizacaoFields));
     updateLocalizacaoFields();
 
+  // Botões de "Usar minha localização" (agendar)
+  // Bind em botões com atributo data-geo (data-geo="origem" | "destino")
+  try{
+    const geoButtons = Array.from(document.querySelectorAll('button[data-geo]'));
+    geoButtons.forEach(btn=>{
+      const key = btn.getAttribute('data-geo');
+      on(btn,'click', (e)=>{
+        e.preventDefault();
+        try{
+          btn.textContent = '⏳ Capturando...';
+          // Start a dedicated watch for this key and pass the button as badge so Geo can update label
+          Geo.start(key, btn);
+          // one-time listener to apply resolved address/coords to the corresponding fields
+          const handler = (ev)=>{
+            try{
+              const k = ev?.detail?.key;
+              if(k !== key) return;
+              const addrObj = ev?.detail?.address;
+              const best = Geo.get(key);
+              const prefix = (k === 'default') ? 'end' : k; // map key to form prefix
+              const ruaEl = byId(prefix + '-rua');
+              const cepEl = byId(prefix + '-cep');
+              if(addrObj && ruaEl && (ruaEl.value||'').trim() === ''){
+                // prefer structured parts when available, fallback to display
+                const d = addrObj.details || {};
+                const road = d.road || d.pedestrian || d.cycleway || '';
+                const housen = d.house_number || '';
+                const display = addrObj.display || '';
+                ruaEl.value = (road ? (road + (housen ? (', ' + housen) : '')) : display) || '';
+                try{ ruaEl.dispatchEvent(new Event('input',{bubbles:true})); ruaEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
+              }
+              if(addrObj && cepEl && (cepEl.value||'').trim() === '' && addrObj.details && addrObj.details.postcode){ cepEl.value = addrObj.details.postcode; try{ cepEl.dispatchEvent(new Event('input',{bubbles:true})); cepEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
+              // store coords on the rua element for later use
+              if(best && ruaEl){ ruaEl.dataset.geoLat = String(best.lat); ruaEl.dataset.geoLng = String(best.lng); ruaEl.dataset.geoAcc = String(best.accuracy || ''); }
+              // restore button label to a short form
+              try{
+                if(addrObj && addrObj.display){ const short = String(addrObj.display).split(',').slice(0,3).join(', '); btn.textContent = '📍 ' + short; }
+                else btn.textContent = '📍 Usar minha localização';
+              }catch(_){ btn.textContent = '📍 Usar minha localização'; }
+            }catch(e){ console.warn('apply geo (agendar) failed', e); }
+            // remove listener after first call
+            try{ window.removeEventListener('focinhos:geo:address:resolved', handler); }catch(_){ }
+          };
+          window.addEventListener('focinhos:geo:address:resolved', handler);
+          // also set a fallback timeout in case reverseGeocode didn't resolve
+          setTimeout(()=>{
+            try{
+              const best = Geo.get(key);
+              if(!best){ /* still no position */ btn.textContent = '📍 Captura falhou'; setTimeout(()=> btn.textContent = '📍 Usar minha localização', 1800); }
+            }catch(_){}
+          }, (window.CONFIG?.geoloc?.waitMs || 40000) + 1200);
+        }catch(err){ console.warn('geo btn click failed', err); btn.textContent = '📍 Usar minha localização'; }
+      });
+    });
+  }catch(e){ console.warn('bind geo buttons (agendar) failed', e); }
+
   function getServicosGlobaisLista(){
       // Mantido apenas para compat; hoje não há serviços globais.
       const list = [];
@@ -899,6 +960,7 @@
         const valOk = (v)=> !!v && String(v).trim() !== '-' && String(v).trim() !== '';
         const details = [];
         if(valOk(p.especie)) details.push(`Espécie: ${p.especie}`);
+        if(valOk(p.genero)) details.push(`Gênero: ${p.genero}`);
         if(valOk(p.porte)) details.push(`Porte: ${p.porte}`);
         if(valOk(p.pelagem)) details.push(`Pelagem: ${p.pelagem}`);
         if(valOk(p.temperamento)) details.push(`Temperamento: ${p.temperamento}`);
@@ -924,6 +986,10 @@
   const destinoAddr = ['destino-rua','destino-numero','destino-bairro','destino-complemento','destino-cep'].map(id=> (byId(id)?.value||'').trim()).filter(Boolean).join(', ');
 
       // Use empty strings as fallback so tidyMessage can remove empty sections
+      const videoLink = (byId('videoLink')?.value || '').trim();
+      const videoObs = (byId('videoObservacoes')?.value || '').trim();
+      const videoInfo = videoLink ? `Link: ${videoLink}${videoObs ? ' • ' + videoObs : ''}` : (videoObs ? videoObs : 'Será solicitado via WhatsApp');
+      
       const map = {
         petsLista: petsTxt,
   servicosLista: getServicosGlobaisLista() || '',
@@ -947,6 +1013,7 @@
         destinoAccuracy: geoDefault? fmtAcc(geoDefault.accuracy) : '',
         origemTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
         destinoTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
+        videoInfo: videoInfo || '',
         observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || ''
       };
       const tpl = window.CONFIG.waTemplates.agendar;
@@ -957,7 +1024,7 @@
         const coords = (map.origemLat && map.origemLng) ? `${map.origemLat},${map.origemLng}` : '';
         // Monta uma mensagem compacta reusando as mesmas seções principais
   let rawLoja = [
-          '📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)',
+          '📅 *AGENDAMENTO — SOLICITAÇÃO DE ORÇAMENTO* — FOCINHOS AMADOS (BH)',
           '',
           '🐾 *Pets*',
           map.petsLista,
@@ -973,11 +1040,17 @@
           '',
           '📍 Localização do solicitante: ' + coords,
           '',
+          '🎥 *Vídeo do animal*',
+          map.videoInfo,
+          '',
           '📝 *Observações gerais*',
           map.observacoes,
           '',
           '🏪 *Loja física*',
-          map.enderecoLoja
+          map.enderecoLoja,
+          '',
+          '—',
+          '💡 Próximos passos: Nossa equipe verificará a disponibilidade e, se necessário, solicitará o vídeo do animal (1min30s). Após análise, enviaremos o orçamento final para confirmação.'
         ].join('\n');
         try{
           const trackTpl = window.CONFIG?.waTemplates?.agendarTracking || '';
@@ -1158,18 +1231,6 @@
       // manter href atualizado por acessibilidade
       try{ btnWA.href = url; }catch(e){}
     });
-
-  // Show delivery guidance note under actions (no add-delivery button)
-  const summaryActions = (btnWA && btnWA.parentNode) || null;
-  if(summaryActions && !byId('__agendar-delivery-note')){
-      const note = document.createElement('p');
-      note.id = '__agendar-delivery-note';
-      note.className = 'muted';
-  // spacing handled by CSS (.actions .muted)
-  try{ note.style.removeProperty('margin-top'); }catch(_){ note.style.marginTop = ''; }
-      note.textContent = 'Se precisar de delivery, conclua este agendamento e depois volte ao site para combinar pelo Delivery.';
-      summaryActions.appendChild(note);
-    }
 
   try{ attachCopyButton(btnWA && btnWA.parentNode || document.body, 'btn-copy-msg-agendar', resumoTexto); }catch(e){ console.warn('attach copy (agendar) failed', e); }
 
@@ -1379,180 +1440,6 @@
       setupCepHandler(byId('origem-cep'), 'origem');
       setupCepHandler(byId('destino-cep'), 'destino');
     }catch(e){ console.warn('setup CEP handlers (agendar) failed', e); }
-  }
-
-  // ====== Fluxo: DELIVERY ======
-  function initDelivery(){
-    if(document.body.dataset.page !== 'delivery') return;
-    const els = {
-      produto: byId('produto'), variacao: byId('variacao'), qtd: byId('qtd'), carrinho: byId('carrinho'),
-      add: byId('btn-add-prod'),
-      recebedor: byId('recebedor'), tel: byId('tel'),
-      rua: byId('end-rua'), numero: byId('end-numero'), bairro: byId('end-bairro'), cep: byId('end-cep'),
-      obs: byId('obs'), preResumo: byId('delivery-resumo'), btnResumo: byId('btn-ver-resumo'), btnWA: byId('btn-wa')
-    };
-  let cart = getCartFromStorage();
-
-    // Prefill from agendar draft if present
-    try{
-      const raw = localStorage.getItem('focinhos:delivery:draft');
-      if(raw){ const draft = JSON.parse(raw); if(draft){
-        if(draft.rua && !els.rua.value) els.rua.value = draft.rua;
-        if(draft.numero && !els.numero.value) els.numero.value = draft.numero;
-        if(draft.bairro && !els.bairro.value) els.bairro.value = draft.bairro;
-        if(draft.cep && !els.cep.value) els.cep.value = draft.cep;
-        if(draft.recebedor && !els.recebedor.value) els.recebedor.value = draft.recebedor;
-        if(draft.tel && !els.tel.value) els.tel.value = draft.tel;
-        if(draft.observacoes && !els.obs.value) els.obs.value = draft.observacoes;
-      } }
-    }catch(e){ console.warn('prefill delivery draft failed', e); }
-
-    function renderCart(){
-      if(!els.carrinho) return;
-      // render items without showing prices
-      els.carrinho.innerHTML = cart.map((it,idx)=>{
-        return (`<li class="cart-item" data-idx="${idx}"><div class="cart-item__main"><strong>${it.nome}</strong>${it.variacao? ` — ${it.variacao}`:''}</div><div class="cart-item__controls"><button class="item__btn qty-dec" data-act="dec" data-idx="${idx}" aria-label="Diminuir quantidade">−</button><input class="item__qty_input" type="number" min="1" value="${it.qtd}" data-idx="${idx}" aria-label="Quantidade" /><button class="item__btn qty-inc" data-act="inc" data-idx="${idx}" aria-label="Aumentar quantidade">＋</button><button class="item__btn item__remove" data-idx="${idx}" aria-label="Remover item">remover</button></div></li>`);
-      }).join('');
-      // show notice about prices being provided via WhatsApp at checkout
-      try{
-        let note = document.getElementById('__delivery-price-note');
-  if(!note){ note = document.createElement('div'); note.id = '__delivery-price-note'; note.style.marginTop='8px'; note.className='cart-note'; note.textContent = 'Detalhes e confirmações serão combinados via WhatsApp.'; els.carrinho.parentNode.insertBefore(note, els.carrinho.nextSibling); }
-      }catch(e){}
-
-      // attach listeners
-      // attach listeners
-  els.carrinho.querySelectorAll('.qty-dec').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = Math.max(1, (c[i].qtd||1) - 1); updateCartQty(i,newQ); renderCart(); }));
-  els.carrinho.querySelectorAll('.qty-inc').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; const c = getCartFromStorage(); const newQ = (c[i].qtd||1) + 1; updateCartQty(i,newQ); renderCart(); }));
-      els.carrinho.querySelectorAll('.item__qty_input').forEach(inp=> inp.addEventListener('change', (e)=>{ const i = +inp.dataset.idx; const v = Math.max(1, Number(inp.value)||1); if(v<1){ inp.value = 1; } updateCartQty(i, v); renderCart(); }));
-      els.carrinho.querySelectorAll('.item__remove').forEach(b=> b.addEventListener('click', ()=>{ const i = +b.dataset.idx; removeCartItem(i); renderCart(); }));
-    }
-
-    function listagem(){
-      return cart.map(it=> `${it.qtd}x ${it.nome}${it.variacao? ' '+it.variacao:''}`).join('\n');
-    }
-
-    on(els.add,'click', ()=>{
-      const nome = (els.produto.value||'').trim();
-      const variacao = (els.variacao.value||'').trim();
-      const qtd = parseInt(els.qtd.value||'1',10) || 1;
-      if(!nome) return;
-  cart.push({nome, variacao, qtd});
-  saveCartToStorage(cart);
-      els.produto.value=''; els.variacao.value=''; els.qtd.value='1';
-      renderCart();
-    });
-
-  // Sem botão de geo; geoloc inicia globalmente no boot
-
-    function resumoTexto(){
-      const geo = Geo.get('default');
-      const map = {
-        itensLista: listagem() || '',
-        nome: (els.recebedor.value||'').trim() || '',
-        telefone: (els.tel.value||'').trim() || '',
-  enderecoCompleto: [els.rua?.value, els.numero?.value, els.bairro?.value, byId('endereco-complemento')?.value, els.cep?.value].map(s=> (s||'').trim()).filter(Boolean).join(', '),
-        lat: geo? geo.lat.toFixed(6) : '',
-        lng: geo? geo.lng.toFixed(6) : '',
-        accuracy: geo? fmtAcc(geo.accuracy) : '',
-        timestamp: geo? fmtDT(geo.timestamp) : '',
-        observacoes: (els.obs.value||'').trim() || ''
-      };
-  try{
-    let raw = interpolate(window.CONFIG.waTemplates.delivery, map);
-    const trackTpl = window.CONFIG?.waTemplates?.deliveryTracking || '';
-    if(trackTpl){ raw += interpolate(trackTpl, map); }
-    return processMessageForPlatform(tidyMessage(raw));
-  }catch(_){ return processMessageForPlatform(tidyMessage(interpolate(window.CONFIG.waTemplates.delivery, map))); }
-    }
-
-    function validar(){
-      let ok = true;
-  if(cart.length===0){ ok=false; alert('Adicione pelo menos um produto.'); }
-  ok &= required(els.recebedor, 'Informe o nome do recebedor.');
-  ok &= required(els.tel, 'Informe um telefone válido.');
-      if(ok && !isTelBR(els.tel.value)){ setErr(els.tel,'Informe um telefone válido.'); ok=false; }
-  // exigir Rua, Nº, Bairro e CEP
-  ok &= required(els.rua, 'Informe a rua.');
-  ok &= required(els.numero, 'Informe o número.');
-  ok &= required(els.bairro, 'Informe o bairro.');
-  ok &= required(byId('endereco-complemento'), 'Informe o complemento.');
-  ok &= required(els.cep, 'Informe o CEP.');
-      return !!ok;
-    }
-
-    on(els.btnResumo,'click', ()=>{ if(els.preResumo) els.preResumo.textContent = resumoTexto(); });
-    on(els.btnWA,'click', (e)=>{
-      e.preventDefault();
-      if(!validar()){ return; }
-      const url = waLink(resumoTexto());
-      try{ if(location && (location.hostname==='localhost' || location.hostname==='127.0.0.1')) console.debug('[dev] btn-wa open ->', url); }catch(e){}
-      window.open(url, '_blank');
-      try{ els.btnWA.href = url; }catch(e){}
-    });
-
-  try{ attachCopyButton(els.btnWA && els.btnWA.parentNode || document.body, '__delivery-copy-msg', resumoTexto); }catch(e){ console.warn('attach copy (delivery) failed', e); }
-  // react to external cart changes
-  window.addEventListener('focinhos:cart:changed', ()=>{ cart = getCartFromStorage(); renderCart(); try{ autoUpdateResumo(); }catch(e){} });
-
-    // Auto-update summary when form is complete (silent validation)
-    function canAutoSummarize(){
-      try{
-        const c = getCartFromStorage();
-        if(!c || c.length===0) return false;
-        if(!(els.recebedor && (els.recebedor.value||'').trim())) return false;
-        if(!(els.tel && isTelBR(els.tel.value))) return false;
-        const requiredFilled = [els.rua, els.numero, els.bairro, els.cep].every(el=> !!el && (el.value||'').trim());
-        if(!requiredFilled) return false;
-        return true;
-      }catch(_){ return false; }
-    }
-
-    const autoUpdateResumo = debounce(()=>{
-      try{
-        if(!els.preResumo) return;
-        if(canAutoSummarize()){
-          const txt = resumoTexto();
-          els.preResumo.textContent = txt;
-          try{ if(els.btnWA) els.btnWA.href = waLink(txt); }catch(e){}
-        }
-      }catch(e){ /* silent */ }
-    }, 300);
-
-    // Bind auto-update on inputs
-    try{
-      const formEl = byId('form-delivery') || document.querySelector('form');
-      if(formEl){ formEl.addEventListener('input', autoUpdateResumo, { passive:true }); formEl.addEventListener('change', autoUpdateResumo, { passive:true }); }
-      setTimeout(autoUpdateResumo, 50);
-    }catch(e){ /* ignore */ }
-
-    // Save minimal delivery draft (address/contact) on changes
-    try{
-      const DELIV_DRAFT_KEY = 'focinhos:delivery:draft';
-      const saveDraft = debounce(()=>{
-        try{
-          const d = {
-            rua: els.rua?.value || '',
-            numero: els.numero?.value || '',
-            bairro: els.bairro?.value || '',
-            cep: els.cep?.value || '',
-            recebedor: els.recebedor?.value || '',
-            tel: els.tel?.value || '',
-            observacoes: els.obs?.value || ''
-          };
-          localStorage.setItem(DELIV_DRAFT_KEY, JSON.stringify(d));
-        }catch(e){ /* ignore */ }
-      }, 300);
-      ['recebedor','tel','end-rua','end-numero','end-bairro','end-cep','obs'].forEach(id=>{
-        const el = byId(id); if(!el) return;
-        el.addEventListener('input', saveDraft, { passive:true });
-        el.addEventListener('change', saveDraft, { passive:true });
-      });
-    }catch(e){ console.warn('delivery draft save bind failed', e); }
-
-    // Setup CEP lookup for delivery
-    try{
-      setupCepHandler(els.cep, 'end');
-    }catch(e){ console.warn('setup CEP handler (delivery) failed', e); }
   }
 
   // ====== Fluxo: TÁXI ======
@@ -1971,7 +1858,7 @@
   }
 
   // Boot
-  document.addEventListener('DOMContentLoaded', ()=>{
+  const boot = ()=>{
     // Load dynamic config first (network-first). If fetch fails, fall back to any inline `window.CONFIG`.
     (async ()=>{
       try{
@@ -1987,7 +1874,7 @@
         if(resp && resp.ok){ const json = await resp.json(); window.CONFIG = Object.assign(window.CONFIG || {}, json); }
       }catch(e){ console.warn('config.json fetch failed, using inline CONFIG if present', e); }
       // Run each init inside try/catch so a failure in one doesn't stop others
-  [initNav, bindConfig, initAgendar, initDelivery, initTaxi, initCartPanel, initCartModal, initInstallPrompt, initSW].forEach(fn=>{
+  [initNav, bindConfig, initAgendar, initTaxi, initCartPanel, initCartModal, initInstallPrompt, initSW].forEach(fn=>{
         try{ if(typeof fn === 'function') fn(); }catch(err){ console.error('[init error]', err); }
       });
       try{ initFormPersistence(); }catch(e){ console.warn('initFormPersistence failed', e); }
@@ -1998,7 +1885,14 @@
     window.addEventListener('error', (ev)=>{
       try{ console.error('Unhandled error:', ev.error || ev.message || ev); }catch(e){}
     });
-  });
+  };
+
+  // If DOM is ready, run boot immediately; else wait for DOMContentLoaded
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 
   // Reload the page when a new service worker takes control to ensure users get the latest UI
   if('serviceWorker' in navigator){
