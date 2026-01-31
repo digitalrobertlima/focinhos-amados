@@ -84,28 +84,6 @@ window.CONFIG = {
   agendarTracking:
 `\n—\nTracking\nOrigem: {origemLat},{origemLng} • ±{origemAccuracy}m @ {origemTimestamp}\nDestino: {destinoLat},{destinoLng} • ±{destinoAccuracy}m @ {destinoTimestamp}`,
 
-    delivery:
-`📦 *DELIVERY* — FOCINHOS AMADOS (BH)
-
-📋 *Itens*  
-{itensLista}
-
-👤 *Recebedor*  
-{nome} • 📞 {telefone}
-
-📍 *Endereço*  
-{enderecoCompleto}  
-
-📝 *Observações*  
-{observacoes}
-
-🏪 *Loja física*
-{enderecoLoja}`,
-
-  // Tracking técnico (apêndice) para o template Delivery
-  deliveryTracking:
-`\n—\nTracking\nEntrega: {lat},{lng} • ±{accuracy}m @ {timestamp}`,
-
     taxiBanho:
 `🚕 *TÁXI DOG — BANHO/TOSA* (BH)
 
