@@ -684,7 +684,9 @@
 
   // ====== Fluxo: AGENDAR ======
   function initAgendar(){
+    console.log('[initAgendar] called. page:', document.body.dataset.page);
     if(document.body.dataset.page !== 'agendar') return;
+    console.log('[initAgendar] running on agendar page');
     // Elementos estáticos
     const f = {
       tutorNome: byId('tutorNome'), tutorTelefone: byId('tutorTelefone'),
@@ -709,6 +711,7 @@
   const petsContainer = byId('pets');
     const tplPet = byId('tpl-pet');
     const btnAddPet = byId('btn-add-pet');
+  console.log('[agendar] btnAddPet element:', btnAddPet, 'selector found?', !!document.getElementById('btn-add-pet'));
   console.debug('[agendar] init elements', { btnAddPet: !!btnAddPet, tplPet: !!tplPet, petsCount: (petsContainer? petsContainer.querySelectorAll('.pet').length:0) });
   const modalidadeEls = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']"));
     const fieldOrigem = byId('field-origem');
