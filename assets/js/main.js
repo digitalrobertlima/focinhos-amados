@@ -952,6 +952,7 @@
         const valOk = (v)=> !!v && String(v).trim() !== '-' && String(v).trim() !== '';
         const details = [];
         if(valOk(p.especie)) details.push(`Espécie: ${p.especie}`);
+        if(valOk(p.genero)) details.push(`Gênero: ${p.genero}`);
         if(valOk(p.porte)) details.push(`Porte: ${p.porte}`);
         if(valOk(p.pelagem)) details.push(`Pelagem: ${p.pelagem}`);
         if(valOk(p.temperamento)) details.push(`Temperamento: ${p.temperamento}`);
