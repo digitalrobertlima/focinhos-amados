@@ -1,3 +1,9 @@
+## 0.4.1
+- Tela de data: botão "Escolher outra data" (calendário do celular, até 90 dias), recusando domingos, dias fechados e datas passadas.
+- Botões sazonais configuráveis (`booking.seasonal` no config.json). Primeiro: "🎄 Banho de Natal" com os dias de dezembro até a véspera. Some sozinho depois da data ou com `"ativo": false`.
+- Dias fechados (`booking.closedDates`): 25/12 e 01/01.
+- A mensagem do WhatsApp marca quando o banho é da campanha de Natal.
+
 ## 0.4.0
 - Fidelidade sem servidor: selos assinados digitalmente (ECDSA P-256, WebCrypto).
   - `painel.html` (só para a loja): cria a chave da loja no celular da dona, dá selo de banho, entrega a hidratação e manda o selo pelo WhatsApp. Cópia de segurança da chave em arquivo.

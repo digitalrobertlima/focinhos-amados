@@ -37,7 +37,7 @@
   /* ---------------- Regras de horário ---------------- */
   function regras() {
     return Object.assign({
-      closedWeekdays: [0], arrivalTimes: ['13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'], minLeadMinutes: 30, askForVideo: true, petsAtSameTime: 2, tosasAtSameTime: 1, busy: {},
+      closedWeekdays: [0], arrivalTimes: ['13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'], minLeadMinutes: 30, askForVideo: true, petsAtSameTime: 2, tosasAtSameTime: 1, busy: {}, closedDates: [], maxDaysAhead: 90, seasonal: [],
     }, (window.CONFIG && window.CONFIG.booking) || {});
   }
   /* Capacidade: no máximo `petsAtSameTime` cães por horário e `tosasAtSameTime` tosa por horário.
@@ -72,7 +72,9 @@
   }
   function horariosDo(dia, ref = new Date()) {
     const d = FA.lerYmd(dia); const r = regras();
-    if (!d || r.closedWeekdays.includes(d.getDay())) return [];
+    if (!d || r.closedWeekdays.includes(d.getDay()) || (r.closedDates || []).includes(dia)) return [];
+    const hojeRef = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate());
+    if (d < hojeRef || (d - hojeRef) / 864e5 > (Number(r.maxDaysAhead) || 90)) return [];
     let hs = r.arrivalTimes.slice();
     if (dia === FA.ymd(ref)) {
       const limite = ref.getHours() * 60 + ref.getMinutes() + (Number(r.minLeadMinutes) || 0);
@@ -87,6 +89,26 @@
     const pl = planoAtual();
     if (pl.every((h) => h === pl[0])) return pl[0];
     return S.pets.map((p, i) => `${(p.nome || 'Pet').trim()} ${pl[i]}`).join(' • ');
+  }
+  /* Campanhas sazonais (ex.: Natal). Ficam no config.json → booking.seasonal.
+     Para tirar o botão: "ativo": false, ou apague o item. Ele também some sozinho depois de "mostrarAte". */
+  function campanhaAtiva(ref = new Date()) {
+    const hoje = FA.ymd(ref);
+    return (regras().seasonal || []).find((c) => c && c.ativo !== false && (!c.mostrarDe || hoje >= c.mostrarDe) && (!c.mostrarAte || hoje <= c.mostrarAte)) || null;
+  }
+  function campanhaDoDia(dia) {
+    return (regras().seasonal || []).find((c) => c && c.ativo !== false && c.datasDe && c.datasAte && dia >= c.datasDe && dia <= c.datasAte) || null;
+  }
+  function diasEntre(de, ate) {
+    const out = []; const d0 = FA.lerYmd(de); const d1 = FA.lerYmd(ate); if (!d0 || !d1) return out;
+    for (let d = new Date(d0); d <= d1 && out.length < 62; d.setDate(d.getDate() + 1)) {
+      const y = FA.ymd(d); if (horariosDo(y).length) out.push({ y, d: new Date(d) });
+    }
+    return out;
+  }
+  function botaoDia({ y, d }, hoje, amanha) {
+    return `<button type="button" class="dia" role="radio" data-dia="${y}" aria-checked="${S.dia === y}" aria-label="${FA.dataLonga(y)}">
+              <span>${FA.DIAS_CURTOS[d.getDay()]}</span><b>${d.getDate()}</b><em>${y === hoje ? 'hoje' : y === amanha ? 'amanhã' : FA.MESES[d.getMonth()]}</em></button>`;
   }
   function proximosDias(qtd = 6) {
     const out = []; const hoje = new Date();
@@ -307,15 +329,55 @@
         const dias = proximosDias(6);
         const hoje = FA.ymd(new Date());
         const amanha = FA.ymd(new Date(Date.now() + 864e5));
+        // dia escolhido fora das sugestões continua aparecendo marcado
+        if (S.dia && horariosDo(S.dia).length && !dias.some((x) => x.y === S.dia)) dias.push({ y: S.dia, d: FA.lerYmd(S.dia) });
+        const c = campanhaAtiva();
+        const diasC = c ? diasEntre(c.datasDe > hoje ? c.datasDe : hoje, c.datasAte) : [];
+        const r = regras();
+        const max = FA.ymd(new Date(Date.now() + (Number(r.maxDaysAhead) || 90) * 864e5));
         return {
           fig: 'calendario', pergunta: 'Que dia fica bom?', dica: 'De segunda a sábado, à tarde.',
-          corpo: `<div class="dias" role="radiogroup" aria-label="Dia">${dias.map(({ y, d }) => `
-            <button type="button" class="dia" role="radio" data-dia="${y}" aria-checked="${S.dia === y}" aria-label="${FA.dataLonga(y)}">
-              <span>${FA.DIAS_CURTOS[d.getDay()]}</span><b>${d.getDate()}</b><em>${y === hoje ? 'hoje' : y === amanha ? 'amanhã' : FA.MESES[d.getMonth()]}</em></button>`).join('')}</div>`,
+          corpo: `${c && diasC.length ? `<button type="button" class="sazonal" id="btn-sazonal" aria-expanded="false">
+              <span class="sazonal-icone" aria-hidden="true">${esc(c.icone || '✨')}</span>
+              <span><b>${esc(c.titulo)}</b><small>${esc(c.subtitulo || '')}</small></span></button>
+            <div class="sazonal-dias" id="sazonal-dias" hidden>
+              <p class="sazonal-dica">${esc(c.dica || 'Escolha o dia:')}</p>
+              <div class="dias" role="radiogroup" aria-label="${esc(c.titulo)}">${diasC.map((x) => botaoDia(x, hoje, amanha)).join('')}</div>
+            </div>` : ''}
+            <div class="dias" role="radiogroup" aria-label="Próximos dias">${dias.map((x) => botaoDia(x, hoje, amanha)).join('')}</div>
+            <button type="button" class="outra-data" id="btn-outra-data">📅 Escolher outra data</button>
+            <div class="campo" id="outra-data" hidden>
+              <label for="f-data">Qual data você prefere?</label>
+              <input id="f-data" class="entrada" type="date" min="${hoje}" max="${max}" value="${S.dia && !dias.slice(0, 6).some((x) => x.y === S.dia) ? S.dia : ''}">
+              <p class="erro" id="data-erro" role="status"></p>
+            </div>`,
           ligar(tela) {
+            const escolher = (y) => { if (S.dia !== y) S.hora = ''; S.dia = y; avancarLogo(); };
             tela.querySelectorAll('[data-dia]').forEach((b) => b.addEventListener('click', () => {
-              marcar(b, 'aria-checked'); if (S.dia !== b.dataset.dia) S.hora = ''; S.dia = b.dataset.dia; avancarLogo();
+              tela.querySelectorAll('[data-dia]').forEach((x) => x.setAttribute('aria-checked', String(x.dataset.dia === b.dataset.dia)));
+              FA.vibrar(8); escolher(b.dataset.dia);
             }));
+            const bs = tela.querySelector('#btn-sazonal');
+            if (bs) bs.addEventListener('click', () => {
+              const box = tela.querySelector('#sazonal-dias'); box.hidden = !box.hidden;
+              bs.setAttribute('aria-expanded', String(!box.hidden));
+              if (!box.hidden) box.scrollIntoView({ behavior: FA.reduzMovimento() ? 'auto' : 'smooth', block: 'nearest' });
+            });
+            tela.querySelector('#btn-outra-data').addEventListener('click', () => {
+              const box = tela.querySelector('#outra-data'); box.hidden = false;
+              const inp = tela.querySelector('#f-data'); inp.focus();
+              try { if (inp.showPicker) inp.showPicker(); } catch (_) { /* alguns navegadores não deixam */ }
+            });
+            tela.querySelector('#f-data').addEventListener('change', (e) => {
+              const y = e.target.value; const err = tela.querySelector('#data-erro');
+              const d = FA.lerYmd(y); if (!d) return;
+              if (y < hoje) { err.textContent = 'Essa data já passou.'; return; }
+              if (y > max) { err.textContent = 'Dá pra agendar com até 3 meses de antecedência.'; return; }
+              if (r.closedWeekdays.includes(d.getDay())) { err.textContent = 'Domingo a gente não abre. Escolha outro dia.'; return; }
+              if ((r.closedDates || []).includes(y)) { err.textContent = 'Nesse dia a loja não abre. Escolha outro dia.'; return; }
+              if (!horariosDo(y).length) { err.textContent = 'Esse dia não tem mais horário. Escolha outro.'; return; }
+              err.textContent = ''; escolher(y);
+            });
           },
         };
       },
@@ -513,7 +575,7 @@
     const r = regras();
     const map = {
       petsLista: linhasPet,
-      dataPreferida: FA.dataLonga(S.dia).replace(/^./, (c) => c.toUpperCase()),
+      dataPreferida: FA.dataLonga(S.dia).replace(/^./, (c) => c.toUpperCase()) + (campanhaDoDia(S.dia) ? ` ${campanhaDoDia(S.dia).icone || ''} (${campanhaDoDia(S.dia).titulo})` : ''),
       janela: textoHora(),
       transporte: textoTransporte(),
       tutorNome: S.tutor.nome.trim(),
@@ -752,7 +814,7 @@
   }
 
   // Para testes automatizados
-  window.__faAgendar = { estado: () => S, tela: () => atual().id, mensagem: mensagemZap, horariosDo, planejar, textoHora };
+  window.__faAgendar = { estado: () => S, tela: () => atual().id, mensagem: mensagemZap, horariosDo, planejar, textoHora, campanhaAtiva };
 
   if (FA.pronto) iniciar(); else document.addEventListener('fa:pronto', iniciar, { once: true });
 })();

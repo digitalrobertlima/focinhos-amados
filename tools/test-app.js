@@ -133,11 +133,26 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     await esperaTela('saude'); await tocar('Não');
     await esperaTela('outroPet'); await tocar('Não, só');
     await esperaTela('dia');
-    const dias = await page.$$eval('[data-dia]', (bs) => bs.map((b) => b.dataset.dia));
+    const dias = await page.$$eval('[aria-label="Próximos dias"] [data-dia]', (bs) => bs.map((b) => b.dataset.dia));
     certo(dias.length === 6, 'deveria mostrar 6 dias');
     certo(dias.every((d) => new Date(d + 'T12:00:00').getDay() !== 0), 'domingo apareceu: ' + dias);
-    await page.click('[data-dia]');
+    const saz = await page.evaluate(() => ({ ativa: !!window.__faAgendar.campanhaAtiva(), botao: !!document.getElementById('btn-sazonal') }));
+    certo(saz.ativa === saz.botao, 'botão sazonal: ' + JSON.stringify(saz));
+    if (saz.botao) { await page.click('#btn-sazonal'); certo(await page.$eval('#sazonal-dias', (e) => !e.hidden && e.querySelectorAll('[data-dia]').length > 0), 'dias sazonais'); }
+    // escolher outra data pelo calendário: um domingo é recusado, uma data livre avança
+    await page.click('#btn-outra-data');
+    const alvo = await page.evaluate(() => {
+      const d = new Date(); d.setDate(d.getDate() + 10); const dom = new Date(d); while (dom.getDay() !== 0) dom.setDate(dom.getDate() + 1);
+      while (d.getDay() === 0) d.setDate(d.getDate() + 1);
+      const inp = document.getElementById('f-data');
+      inp.value = FA.ymd(dom); inp.dispatchEvent(new Event('change'));
+      const erro = document.getElementById('data-erro').textContent;
+      inp.value = FA.ymd(d); inp.dispatchEvent(new Event('change'));
+      return { y: FA.ymd(d), erro };
+    });
+    certo(/Domingo/.test(alvo.erro), 'domingo pelo calendário: ' + alvo.erro);
     await esperaTela('hora');
+    certo((await page.evaluate(() => window.__faAgendar.estado().dia)) === alvo.y, 'data escolhida no calendário');
     const horas = await page.$$eval('[data-hora]', (bs) => bs.map((b) => b.dataset.hora));
     certo(horas.every((h) => h >= '13:30' && h <= '18:00'), 'hora fora da regra: ' + horas);
     await page.click('[data-hora]');
@@ -213,14 +228,14 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     await esperaTela('acessorio'); await tocar('Nenhum');
     await esperaTela('saude'); await tocar('Não');
     await esperaTela('outroPet'); await tocar('Não, só');
-    await esperaTela('dia'); await page.click('[data-dia]');
+    await esperaTela('dia'); await page.click('[aria-label="Próximos dias"] [data-dia]');
     await esperaTela('hora'); await page.click('[data-hora]');
     await esperaTela('vem'); await tocar('Eu levo');
     await esperaTela('tutorNome'); await digitar('#f-tutor', 'Rob'); await continuar();
     await esperaTela('tutorTel'); await page.type('#f-tel', '31977776666'); await continuar();
     await esperaTela('revisao');
     await page.click('[data-editar="dia"]');
-    await esperaTela('dia'); await page.click('[data-dia]:nth-child(2)');
+    await esperaTela('dia'); await page.click('[aria-label="Próximos dias"] [data-dia]:nth-child(2)');
     await esperaTela('hora'); await page.click('[data-hora]:last-child');
     await esperaTela('revisao');
     const r = await page.evaluate(() => window.__faAgendar.estado());
@@ -319,6 +334,31 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     certo(outro.n === 0 && /outro número/.test(outro.aviso), 'selo de outro número aceito: ' + JSON.stringify(outro));
     pubTeste = null; await page.setBypassServiceWorker(false);
     return { tamanhoToken: token.length };
+  });
+
+
+  await caso('data: escolher outra data, domingo/feriado recusados, botão sazonal liga e desliga', async () => {
+    await page.goto(BASE + '/agendar.html?novo=1', { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => window.__faAgendar);
+    const r = await page.evaluate(() => {
+      const A = window.__faAgendar; const C = window.CONFIG.booking;
+      const hoje = new Date(); const y = (d) => FA.ymd(d);
+      const em = (n) => new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + n);
+      let dom = em(1); while (dom.getDay() !== 0) dom = new Date(dom.getTime() + 864e5);
+      let seg = em(20); while (seg.getDay() === 0) seg = new Date(seg.getTime() + 864e5);
+      C.closedDates = [y(seg)];
+      const out = { domingo: A.horariosDo(y(dom)).length, feriado: A.horariosDo(y(seg)).length, longe: A.horariosDo(y(em(200))).length };
+      C.closedDates = [];
+      C.seasonal = [{ ativo: true, titulo: 'Banho de Natal', icone: '🎄', mostrarDe: y(em(-1)), mostrarAte: y(em(30)), datasDe: y(em(1)), datasAte: y(em(20)) }];
+      out.ativa = !!A.campanhaAtiva();
+      C.seasonal[0].ativo = false; out.desligada = !A.campanhaAtiva();
+      C.seasonal[0].ativo = true; C.seasonal[0].mostrarAte = y(em(-1)); out.vencida = !A.campanhaAtiva();
+      C.seasonal[0].mostrarAte = y(em(30));
+      return out;
+    });
+    certo(r.domingo === 0 && r.feriado === 0 && r.longe === 0, 'dias fechados: ' + JSON.stringify(r));
+    certo(r.ativa && r.desligada && r.vencida, 'campanha: ' + JSON.stringify(r));
+    return r;
   });
 
   await caso('sobre: apagar meus dados', async () => {

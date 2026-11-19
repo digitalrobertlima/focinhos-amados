@@ -405,3 +405,16 @@ textarea.entrada{ min-height: 120px; font-size: 1.1rem; font-weight: 600; resize
   .marca small{ display: none; }
   .status{ font-size: .72rem; padding: 6px 9px; }
 }
+
+/* Data: botão sazonal e "outra data" */
+.sazonal{ width: 100%; margin-top: 18px; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 16px; border: 0; border-radius: 20px; color: #fff; text-align: left; font: inherit; cursor: pointer;
+  background: linear-gradient(135deg, #c62828, #8e1b1b 60%, #0f6b34); box-shadow: 0 10px 22px -12px rgba(198, 40, 40, .8); touch-action: manipulation; }
+.sazonal b{ display: block; font-size: 1.08rem; font-weight: 900; }
+.sazonal small{ display: block; opacity: .92; font-size: .85rem; }
+.sazonal-icone{ font-size: 1.9rem; filter: drop-shadow(0 3px 4px rgba(0,0,0,.3)); }
+.sazonal[aria-expanded="true"]{ outline: 3px solid #ffd54f; outline-offset: 2px; }
+.sazonal-dias{ margin-top: 10px; padding: 12px; border-radius: 20px; background: #fff6f6; border: 2px dashed #e57373; }
+.sazonal-dias .dias{ margin-top: 8px; }
+.sazonal-dica{ font-weight: 800; color: #8e1b1b; text-align: center; }
+.outra-data{ display: block; width: 100%; margin-top: 14px; min-height: 52px; border-radius: 16px; border: 2px dashed var(--linha); background: transparent; font: inherit; font-weight: 800; color: var(--verde-escuro); cursor: pointer; }
+#outra-data{ margin-top: 12px; }
