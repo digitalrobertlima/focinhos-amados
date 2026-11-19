@@ -26,6 +26,7 @@ function servir() {
   });
 }
 
+let pubTeste = null; // chave pública injetada no config.json durante o teste dos selos
 const resultados = [];
 async function caso(nome, fn) {
   try { const r = await fn(); resultados.push({ nome, ok: true }); console.log(`[OK] ${nome}${r ? ' — ' + JSON.stringify(r) : ''}`); }
@@ -49,6 +50,10 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     if (u.includes('viacep.com.br/ws/30140071')) return r.respond({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ logradouro: 'Rua da Bahia', bairro: 'Centro', localidade: 'Belo Horizonte' }) });
     if (u.includes('viacep.com.br')) return r.respond({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: '{"erro":true}' });
     if (!u.startsWith(BASE)) return r.abort();
+    if (pubTeste && new URL(u).pathname === '/config.json') {
+      const j = JSON.parse(fs.readFileSync(path.join(raiz, 'config.json'), 'utf8')); j.loyalty.publicKey = pubTeste;
+      return r.respond({ status: 200, contentType: 'application/json', body: JSON.stringify(j) });
+    }
     r.continue();
   });
   await page.evaluateOnNewDocument(() => { window.open = (u) => { window.__aberto = u; return null; }; });
@@ -87,7 +92,7 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
 
   await caso('alvos de toque >= 44px (home e fidelidade)', async () => {
     const pequenos = [];
-    for (const url of ['/', '/fidelidade.html']) {
+    for (const url of ['/', '/fidelidade.html', '/painel.html']) {
       await page.goto(BASE + url, { waitUntil: 'networkidle0' });
       pequenos.push(...await page.evaluate(() => [...document.querySelectorAll('a.btn, button, .abas a, .cofre-palco')].filter((e) => e.offsetParent).map((e) => {
         const r = e.getBoundingClientRect(); return { t: e.textContent.trim().slice(0, 20), h: Math.round(r.height), w: Math.round(r.width) };
@@ -241,7 +246,7 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     await page.click('#cofre');
     await page.waitForFunction(() => document.getElementById('cofre').classList.contains('aberto'), { timeout: 3000 });
     const r = await page.evaluate(() => ({ cheios: document.querySelectorAll('.carimbo.cheio').length, breve: document.querySelector('.em-breve').textContent, cripto: /criptomoedas/.test(document.body.textContent) }));
-    certo(r.cheios === 2, 'carimbos: ' + r.cheios);
+    certo(r.cheios === 0, 'agendar não pode dar selo: ' + r.cheios);
     certo(await page.evaluate(() => /3 banhos|Hidratação/i.test(document.body.textContent) && document.querySelectorAll('.nivel.misterio').length >= 1), 'trilha: hidratação + misteriosa');
     certo(/breve/i.test(r.breve) && r.cripto, 'texto em breve/cripto');
     return r;
@@ -276,6 +281,44 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     const html = await page.evaluate(() => window.__faAgendar.mensagem.toString());
     certo(/1 minuto/.test(html) && !/20 segundos/.test(html), 'vídeo de 1 minuto');
     return r;
+  });
+
+
+  await caso('selos sem servidor: painel assina, cliente guarda, falsificação e outro número recusados', async () => {
+    await page.setBypassServiceWorker(true); // o SW buscaria o config.json sem passar pela injeção da chave de teste
+    await page.goto(BASE + '/painel.html', { waitUntil: 'networkidle0' });
+    await page.evaluate(() => localStorage.clear()); await page.reload({ waitUntil: 'networkidle0' });
+    await page.click('#btn-criar');
+    await page.waitForFunction(() => !document.getElementById('com-chave').hidden);
+    pubTeste = await page.evaluate(() => window.__faPainel.ler().pub);
+    certo(!JSON.stringify(pubTeste).includes('"d"'), 'chave pública não pode ter parte privada');
+    await page.reload({ waitUntil: 'networkidle0' });
+    await page.type('#p-tel', '31 98888-7777'); await page.type('#p-nome', 'Thor');
+    for (let k = 0; k < 3; k++) { await page.click('#btn-banho'); await page.waitForFunction((n) => (window.__faPainel.ler().clientes['31988887777'] || {}).n === n, {}, k + 1); }
+    const zap = await page.$eval('#btn-enviar', (a) => a.href);
+    certo(zap.startsWith('https://wa.me/5531988887777?text=') && decodeURIComponent(zap).includes('hidratação'), 'link do whatsapp: ' + zap.slice(0, 60));
+    const token = await page.evaluate(() => window.__faPainel.ler().clientes['31988887777'].ult);
+    certo(!(await page.$eval('#btn-resgate', (b) => b.disabled)), 'resgate deveria liberar com 3 banhos');
+
+    // cliente recebe o link (perfil já tem o telefone do agendamento)
+    await page.evaluate(() => { localStorage.removeItem('fa:painel:v1'); localStorage.setItem('fa:perfil:v1', JSON.stringify({ tutor: { nome: 'Ana', tel: '(31) 98888-7777' }, pets: [] })); });
+    await page.goto(BASE + '/fidelidade.html#selo=' + token, { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => (window.__faSelo.ler().n || 0) === 3, { timeout: 4000 });
+    const r = await page.evaluate(() => ({ url: location.hash, aviso: document.getElementById('selo-aviso').textContent, cheios: document.querySelectorAll('.carimbo.cheio').length, aberto: !!document.querySelector('.nivel.aberto') }));
+    certo(!r.url && r.cheios === 3 && r.aberto, 'trilha: ' + JSON.stringify(r));
+
+    // selo adulterado (n=99) é recusado
+    const [c, sg] = token.split('.');
+    const falso = Buffer.from(Buffer.from(c, 'base64url').toString().replace('"n":3', '"n":99')).toString('base64url') + '.' + sg;
+    await page.evaluate((t) => window.__faSelo.receber(t), falso);
+    certo((await page.evaluate(() => window.__faSelo.ler().n)) === 3, 'selo falso aceito');
+    // selo de outro número é recusado
+    await page.evaluate(() => localStorage.setItem('fa:selo:v1', JSON.stringify({ tel: '31977776666' })));
+    await page.evaluate((t) => window.__faSelo.receber(t), token);
+    const outro = await page.evaluate(() => ({ n: window.__faSelo.ler().n || 0, aviso: document.getElementById('selo-aviso').textContent }));
+    certo(outro.n === 0 && /outro número/.test(outro.aviso), 'selo de outro número aceito: ' + JSON.stringify(outro));
+    pubTeste = null; await page.setBypassServiceWorker(false);
+    return { tamanhoToken: token.length };
   });
 
   await caso('sobre: apagar meus dados', async () => {

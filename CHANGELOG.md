@@ -1,3 +1,11 @@
+## 0.4.0
+- Fidelidade sem servidor: selos assinados digitalmente (ECDSA P-256, WebCrypto).
+  - `painel.html` (só para a loja): cria a chave da loja no celular da dona, dá selo de banho, entrega a hidratação e manda o selo pelo WhatsApp. Cópia de segurança da chave em arquivo.
+  - O cliente se identifica só pelo celular (sem login, sem CPF, sem senha). O selo é cumulativo e só vale para o número dele.
+  - O app confere a assinatura com `config.json → loyalty.publicKey`. Selos adulterados ou de outro número são recusados.
+  - Agendar não dá mais selo: o selo só vem depois do banho feito.
+- Vibração só depois de um toque (evita aviso do navegador).
+
 ## 0.3.1
 - Vídeo: pedimos pelo menos 1 minuto.
 - Horários de chegada agora vão até 18:00 (novos: 17:30 e 18:00).

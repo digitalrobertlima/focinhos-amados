@@ -1,14 +1,14 @@
 /* Focinhos Amados — Service Worker
    HTML e config: rede primeiro (sempre atualizado). Estáticos: cache primeiro, atualizando em segundo plano. */
 const SW_URL = new URL(self.location.href);
-const V = SW_URL.searchParams.get('v') || '0.3.1';
+const V = SW_URL.searchParams.get('v') || '0.4.0';
 const CACHE = `fa-static-${V}`;
 const q = `?v=${V}`;
 const ESTATICOS = [
-  './', './index.html', './agendar.html', './fidelidade.html', './sobre.html', './404.html',
+  './', './index.html', './agendar.html', './fidelidade.html', './sobre.html', './404.html', './painel.html',
   './assets/css/app.css' + q,
   './assets/js/ilustracoes.js' + q, './assets/js/config.js' + q, './assets/js/core.js' + q,
-  './assets/js/agendar.js' + q, './assets/js/inicio.js' + q, './assets/js/fidelidade.js' + q, './assets/js/sobre.js' + q,
+  './assets/js/agendar.js' + q, './assets/js/inicio.js' + q, './assets/js/fidelidade.js' + q, './assets/js/sobre.js' + q, './assets/js/selo.js' + q, './assets/js/painel.js' + q,
   './assets/img/logo.png', './assets/img/pwa-192.png', './assets/img/pwa-512.png',
   './assets/img/gallery-pet-1.webp', './assets/img/gallery-pet-2.webp', './assets/img/gallery-pet-3.webp', './assets/img/gallery-pet-4.webp',
   './manifest.webmanifest',

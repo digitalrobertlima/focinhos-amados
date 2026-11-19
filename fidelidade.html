@@ -19,7 +19,7 @@
   <meta property="og:image" content="assets/img/gallery-pet-1.webp">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.3.1">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.4.0">
 </head>
 <body data-page="fidelidade">
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
@@ -52,8 +52,21 @@
     <section class="secao">
       <div class="cartao">
         <h2 style="font-size:1.15rem;font-weight:900">Sua trilha</h2>
-        <p class="muted pequeno" style="margin-top:4px" id="cartao-texto">Cada banho vira um carimbo. Com 3, você ganha uma hidratação de brinde.</p>
+        <p class="muted pequeno" style="margin-top:4px" id="cartao-texto">Cada banho vira um selo. Com 3, você ganha uma hidratação de brinde.</p>
+        <p class="selo-aviso" id="selo-aviso" role="status" hidden></p>
+        <form class="selo-tel" id="form-tel" hidden novalidate>
+          <label for="f-tel-selo">Qual é o seu celular? <small>O mesmo do WhatsApp. É ele que guarda seus selos.</small></label>
+          <input id="f-tel-selo" class="entrada" type="tel" inputmode="tel" autocomplete="tel" placeholder="(31) 9 0000-0000">
+          <button type="submit" class="btn btn-principal btn-largo">Confirmar</button>
+        </form>
         <ol class="trilha" id="trilha" aria-label="Trilha de fidelidade"></ol>
+        <p class="muted pequeno" id="selo-numero" style="margin-top:10px" hidden></p>
+        <details class="colar-selo">
+          <summary>Recebeu um selo e ele não apareceu?</summary>
+          <label class="sr-only" for="f-selo">Link do selo</label>
+          <input id="f-selo" class="entrada" placeholder="Cole aqui o link do selo" autocomplete="off">
+          <button type="button" class="btn btn-claro btn-largo" id="btn-colar-selo">Adicionar selo</button>
+        </details>
       </div>
       <div class="cartao">
         <h2 style="font-size:1.15rem;font-weight:900">Seja avisado primeiro</h2>
@@ -61,11 +74,11 @@
         <button type="button" class="btn btn-principal btn-largo" id="btn-instalar" style="margin-top:14px">Instalar o app</button>
         <p class="muted pequeno" id="ja-instalado" hidden style="margin-top:10px">✓ O app já está instalado neste celular.</p>
       </div>
-      <p class="muted pequeno" style="margin:14px 4px 0">As regras e os prêmios ainda serão divulgados. Nada aqui é investimento nem promessa de valor. Os carimbos ficam salvos só neste celular por enquanto.</p>
+      <p class="muted pequeno" style="margin:14px 4px 0">As regras e os prêmios ainda serão divulgados. Nada aqui é investimento nem promessa de valor. Seus selos ficam no seu celular: depois de cada banho, a Focinhos manda o selo atualizado pelo WhatsApp, é só tocar no link.</p>
     </section>
     <footer class="rodape">
       <p>Focinhos Amados · <span data-bind="cidade">Belo Horizonte/MG</span></p>
-      <p><a href="sobre.html#privacidade">Privacidade</a> · versão <span data-bind="versao">v0.3.1</span></p>
+      <p><a href="sobre.html#privacidade">Privacidade</a> · versão <span data-bind="versao">v0.4.0</span></p>
     </footer>
   </main>
   <nav class="abas" aria-label="Menu principal">
@@ -76,10 +89,11 @@
       <li><a href="sobre.html" data-aba="sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>Sobre</a></li>
     </ul>
   </nav>
-  <script src="assets/js/pixel.js?v=0.3.1" defer></script>
-  <script src="assets/js/ilustracoes.js?v=0.3.1" defer></script>
-  <script src="assets/js/config.js?v=0.3.1" defer></script>
-  <script src="assets/js/core.js?v=0.3.1" defer></script>
-  <script src="assets/js/fidelidade.js?v=0.3.1" defer></script>
+  <script src="assets/js/pixel.js?v=0.4.0" defer></script>
+  <script src="assets/js/ilustracoes.js?v=0.4.0" defer></script>
+  <script src="assets/js/config.js?v=0.4.0" defer></script>
+  <script src="assets/js/core.js?v=0.4.0" defer></script>
+  <script src="assets/js/selo.js?v=0.4.0" defer></script>
+  <script src="assets/js/fidelidade.js?v=0.4.0" defer></script>
 </body>
 </html>

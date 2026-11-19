@@ -1,7 +1,7 @@
 /* Configuração padrão — Focinhos Amados (BH)
    O arquivo config.json (editável) sobrescreve estes valores. Disponível em window.CONFIG */
 window.CONFIG = {
-  appVersion: "v0.3.1",
+  appVersion: "v0.4.0",
   business: {
     name: "Focinhos Amados",
     city: "Belo Horizonte/MG",
@@ -17,6 +17,7 @@ window.CONFIG = {
     petsAtSameTime: 2,
     askForVideo: true
   },
+  loyalty: { publicKey: null },
   payments: { pixKey: "", pixKeyType: "", pixHolder: "", depositNote: "" },
   waTemplates: {
     agendar: "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Chegada: {janela}\n\n🚕 *Como vem*\n{transporte}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}{videoNota}"

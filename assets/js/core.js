@@ -13,7 +13,7 @@
   const byId = (id) => document.getElementById(id);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const reduzMovimento = () => global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const vibrar = (p) => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (_) { /* sem vibração */ } };
+  const vibrar = (p) => { try { if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(p); } catch (_) { /* sem vibração */ } };
 
   /* ---------------- Config ---------------- */
   function mesclar(base, extra) {

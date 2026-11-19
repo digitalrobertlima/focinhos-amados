@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.facebook.com; connect-src 'self' https://viacep.com.br https://www.facebook.com https://connect.facebook.net; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Painel da loja • Focinhos Amados</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f6fbf7">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/pwa-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Focinhos">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.4.0">
+</head>
+<body data-page="painel">
+  <header class="topo">
+    <a class="marca" href="./" aria-label="Focinhos Amados, início"><img src="assets/img/logo.png" alt="" width="36" height="36"><span>Painel da loja</span></a>
+  </header>
+  <main id="conteudo" class="app painel">
+    <section class="secao" id="sem-chave" hidden>
+      <div class="cartao">
+        <h1 class="painel-titulo">Primeira vez neste celular</h1>
+        <p class="muted">Este painel dá os selos de fidelidade. Ele cria uma <b>chave secreta da loja</b> que fica só neste celular. Sem ela ninguém consegue inventar selos.</p>
+        <button type="button" class="btn btn-principal btn-largo" id="btn-criar">Criar a chave da loja</button>
+        <label class="btn btn-claro btn-largo" style="margin-top:10px">Já tenho uma cópia de segurança<input type="file" id="f-restaurar" accept=".json,application/json" hidden></label>
+      </div>
+    </section>
+
+    <section class="secao" id="com-chave" hidden>
+      <p class="selo-aviso erro" id="aviso-chave" hidden></p>
+      <div class="cartao">
+        <h1 class="painel-titulo">Dar selo</h1>
+        <div class="campo"><label for="p-tel">Celular do cliente (WhatsApp)</label>
+          <input id="p-tel" class="entrada" type="tel" inputmode="tel" placeholder="(31) 9 0000-0000" list="p-clientes" autocomplete="off"></div>
+        <datalist id="p-clientes"></datalist>
+        <div class="campo"><label for="p-nome">Nome do pet ou do tutor <small>(opcional)</small></label>
+          <input id="p-nome" class="entrada" autocomplete="off"></div>
+        <p class="painel-status" id="p-status" role="status"></p>
+        <button type="button" class="btn btn-principal btn-largo" id="btn-banho">✓ Banho feito: dar 1 selo</button>
+        <button type="button" class="btn btn-claro btn-largo" id="btn-resgate" style="margin-top:10px" disabled>🎁 Entregar a hidratação</button>
+        <button type="button" class="btn-texto" id="btn-reenviar" style="display:block;margin:12px auto 0">Reenviar o último selo</button>
+      </div>
+
+      <div class="cartao" id="enviar" hidden>
+        <h2 class="painel-sub">Pronto! Agora mande pro cliente</h2>
+        <p class="muted pequeno">Abre o WhatsApp com a mensagem e o link do selo. É só enviar.</p>
+        <a class="btn btn-zap btn-largo" id="btn-enviar" target="_blank" rel="noopener">Enviar selo no WhatsApp</a>
+      </div>
+
+      <div class="cartao">
+        <h2 class="painel-sub">Clientes</h2>
+        <ul class="painel-lista" id="p-lista"></ul>
+      </div>
+
+      <details class="cartao">
+        <summary class="painel-sub">Segurança e chave</summary>
+        <p class="muted pequeno">Guarde uma <b>cópia de segurança</b> no Google Drive ou mande pra você mesma no WhatsApp. Se trocar de celular, é com ela que você continua dando selos. Não mande para ninguém: quem tiver esse arquivo consegue dar selos.</p>
+        <button type="button" class="btn btn-principal btn-largo" id="btn-backup">Baixar cópia de segurança</button>
+        <p class="muted pequeno" style="margin-top:14px">Chave pública (essa pode mostrar; vai no site, no <code>config.json</code> → <code>loyalty.publicKey</code>):</p>
+        <code class="painel-chave" id="p-pub"></code>
+        <button type="button" class="btn btn-claro btn-largo" id="btn-copiar-pub" style="margin-top:8px">Copiar chave pública</button>
+      </details>
+    </section>
+  </main>
+  <script src="assets/js/config.js?v=0.4.0" defer></script>
+  <script src="assets/js/ilustracoes.js?v=0.4.0" defer></script>
+  <script src="assets/js/core.js?v=0.4.0" defer></script>
+  <script src="assets/js/selo.js?v=0.4.0" defer></script>
+  <script src="assets/js/painel.js?v=0.4.0" defer></script>
+</body>
+</html>

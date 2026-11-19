@@ -47,6 +47,10 @@
     "tosasAtSameTime": 1,
     "askForVideo": true
   },
+  "loyalty": {
+    "_comment": "Chave PÚBLICA dos selos de fidelidade. Copie do painel da loja (painel.html → Segurança e chave). Nunca coloque a chave privada aqui.",
+    "publicKey": null
+  },
   "payments": {
     "_comment": "Sinal via Pix. Deixe pixKey vazio para esconder. Preencha com a chave Pix da Juliana (CPF, celular, e-mail ou aleatória).",
     "pixKey": "",
@@ -54,7 +58,7 @@
     "pixHolder": "",
     "depositNote": "Ele é descontado do valor final, que a gente passa no WhatsApp depois de ver o vídeo."
   },
-  "appVersion": "v0.3.1",
+  "appVersion": "v0.4.0",
   "waTemplates": {
     "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Chegada: {janela}\n\n🚕 *Como vem*\n{transporte}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}{videoNota}"
   }

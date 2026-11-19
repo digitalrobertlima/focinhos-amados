@@ -374,3 +374,25 @@ textarea.entrada{ min-height: 120px; font-size: 1.1rem; font-weight: 600; resize
 .nivel-estado{ font-weight: 900; color: var(--muted); }
 .carimbos-linha{ display: flex; gap: 8px; margin-top: 8px; }
 .carimbos-linha .carimbo{ width: 30px; height: 30px; aspect-ratio: auto; }
+
+/* Selos assinados */
+.selo-aviso{ margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; background: #eef7f1; color: var(--verde-escuro); font-weight: 700; font-size: .95rem; }
+.selo-aviso.erro{ background: #fff1e6; color: #8a3b00; }
+.selo-tel{ display: grid; gap: 10px; margin-top: 12px; }
+.selo-tel label{ font-weight: 800; }
+.selo-tel small{ display: block; font-weight: 500; color: var(--muted); }
+.colar-selo{ margin-top: 14px; }
+.colar-selo summary{ cursor: pointer; color: var(--muted); font-size: .95rem; min-height: 44px; display: flex; align-items: center; }
+.colar-selo .entrada{ margin: 6px 0 10px; }
+.nivel.resgatado{ opacity: .7; }
+
+/* Painel da loja */
+.painel .cartao + .cartao, .painel details.cartao{ margin-top: 14px; }
+.painel-titulo{ font-size: 1.4rem; font-weight: 900; margin-bottom: 10px; }
+.painel-sub{ font-size: 1.1rem; font-weight: 900; }
+.painel summary.painel-sub{ cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.painel-status{ min-height: 1.4em; margin: 6px 0 12px; font-weight: 700; color: var(--verde-escuro); }
+.painel-lista{ list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.painel-lista button{ width: 100%; min-height: 56px; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border: 2px solid var(--linha); border-radius: 14px; background: #fff; font: inherit; text-align: left; }
+.painel-lista small{ display: block; color: var(--muted); }
+.painel-chave{ display: block; word-break: break-all; font-size: .75rem; background: #f4f4f4; padding: 8px; border-radius: 8px; margin-top: 6px; }

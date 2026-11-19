@@ -1,4 +1,5 @@
 User-agent: *
+Disallow: /painel.html
 Allow: /
 
 Sitemap: https://focinhosamados.com.br/sitemap.xml
