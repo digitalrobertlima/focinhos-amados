@@ -37,7 +37,7 @@ function main(){
 
   // Scan for referenced assets (images)
   const pages = roots.filter(f => f.endsWith('.html')).map(f => path.join(repo, f));
-  const codeFiles = [...pages];
+  const codeFiles = [...pages, ...['manifest.webmanifest', 'sw.js'].map(f => path.join(repo, f)).filter(f => fs.existsSync(f))];
   if (fs.existsSync(cssDir)) codeFiles.push(...walk(cssDir));
   if (fs.existsSync(jsDir)) codeFiles.push(...walk(jsDir));
   const content = codeFiles.map(f => fs.readFileSync(f, 'utf8')).join('\n');

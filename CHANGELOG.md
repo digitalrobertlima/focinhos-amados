@@ -1,5 +1,29 @@
 # Changelog
 #
+## [0.3.0] - 2026-11-19 (branch redesign/agendamento-v2, em teste)
+### Changed: redesign completo baseado em pesquisa (docs/ux-pesquisa.md)
+- **Agendamento em uma pergunta por tela:** nome → cachorro/gato → tamanho → pelo → manso/bravo → serviço → tipo de tosa → mimos → perfume → laço/gravata → saúde → outro pet → dia → hora → como vem → CEP/número (só Táxi Dog) → nome → WhatsApp → revisão → final.
+- Escolhas de um toque avançam sozinhas. O botão "Continuar" só aparece quando precisa digitar.
+- O progresso é por etapas (Seu pet · Horário · Você) e começa andado.
+- A revisão tem compromisso ativo ("Eu confirmo: Thor chega sábado às 14:00").
+- Tela final com 3D, WhatsApp, vídeo, sinal Pix (quando houver chave) e "Salvar na minha agenda" (.ics com aviso 3h antes).
+- Cliente que volta: "Agendar Thor de novo" e escolha entre os pets salvos.
+- O rascunho é salvo a cada passo (6h). Os botões voltar do app e do celular funcionam.
+- Nova home com um único botão principal, Táxi Dog, galeria, depoimentos, onde estamos e abas embaixo.
+- Ilustrações 3D originais em SVG (banheira, bolhas, osso, pata, shampoo, tesoura, cachorro, gato, carro, cofre, moedas).
+### Added
+- Aba **Fidelidade (em breve)** com cofre 3D que abre e cartão de carimbos (1º carimbo de boas-vindas).
+- **Convite para instalar o app** depois de enviar o agendamento (Android: instalação nativa; iPhone: instruções).
+- Manifest com atalhos "Agendar banho" e "Táxi Dog".
+- **Segurança:** Content-Security-Policy, Meta Pixel em arquivo próprio, escape de todo texto digitado, sem GPS silencioso, botão "Apagar meus dados deste celular".
+- Teste de ponta a ponta `tools/test-app.js` (`npm test`).
+### Removed
+- Formulários longos, `main.js` e `style.css` antigos, testes antigos, captura automática de localização.
+- `taxi.html` agora redireciona para o agendamento com Táxi Dog.
+### Fixed
+- O `dist/` não incluía os ícones do app (pwa-192/512).
+- Sitemap e robots apontavam para o GitHub Pages.
+
 ## [0.2.0] - 2026-11-19 (branch redesign/agendamento-v2, em teste)
 ### Removed
 - Delivery saiu do site (página, menu, home, mensagens e testes). Delivery é da loja do 1º piso.

@@ -19,26 +19,11 @@
     }
   },
   "ui": {
-    "showDirectWhatsOnHome": false,
     "brand": "#029935",
     "danger": "#FE0000",
     "text": "#030302",
     "muted": "#666666",
     "bg": "#FFFCFE"
-  },
-  "geoloc": {
-    "enabled": true,
-    "enableHighAccuracy": true,
-    "waitMs": 40000,
-    "requiredPrecisionM": 20
-  },
-  "suggestions": {
-    "upsellServices": [
-      "Hidratação de pelagem",
-      "Corte de unhas",
-      "Limpeza de ouvido",
-      "Higienização bucal"
-    ]
   },
   "booking": {
     "_comment": "Regras do agendamento. Horários de CHEGADA do pet; o último é 17:00 para dar tempo de terminar até 20:00.",
@@ -57,11 +42,7 @@
     ],
     "minLeadMinutes": 30,
     "petsAtSameTime": 2,
-    "askForVideo": true,
-    "temperamentOptions": [
-      "Manso",
-      "Bravo"
-    ]
+    "askForVideo": true
   },
   "payments": {
     "_comment": "Sinal via Pix. Deixe pixKey vazio para esconder. Preencha com a chave Pix da Juliana (CPF, celular, e-mail ou aleatória).",
@@ -70,14 +51,8 @@
     "pixHolder": "",
     "depositNote": "Ele é descontado do valor final, que a gente passa no WhatsApp depois de ver o vídeo."
   },
-  "appVersion": "v0.2.0",
+  "appVersion": "v0.3.0",
   "waTemplates": {
-    "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Chegada: {janela}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}\n\n🚕 *Modalidade de localização*\n{modalidade}\n\n📍 *Onde buscar o pet?*\n{origemEndereco}\n\n📍 *Onde entregar o pet?*\n{destinoEndereco}\n\n📝 *Observações gerais*\n{observacoes}\n\n🏪 *Loja física*\n{enderecoLoja}{videoNota}",
-    "agendarTracking": "\n—\nTracking\nOrigem: {origemLat},{origemLng} • ±{origemAccuracy}m @ {origemTimestamp}\nDestino: {destinoLat},{destinoLng} • ±{destinoAccuracy}m @ {destinoTimestamp}",
-    "taxiBanho": "🚕 *TÁXI DOG — BANHO/TOSA* (BH)\n\n🚦 *Modalidade*  \n{modalidade}\n\n🐾 *Pet*  \n{petNome}  \n\n👤 *Tutor*  \n{tutorNome} • 📞 {tutorTelefone}\n\n📍 *Onde buscar o pet?*  \n{origemEndereco}  \n\n📍 *Onde entregar o pet?*  \n{destinoEndereco}  \n\n⏰ *Horário desejado*  \n{horario}\n\n📝 *Observações*  \n{observacoes}\n",
-    "taxiBanhoTracking": "\n—\nTracking\nOrigem: {origemLat},{origemLng}\nDestino: {destinoLat},{destinoLng}",
-    "taxiAgendado": "🚕 *TÁXI DOG — AGENDADO* (BH)\n\n📍 *Onde buscar o pet?*  \n{origemEndereco}  \n\n📍 *Onde entregar o pet?*  \n{destinoEndereco}  \n\n⏰ *Horário desejado*  \n{horario}\n\n👤 *Contato*  \n{tutorNome} • 📞 {tutorTelefone}\n\n📝 *Observações*  \n{observacoes}\n",
-    "taxiAgendadoTracking": "\n—\nTracking\nOrigem: {origemLat},{origemLng}\nDestino: {destinoLat},{destinoLng}",
-    "teamReply": "*Pedido recebido — Focinhos Amados (BH)*\n\n📋 *Itens*  \n{itensLista}\n\n👤 *Contato*  \n{nome} • {telefone}\n\n📝 *Observações*  \n{observacoes}\n\n—\nDetalhes e confirmações serão combinados via WhatsApp."
+    "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Chegada: {janela}\n\n🚕 *Como vem*\n{transporte}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}{videoNota}"
   }
 }

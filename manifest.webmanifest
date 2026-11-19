@@ -1,15 +1,24 @@
 {
-  "name": "Focinhos Amados",
-  "short_name": "Pet Shop",
-  "description": "Agendamento de banho & tosa e Táxi Dog - Focinhos Amados (BH)",
-  "version": "0.2.0",
-  "start_url": "index.html",
+  "name": "Focinhos Amados • Banho e tosa",
+  "short_name": "Focinhos",
+  "description": "Agende banho e tosa em 1 minuto. Táxi Dog busca e leva.",
+  "version": "0.3.0",
+  "id": "./",
+  "start_url": "./?origem=app",
   "scope": "./",
   "display": "standalone",
-  "theme_color": "#029935",
-  "background_color": "#b8ffb9",
+  "orientation": "portrait",
+  "lang": "pt-BR",
+  "theme_color": "#f6fbf7",
+  "background_color": "#f6fbf7",
+  "categories": ["lifestyle", "shopping"],
   "icons": [
-    { "src": "assets/img/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "assets/img/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "assets/img/pwa-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/pwa-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Agendar banho", "short_name": "Agendar", "url": "./agendar.html", "icons": [{ "src": "assets/img/pwa-192.png", "sizes": "192x192" }] },
+    { "name": "Táxi Dog", "url": "./agendar.html?vem=taxi", "icons": [{ "src": "assets/img/pwa-192.png", "sizes": "192x192" }] }
   ]
 }

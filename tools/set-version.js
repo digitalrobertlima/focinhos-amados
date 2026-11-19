@@ -4,9 +4,9 @@
  * Updates:
  *  - assets/js/config.js (window.CONFIG.appVersion)
  *  - config.json (appVersion)
- *  - sw.js (fallback version in SW_VERSION template)
+ *  - sw.js (versão padrão do cache)
  *  - manifest.webmanifest (version)
- *  - Root HTML files' fallback text inside <span data-bind="version">...</span>
+ *  - HTML: <span data-bind="versao"> e ?v= dos assets (cache-busting)
  *  - package.json (version) [optional but enabled]
  *
  * Usage:
@@ -64,7 +64,7 @@ function change(p, ok){ if(ok) changes.push(path.relative(repo, p)); }
 {
   const f = path.join(repo, 'sw.js');
   if(fs.existsSync(f)){
-    change(f, upd(f, /(const\s+SW_VERSION\s*=\s*`fa-\$\{V\s*\|\|\s*')(\d+\.\d+\.\d+)('\}`;)/, `$1${NUM}$3`));
+    change(f, upd(f, /(searchParams\.get\('v'\)\s*\|\|\s*')(\d+\.\d+\.\d+)(')/, `$1${NUM}$3`));
   }
 }
 
@@ -78,10 +78,12 @@ function change(p, ok){ if(ok) changes.push(path.relative(repo, p)); }
 
 // 5) HTML fallbacks -> <span data-bind="version">vX.Y.Z</span>
 {
-  const htmlFiles = ['index.html','404.html','agendar.html','sobre.html','taxi.html']
+  const htmlFiles = ['index.html','404.html','agendar.html','sobre.html','fidelidade.html']
     .map(f=> path.join(repo, f)).filter(f=> fs.existsSync(f));
   for(const f of htmlFiles){
-    change(f, upd(f, /(<span\s+data-bind=\"version\">)v?\d+\.\d+\.\d+(<\/span>)/g, `$1${DISP}$2`));
+    let ok = upd(f, /(<span\s+data-bind=\"versao\">)v?\d+\.\d+\.\d+(<\/span>)/g, `$1${DISP}$2`);
+    ok = upd(f, /(\.(?:js|css)\?v=)\d+\.\d+\.\d+/g, `$1${NUM}`) || ok; // cache-busting dos assets
+    change(f, ok);
   }
 }
 

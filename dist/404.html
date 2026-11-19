@@ -2,45 +2,51 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Página não encontrada — Focinhos Amados</title>
-  <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#029935">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.facebook.com; connect-src 'self' https://viacep.com.br https://www.facebook.com https://connect.facebook.net; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Página não encontrada • Focinhos Amados</title>
+  <meta name="description" content="Página não encontrada.">
+  <meta name="theme-color" content="#f6fbf7">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '2740457159685941');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+  <link rel="apple-touch-icon" href="assets/img/pwa-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Focinhos">
+  <meta property="og:title" content="Página não encontrada • Focinhos Amados">
+  <meta property="og:description" content="Página não encontrada.">
+  <meta property="og:image" content="assets/img/gallery-pet-1.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.3.0">
 </head>
-<body class="center">
-  <main class="container" style="max-width:640px">
-    <h1>404 — Página não encontrada</h1>
-    <p class="muted">Ops! O link pode ter mudado. Use os atalhos abaixo:</p>
-    <div class="actions">
-      <a class="btn btn--primary" href="./index.html">Voltar para a Home</a>
-      <a class="btn" href="./agendar.html">Agendar</a>
-      <a class="btn" href="./taxi.html">Táxi Dog</a>
-      <a class="btn" href="./sobre.html">Sobre</a>
-    </div>
-  <p class="muted" style="margin-top:12px">Versão <span data-bind="version">v0.2.0</span></p>
+<body data-page="404">
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <header class="topo">
+    <a class="marca" href="./" aria-label="Focinhos Amados, início">
+      <img src="assets/img/logo.png" alt="" width="40" height="40">
+      <span><strong>Focinhos Amados</strong><small data-bind="cidade">Belo Horizonte/MG</small></span>
+    </a>
+    <span class="status" id="status" role="status"><i aria-hidden="true"></i><span>Seg a sáb à tarde</span></span>
+  </header>
+  <main id="conteudo" class="app" style="text-align:center">
+    <div class="palco" aria-hidden="true" style="height:200px"><div class="objeto" data-3d="osso" style="left:50%;top:30px;width:150px;height:150px;margin-left:-75px"></div></div>
+    <h1 style="font-size:1.8rem;font-weight:900;color:var(--verde-noite)">Ops! Esse osso sumiu</h1>
+    <p class="muted" style="margin:8px 20px 20px">A página que você procurou não existe.</p>
+    <div style="padding:0 18px"><a class="btn btn-principal btn-largo btn-gigante" href="agendar.html">Agendar banho</a></div>
   </main>
-  <script src="assets/js/config.js" defer></script>
-  <script src="assets/js/main.js" defer></script>
+  <nav class="abas" aria-label="Menu principal">
+    <ul>
+      <li><a href="./" data-aba="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>Início</a></li>
+      <li><a href="agendar.html" data-aba="agendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/><path d="m9.5 15 2 2 3.5-3.5"/></svg>Agendar</a></li>
+      <li><a href="fidelidade.html" data-aba="fidelidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="12" cy="12" r="4"/><path d="M12 8v1.5M12 14.5V16M8 12h1.5M14.5 12H16"/></svg>Fidelidade<span class="selo">em breve</span></a></li>
+      <li><a href="sobre.html" data-aba="sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>Sobre</a></li>
+    </ul>
+  </nav>
+  <script src="assets/js/pixel.js?v=0.3.0" defer></script>
+  <script src="assets/js/ilustracoes.js?v=0.3.0" defer></script>
+  <script src="assets/js/config.js?v=0.3.0" defer></script>
+  <script src="assets/js/core.js?v=0.3.0" defer></script>
 </body>
 </html>

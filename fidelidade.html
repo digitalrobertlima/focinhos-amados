@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.facebook.com; connect-src 'self' https://viacep.com.br https://www.facebook.com https://connect.facebook.net; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Fidelidade • Focinhos Amados</title>
+  <meta name="description" content="Em breve: programa de fidelidade da Focinhos Amados com prêmios em criptomoedas.">
+  <meta name="theme-color" content="#f6fbf7">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/pwa-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Focinhos">
+  <meta property="og:title" content="Fidelidade • Focinhos Amados">
+  <meta property="og:description" content="Em breve: programa de fidelidade da Focinhos Amados com prêmios em criptomoedas.">
+  <meta property="og:image" content="assets/img/gallery-pet-1.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.3.0">
+</head>
+<body data-page="fidelidade">
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <header class="topo">
+    <a class="marca" href="./" aria-label="Focinhos Amados, início">
+      <img src="assets/img/logo.png" alt="" width="40" height="40">
+      <span><strong>Focinhos Amados</strong><small data-bind="cidade">Belo Horizonte/MG</small></span>
+    </a>
+    <span class="status" id="status" role="status"><i aria-hidden="true"></i><span>Seg a sáb à tarde</span></span>
+  </header>
+  <main id="conteudo" class="app">
+    <div class="cofre-palco" id="cofre" role="button" tabindex="0" aria-label="Toque para abrir o cofre">
+      <div class="cofre-moldura">
+        <div class="cofre-dentro"><div class="brilho"></div></div>
+        <div class="cofre-porta" data-3d="cofre"></div>
+      </div>
+      <div class="moedas" aria-hidden="true">
+        <span class="m" data-3d="moeda:₿"></span><span class="m" data-3d="moeda:Ξ:eth"></span>
+        <span class="m" data-3d="moeda:R$:verde"></span><span class="m" data-3d="moeda:₿"></span><span class="m" data-3d="moeda:🐾:verde"></span>
+      </div>
+      <p class="cofre-dica" id="cofre-dica">Toque no cofre</p>
+    </div>
+
+    <section class="secao" style="text-align:center;margin-top:18px">
+      <span class="em-breve">Em breve</span>
+      <h1 style="font-size:1.9rem;font-weight:900;color:var(--verde-noite);margin-top:10px">Cada banho vira prêmio</h1>
+      <p class="muted" style="margin-top:8px">Estamos preparando um programa de fidelidade com <b>prêmios em criptomoedas</b> para quem cuida do pet com a gente.</p>
+    </section>
+
+    <section class="secao">
+      <div class="cartao">
+        <h2 style="font-size:1.15rem;font-weight:900">Seu cartão</h2>
+        <p class="muted pequeno" style="margin-top:4px" id="cartao-texto">O primeiro carimbo é presente de boas-vindas.</p>
+        <div class="carimbos" id="carimbos" aria-label="Cartão fidelidade"></div>
+      </div>
+      <div class="cartao">
+        <h2 style="font-size:1.15rem;font-weight:900">Seja avisado primeiro</h2>
+        <p class="muted" style="margin-top:4px">Instale o app no celular. Quando o programa começar, você já está dentro.</p>
+        <button type="button" class="btn btn-principal btn-largo" id="btn-instalar" style="margin-top:14px">Instalar o app</button>
+        <p class="muted pequeno" id="ja-instalado" hidden style="margin-top:10px">✓ O app já está instalado neste celular.</p>
+      </div>
+      <p class="muted pequeno" style="margin:14px 4px 0">As regras e os prêmios ainda serão divulgados. Nada aqui é investimento nem promessa de valor. Os carimbos ficam salvos só neste celular por enquanto.</p>
+    </section>
+    <footer class="rodape">
+      <p>Focinhos Amados · <span data-bind="cidade">Belo Horizonte/MG</span></p>
+      <p><a href="sobre.html#privacidade">Privacidade</a> · versão <span data-bind="versao">v0.3.0</span></p>
+    </footer>
+  </main>
+  <nav class="abas" aria-label="Menu principal">
+    <ul>
+      <li><a href="./" data-aba="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>Início</a></li>
+      <li><a href="agendar.html" data-aba="agendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/><path d="m9.5 15 2 2 3.5-3.5"/></svg>Agendar</a></li>
+      <li><a href="fidelidade.html" data-aba="fidelidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="12" cy="12" r="4"/><path d="M12 8v1.5M12 14.5V16M8 12h1.5M14.5 12H16"/></svg>Fidelidade<span class="selo">em breve</span></a></li>
+      <li><a href="sobre.html" data-aba="sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>Sobre</a></li>
+    </ul>
+  </nav>
+  <script src="assets/js/pixel.js?v=0.3.0" defer></script>
+  <script src="assets/js/ilustracoes.js?v=0.3.0" defer></script>
+  <script src="assets/js/config.js?v=0.3.0" defer></script>
+  <script src="assets/js/core.js?v=0.3.0" defer></script>
+  <script src="assets/js/fidelidade.js?v=0.3.0" defer></script>
+</body>
+</html>

@@ -2,122 +2,85 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sobre nós — Focinhos Amados (BH)</title>
-  <meta name="description" content="Amor, higiene e segurança em cada atendimento. Conheça a equipe e a loja.">
-  <meta name="theme-color" content="#029935">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.facebook.com; connect-src 'self' https://viacep.com.br https://www.facebook.com https://connect.facebook.net; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Sobre • Focinhos Amados</title>
+  <meta name="description" content="Amor, higiene e segurança em cada banho. Conheça a Focinhos Amados, em Belo Horizonte.">
+  <meta name="theme-color" content="#f6fbf7">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="assets/img/favicon-16.png" sizes="16x16" type="image/png">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <meta property="og:title" content="Sobre nós — Focinhos Amados (BH)">
-  <meta property="og:description" content="Amor, higiene e segurança em cada atendimento. Conheça a equipe e a loja.">
+  <link rel="apple-touch-icon" href="assets/img/pwa-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Focinhos">
+  <meta property="og:title" content="Sobre • Focinhos Amados">
+  <meta property="og:description" content="Amor, higiene e segurança em cada banho. Conheça a Focinhos Amados, em Belo Horizonte.">
   <meta property="og:image" content="assets/img/gallery-pet-1.webp">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
-  <!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '2740457159685941');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+  <link rel="stylesheet" href="assets/css/app.css?v=0.3.0">
 </head>
 <body data-page="sobre">
-  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
-  <header class="topbar" role="banner">
-    <div class="container topbar__inner">
-      <a class="brand" href="./">
-  <img class="brand__logo" src="assets/img/logo.png" alt="Logotipo Focinhos Amados" width="32" height="32">
-        <span class="brand__text"><strong>Focinhos Amados</strong><small class="brand__city" data-bind="city">Belo Horizonte/MG</small></span>
-      </a>
-      <nav class="nav" aria-label="principal">
-        <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
-        <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
-          <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
-          <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
-          <li role="none"><a role="menuitem" href="sobre.html" aria-current="page">Sobre</a></li>
-        </ul>
-      </nav>
-      <div class="topbar__actions">
-  <!-- cart removed per UX decision -->
-      </div>
-    </div>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <header class="topo">
+    <a class="marca" href="./" aria-label="Focinhos Amados, início">
+      <img src="assets/img/logo.png" alt="" width="40" height="40">
+      <span><strong>Focinhos Amados</strong><small data-bind="cidade">Belo Horizonte/MG</small></span>
+    </a>
+    <span class="status" id="status" role="status"><i aria-hidden="true"></i><span>Seg a sáb à tarde</span></span>
   </header>
-
-  <main id="conteudo" class="container flow">
-    <h1>Sobre nós</h1>
-
-    <section class="card">
-  <h2 class="card__title">Missão & princípios</h2>
-      <p>Amor, higiene e segurança em cada atendimento. Levamos conforto para pets e tranquilidade para tutores.</p>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">Equipe</h2>
-      <p>Time experiente e apaixonado por animais. Profissionais treinados em manejo, banho e tosa humanizados.</p>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">Estrutura & cuidados</h2>
-      <p>Ambiente ventilado, higienizado e equipado. Produtos selecionados conforme necessidade do seu pet.</p>
-    </section>
-
-    <section class="card" id="endereco">
-      <h2 class="card__title">Endereço & horários</h2>
-      <p><strong data-bind="address">Av. Padre José Maurício, 572 – Nova Cintra</strong> — <span data-bind="city">Belo Horizonte/MG</span></p>
-      <p>Horários: <span data-bind="hoursLabel">Seg–Sáb 13:30–20:00 • Dom fechado</span></p>
-      <div class="actions">
-        <a id="route-link" class="btn btn--ghost" href="https://www.google.com/maps/dir/?api=1&amp;destination=-19.953147097101922,-43.993680031948806" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+  <main id="conteudo" class="app">
+    <section class="heroi" aria-labelledby="titulo">
+      <div class="palco" aria-hidden="true" style="height:180px">
+        <div class="objeto" data-3d="cachorro" style="left:50%;top:18px;width:150px;height:150px;margin-left:-75px"></div>
+        <div class="objeto" data-3d="bolha" style="left:18%;top:30px;width:44px;height:44px;--atraso:-1s"></div>
+        <div class="objeto" data-3d="bolha" style="right:16%;top:70px;width:30px;height:30px;--atraso:-2s"></div>
       </div>
+      <div class="heroi-texto"><h1 id="titulo">Amor, higiene e <em>segurança</em></h1>
+        <p>Conforto para os pets e tranquilidade para os tutores.</p></div>
     </section>
-
-    <section class="card" id="contato">
-      <h2 class="card__title">Canais</h2>
-      <ul class="list">
-        <li>Telefone: <span data-bind="landline">+55 31 3322-3070</span></li>
-        <li>WhatsApp: <span data-bind="waHuman">+55 31 98233-9672</span> (finalização dos fluxos)</li>
-        <li>Instagram: <a href="https://instagram.com/petshopfocinhos" target="_blank" rel="noopener">@petshopfocinhos</a></li>
-      </ul>
+    <section class="secao" style="margin-top:18px">
+      <div class="cartao"><h2 class="secao-titulo" style="margin-top:0">Cuidado de verdade</h2>
+        <p>Profissionais treinados em manejo, banho e tosa humanizados. Ambiente ventilado, higienizado e com produtos escolhidos para cada pet.</p></div>
+      <div class="cartao"><h2 class="secao-titulo" style="margin-top:0">Como funciona</h2>
+        <ol style="margin:0;padding-left:1.2em;display:grid;gap:8px">
+          <li>Você agenda pelo site, uma pergunta de cada vez.</li>
+          <li>Envia a ficha e um vídeo do pet pelo WhatsApp.</li>
+          <li>A gente passa o valor e confirma o horário.</li>
+        </ol></div>
+      <div class="cartao"><h2 class="secao-titulo" style="margin-top:0">Endereço e horário</h2>
+        <ul class="info-lista">
+          <li><span class="i" aria-hidden="true">📍</span><span><b data-bind="endereco">Av. Padre José Maurício, 572 – Nova Cintra</b><br><span class="muted pequeno">2º piso · Belo Horizonte/MG</span></span></li>
+          <li><span class="i" aria-hidden="true">🕐</span><span data-bind="horario">Seg a sáb, 13:30 às 20:00 • domingo fechado</span></li>
+          <li><span class="i" aria-hidden="true">📞</span><span><a data-tel href="tel:+553133223070"><span data-bind="fixo">+55 31 3322-3070</span></a></span></li>
+          <li><span class="i" aria-hidden="true">💬</span><span><a data-zap href="#" target="_blank" rel="noopener"><span data-bind="zapHumano">+55 31 98233-9672</span></a></span></li>
+          <li><span class="i" aria-hidden="true">📷</span><span>Instagram @petshopfocinhos</span></li>
+        </ul>
+        <a class="btn btn-claro btn-largo mapa-btn" data-rota href="https://www.google.com/maps/dir/?api=1&amp;destination=-19.953147097101922,-43.993680031948806" target="_blank" rel="noopener">Ver rota no mapa</a></div>
+      <div class="cartao" id="privacidade"><h2 class="secao-titulo" style="margin-top:0">Privacidade e segurança</h2>
+        <p>Os dados do agendamento ficam <b>só no seu celular</b> e vão para a gente apenas quando você toca em enviar no WhatsApp. Não pedimos senha nem dados de cartão no site.</p>
+        <p style="margin-top:8px">O site usa o Meta Pixel para medir anúncios e consulta o CEP no ViaCEP quando você usa o Táxi Dog.</p>
+        <button type="button" class="btn btn-claro btn-largo" id="btn-esquecer" style="margin-top:14px">Apagar meus dados deste celular</button>
+        <p class="muted pequeno" id="esquecido" role="status" style="margin-top:8px"></p></div>
     </section>
-
-    <section class="card" id="priv">
-      <h2 class="card__title">Privacidade</h2>
-      <p>Usamos seus dados apenas para atender seu pedido e combinar detalhes pelo WhatsApp.</p>
-    </section>
-
-    <section class="card" id="termos">
-      <h2 class="card__title">Termos</h2>
-      <p>Serviços e detalhes confirmados diretamente com a equipe via WhatsApp.</p>
-    </section>
-
-    <section class="card" id="faq">
-      <h2 class="card__title">FAQ — Como funciona</h2>
-      <p>Oferecemos serviços personalizados. As necessidades do seu pet (porte, pelagem, cuidados específicos) definem o atendimento ideal. Por isso, combinamos todos os detalhes diretamente com você pelo WhatsApp.</p>
-      <p>Nossa equipe responde assim que possível usando um modelo que resume seu pedido — assim garantimos precisão e qualidade no atendimento.</p>
-    </section>
+    <footer class="rodape">
+      <p>Focinhos Amados · <span data-bind="cidade">Belo Horizonte/MG</span></p>
+      <p><a href="sobre.html#privacidade">Privacidade</a> · versão <span data-bind="versao">v0.3.0</span></p>
+    </footer>
   </main>
-
-  <footer class="footer">
-    <div class="container footer__inner">
-  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.2.0</span></span></p>
-    </div>
-  </footer>
-
-  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-    <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
-  </svg>
-  <script src="assets/js/config.js" defer></script>
-  <script src="assets/js/main.js" defer></script>
+  <nav class="abas" aria-label="Menu principal">
+    <ul>
+      <li><a href="./" data-aba="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>Início</a></li>
+      <li><a href="agendar.html" data-aba="agendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/><path d="m9.5 15 2 2 3.5-3.5"/></svg>Agendar</a></li>
+      <li><a href="fidelidade.html" data-aba="fidelidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="12" cy="12" r="4"/><path d="M12 8v1.5M12 14.5V16M8 12h1.5M14.5 12H16"/></svg>Fidelidade<span class="selo">em breve</span></a></li>
+      <li><a href="sobre.html" data-aba="sobre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>Sobre</a></li>
+    </ul>
+  </nav>
+  <script src="assets/js/pixel.js?v=0.3.0" defer></script>
+  <script src="assets/js/ilustracoes.js?v=0.3.0" defer></script>
+  <script src="assets/js/config.js?v=0.3.0" defer></script>
+  <script src="assets/js/core.js?v=0.3.0" defer></script>
+  <script src="assets/js/sobre.js?v=0.3.0" defer></script>
 </body>
 </html>
