@@ -1,7 +1,7 @@
 /* Configuração padrão — Focinhos Amados (BH)
    O arquivo config.json (editável) sobrescreve estes valores. Disponível em window.CONFIG */
 window.CONFIG = {
-  appVersion: "v0.4.2",
+  appVersion: "v0.4.3",
   business: {
     name: "Focinhos Amados",
     city: "Belo Horizonte/MG",

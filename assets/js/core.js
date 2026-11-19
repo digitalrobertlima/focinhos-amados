@@ -44,6 +44,11 @@
   const CHAVE_PERFIL = 'fa:perfil:v1';
   const CHAVE_AGENDA = 'fa:agendamentos:v1';
   const CHAVE_INSTALAR = 'fa:instalar:dispensado';
+  const CHAVE_RASCUNHO = 'fa:rascunho:v1';
+  const CHAVE_SELO = 'fa:selo:v1';
+  /* Todos os dados do CLIENTE guardados neste celular. A chave da loja (fa:painel:v1) fica de fora de propósito:
+     apagar os dados do cliente nunca pode apagar a chave que dá selos. */
+  const CHAVES_CLIENTE = [CHAVE_PERFIL, CHAVE_AGENDA, CHAVE_RASCUNHO, CHAVE_SELO, CHAVE_INSTALAR];
   function ler(chave, padrao) {
     try { const v = localStorage.getItem(chave); return v ? JSON.parse(v) : padrao; } catch (_) { return padrao; }
   }
@@ -73,15 +78,22 @@
       const l = ler(CHAVE_AGENDA, []).map((a) => (a.dia >= hoje ? Object.assign({}, a, { pets: (a.pets || []).filter((x) => String(x).toLowerCase() !== n) }) : a))
         .filter((a) => a.dia < hoje || (a.pets || []).length);
       gravar(CHAVE_AGENDA, l);
+      // o rascunho em andamento também esquece esse pet (senão ele volta ao tocar em "Agendar")
+      const r = ler(CHAVE_RASCUNHO, null);
+      if (r && r.S && (r.S.pets || []).some((p) => String(p.nome || '').toLowerCase() === n)) {
+        try { localStorage.removeItem(CHAVE_RASCUNHO); } catch (_) { /* ok */ }
+      }
     },
-    esquecer() { try { localStorage.removeItem(CHAVE_PERFIL); localStorage.removeItem(CHAVE_AGENDA); } catch (_) { /* ok */ } },
+    /* "Apagar meus dados": tudo do cliente, nunca a chave da loja. */
+    esquecer() { CHAVES_CLIENTE.forEach((k) => { try { localStorage.removeItem(k); } catch (_) { /* ok */ } }); },
   };
   const agenda = {
     lista: () => ler(CHAVE_AGENDA, []),
     adicionar(item) { const l = agenda.lista(); l.push(item); return gravar(CHAVE_AGENDA, l.slice(-60)); },
+    marcarEnviado(id) { gravar(CHAVE_AGENDA, agenda.lista().map((a) => (a.id === id ? Object.assign(a, { enviado: true }) : a))); },
     proximo() {
       const hoje = ymd(new Date());
-      return agenda.lista().filter((a) => a.dia >= hoje).sort((a, b) => (a.dia + a.hora).localeCompare(b.dia + b.hora))[0] || null;
+      return agenda.lista().filter((a) => a.dia >= hoje && a.enviado !== false).sort((a, b) => (a.dia + a.hora).localeCompare(b.dia + b.hora))[0] || null;
     },
   };
 

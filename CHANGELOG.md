@@ -1,3 +1,10 @@
+## 0.4.3
+- Tirar um pet do app agora também apaga o rascunho em andamento com esse pet (antes ele voltava ao tocar em "Agendar").
+- Rascunho retomado mostra "Continuando de onde você parou · Começar do zero". Abrir com `?novo=1` ou `?pet=` descarta rascunho velho.
+- Rascunho com pet que não existe mais é descartado ao abrir.
+- "Apagar meus dados" apaga tudo do cliente (perfil, agenda, rascunho, selos, preferência de instalação) e nunca a chave da loja do painel.
+- "Seu próximo horário" só aparece depois de enviar no WhatsApp (antes aparecia mesmo sem enviar).
+
 ## 0.4.2
 - Novo serviço "Só cortar a unha": pula extras, perfume e laço; não ocupa vaga de banho no horário; não pede vídeo.
 - "Seus pets" no início: tirar um pet do app com confirmação delicada, sem perguntar motivo. Some das sugestões e dos próximos horários.

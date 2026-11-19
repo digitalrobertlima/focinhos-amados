@@ -428,3 +428,8 @@ textarea.entrada{ min-height: 120px; font-size: 1.1rem; font-weight: 600; resize
 .mp-tirar{ min-height: 44px; color: var(--suave); font-size: .9rem; }
 .mp-confirma{ padding: 12px; border-radius: 16px; background: #f6f6f6; margin-bottom: 6px; }
 .mp-botoes{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+
+/* Aviso de rascunho retomado */
+.continuar-aviso{ display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 10px; margin: 6px 16px 0; padding: 8px 12px; border-radius: 14px; background: var(--menta); color: var(--verde-escuro); font-weight: 700; font-size: .92rem; transition: opacity .4s; }
+.continuar-aviso .btn-texto{ min-height: 40px; }
+.continuar-aviso.some{ opacity: 0; }

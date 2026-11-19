@@ -75,7 +75,7 @@
     "pixHolder": "",
     "depositNote": "Ele é descontado do valor final, que a gente passa no WhatsApp depois de ver o vídeo."
   },
-  "appVersion": "v0.4.2",
+  "appVersion": "v0.4.3",
   "waTemplates": {
     "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Chegada: {janela}\n\n🚕 *Como vem*\n{transporte}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}{videoNota}"
   }

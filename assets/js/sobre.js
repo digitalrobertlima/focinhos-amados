@@ -7,7 +7,6 @@
     const msg = document.getElementById('esquecido');
     btn.addEventListener('click', () => {
       FA.perfil.esquecer();
-      try { localStorage.removeItem('fa:rascunho:v1'); } catch (_) { /* ok */ }
       msg.textContent = 'Pronto. Apagamos os dados deste celular.';
     });
   }

@@ -179,6 +179,9 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     certo(!/delivery/i.test(href), 'mensagem cita delivery');
     certo(await page.$('#btn-ics'), 'sem botão de agenda');
     certo(!(await page.$('#btn-pix')), 'Pix apareceu sem chave configurada');
+    certo((await page.evaluate(() => FA.agenda.proximo())) === null, 'horário não enviado não pode aparecer como próximo');
+    await page.evaluate(() => { const a = document.getElementById('btn-zap'); a.addEventListener('click', (e) => e.preventDefault(), { once: true }); a.click(); });
+    certo((await page.evaluate(() => FA.agenda.proximo())) !== null, 'depois de enviar, vira próximo horário');
     return { tamanhoMensagem: href.length };
   });
 
@@ -408,11 +411,44 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     return { cta: r.cta };
   });
 
+
+  await caso('dados: tirar pet limpa o rascunho; rascunho avisa e pode recomeçar do zero', async () => {
+    await page.goto(BASE + '/', { waitUntil: 'networkidle0' });
+    await page.evaluate(() => {
+      localStorage.clear();
+      localStorage.setItem('fa:perfil:v1', JSON.stringify({ tutor: { nome: 'Ana', tel: '31999990000' }, pets: [{ nome: 'Thor', especie: 'Cachorro', porte: 'Médio', temperamento: 'Manso' }] }));
+    });
+    // começa um agendamento do Thor e larga no meio
+    await page.goto(BASE + '/agendar.html?pet=Thor', { waitUntil: 'networkidle0' });
+    await esperaTela('servico'); await tocar('Banho e tosa'); await esperaTela('tosa');
+    certo(await page.evaluate(() => /Thor/.test(localStorage.getItem('fa:rascunho:v1') || '')), 'rascunho deveria existir');
+    // volta pra home e tira o Thor
+    await page.goto(BASE + '/', { waitUntil: 'networkidle0' });
+    await page.evaluate(() => { document.querySelector('.mp-tirar').click(); document.querySelector('.mp-confirma:not([hidden]) .mp-sim').click(); });
+    const depois = await page.evaluate(() => ({ rasc: localStorage.getItem('fa:rascunho:v1'), perfil: localStorage.getItem('fa:perfil:v1'), cta: document.getElementById('cta-agendar').getAttribute('href') }));
+    certo(depois.rasc === null && !/Thor/.test(depois.perfil) && depois.cta === 'agendar.html', 'sobrou Thor: ' + JSON.stringify(depois));
+    await page.click('#cta-agendar');
+    await esperaTela('nome');
+    certo((await page.$eval('#f-nome', (e) => e.value)) === '' && !(await page.$('.continuar-aviso')), 'agendar deveria começar do zero');
+    // rascunho comum: avisa e "começar do zero" limpa
+    await digitar('#f-nome', 'Bidu'); await continuar(); await esperaTela('especie');
+    await page.goto(BASE + '/agendar.html', { waitUntil: 'networkidle0' });
+    await esperaTela('especie');
+    certo(!!(await page.$('.continuar-aviso')), 'faltou aviso de continuar');
+    await page.click('#btn-do-zero');
+    await page.waitForFunction(() => location.search.includes('novo=1'));
+    await esperaTela('nome');
+    certo((await page.$eval('#f-nome', (e) => e.value)) === '', 'não recomeçou do zero');
+    // nome do tutor continua (é dele, não do pet)
+    certo((await page.evaluate(() => window.__faAgendar.estado().tutor.nome)) === 'Ana', 'tutor perdido');
+  });
+
   await caso('sobre: apagar meus dados', async () => {
     await page.goto(BASE + '/sobre.html', { waitUntil: 'networkidle0' });
+    await page.evaluate(() => ['fa:perfil:v1', 'fa:agendamentos:v1', 'fa:rascunho:v1', 'fa:selo:v1', 'fa:instalar:dispensado', 'fa:painel:v1'].forEach((k) => localStorage.setItem(k, '{"x":1}')));
     await page.click('#btn-esquecer');
-    const r = await page.evaluate(() => localStorage.getItem('fa:agendamentos:v1'));
-    certo(r === null, 'dados não apagados');
+    const r = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith('fa:')));
+    certo(r.length === 1 && r[0] === 'fa:painel:v1', 'sobrou ou apagou demais: ' + r.join());
   });
 
   await caso('taxi.html leva ao agendamento com Táxi Dog', async () => {

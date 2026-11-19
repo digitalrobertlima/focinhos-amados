@@ -627,6 +627,7 @@
       ligar(tela) {
         tela.querySelector('#btn-zap').addEventListener('click', () => {
           tela.querySelector('#passo-zap').classList.add('feito');
+          FA.agenda.marcarEnviado(criadoEm);
           if (window.fbq) { try { window.fbq('track', 'Schedule'); } catch (_) { /* ok */ } }
           // Convite para instalar: quando a pessoa volta do WhatsApp (ou depois de alguns segundos)
           let feito = false;
@@ -787,11 +788,29 @@
     return null;
   }
 
+  function apagarRascunho() { try { localStorage.removeItem(CHAVE_RASCUNHO); } catch (_) { /* ok */ } }
+  /* Rascunho só vale se os pets "salvos" dele ainda existem (o cliente pode ter tirado um pet do app). */
+  function rascunhoValido(r, perfil) {
+    const nomes = new Set((perfil.pets || []).map((p) => String(p.nome).toLowerCase()));
+    return (r.S.pets || []).every((p) => !p.salvo || nomes.has(String(p.nome || '').toLowerCase()));
+  }
+  let continuando = false;
+  function avisoContinuar() {
+    if (!continuando) return;
+    const el = document.createElement('div');
+    el.className = 'continuar-aviso'; el.setAttribute('role', 'status');
+    el.innerHTML = '<span>Continuando de onde você parou.</span> <button type="button" class="btn-texto" id="btn-do-zero">Começar do zero</button>';
+    document.querySelector('.wz-corpo').before(el);
+    el.querySelector('#btn-do-zero').addEventListener('click', () => { apagarRascunho(); location.replace('agendar.html?novo=1'); });
+    setTimeout(() => { el.classList.add('some'); setTimeout(() => el.remove(), 400); }, 9000);
+  }
+
+  let criadoEm = 0;
   function finalizar() {
     const tutor = { nome: S.tutor.nome.trim(), tel: S.tutor.tel };
     FA.perfil.salvar(tutor, S.pets);
-    FA.agenda.adicionar({ dia: S.dia, hora: S.hora, pets: S.pets.map((p) => p.nome), vem: S.vem, criado: Date.now() });
-    try { localStorage.removeItem(CHAVE_RASCUNHO); } catch (_) { /* ok */ }
+    FA.agenda.adicionar({ id: criadoEm = Date.now(), dia: S.dia, hora: S.hora, pets: S.pets.map((p) => p.nome), vem: S.vem, criado: criadoEm, enviado: false });
+    apagarRascunho();
     ir({ id: 'final', i: 0 }, 'frente');
   }
 
@@ -808,7 +827,8 @@
     const perfil = FA.perfil.obter();
     if (perfil.tutor) S.tutor = Object.assign({ nome: '', tel: '' }, perfil.tutor);
 
-    const rasc = url.has('novo') ? null : lerRascunho();
+    if (url.has('novo') || url.has('pet')) apagarRascunho();
+    const rasc = url.has('novo') || url.has('pet') ? null : lerRascunho();
     const petPedido = url.get('pet');
     const salvo = petPedido && (perfil.pets || []).find((p) => p.nome.toLowerCase() === petPedido.toLowerCase());
     if (url.get('vem') === 'taxi') S.vem = 'buscaEntrega';
@@ -816,15 +836,19 @@
     if (salvo) {
       S.pets = [Object.assign(novoPet(), salvo, { extras: [], temSaude: salvo.saude ? true : null, salvo: true })];
       pilha = [{ id: 'servico', i: 0 }];
-    } else if (rasc) {
+    } else if (rasc && rascunhoValido(rasc, perfil)) {
       S = Object.assign(S, rasc.S); S.pets = S.pets.map((p) => Object.assign(novoPet(), p));
+      if (perfil.tutor) S.tutor = Object.assign({ nome: '', tel: '' }, perfil.tutor, { nome: S.tutor.nome || perfil.tutor.nome, tel: S.tutor.tel || perfil.tutor.tel });
       pilha = rasc.pilha.filter((p) => TELAS[p.id] && p.id !== 'final');
       if (!pilha.length) pilha = [primeiraPet(0)];
+      continuando = true;
     } else {
+      if (rasc) apagarRascunho();
       pilha = [primeiraPet(0)];
     }
     try { history.replaceState({ fa: 1 }, ''); for (let k = 1; k < pilha.length; k++) history.pushState({ fa: k + 1 }, ''); } catch (_) { /* ok */ }
     desenhar('frente');
+    avisoContinuar();
   }
 
   // Para testes automatizados
