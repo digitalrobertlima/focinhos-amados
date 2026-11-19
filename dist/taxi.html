@@ -45,7 +45,6 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
         <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
         <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
           <li role="none"><a role="menuitem" href="agendar.html">Agendar</a></li>
-          <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
           <li role="none"><a role="menuitem" href="taxi.html" aria-current="page">Táxi Dog</a></li>
           <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
         </ul>
@@ -128,6 +127,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
         <div class="field">
           <label for="horario">Horário desejado</label>
           <input id="horario" type="datetime-local" class="input">
+          <small class="help">Atendemos de segunda a sábado. O pet chega entre 13h30 e 17h.</small>
         </div>
 
         <div class="field">
@@ -172,6 +172,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
           <div class="field">
             <label for="horario2">Horário desejado</label>
             <input id="horario2" type="datetime-local" class="input">
+            <small class="help">Atendemos de segunda a sábado, das 13h30 às 20h.</small>
           </div>
           <div class="field">
             <label for="contato2">Contato (nome e telefone)</label>
@@ -190,7 +191,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
         <div class="actions">
           <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
           <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
-          <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+          <a class="btn btn--ghost" id="btn-rotas" href="https://www.google.com/maps/dir/?api=1&amp;destination=-19.953147097101922,-43.993680031948806" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
         </div>
         <div id="taxi-err" class="toast" role="status" aria-live="polite"></div>
       </section>
@@ -199,7 +200,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
 
   <footer class="footer">
     <div class="container footer__inner">
-  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.20</span></span></p>
+  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.2.0</span></span></p>
       <a href="sobre.html">Sobre</a>
     </div>
   </footer>

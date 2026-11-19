@@ -268,3 +268,10 @@ section{ margin:16px 0; }
 .install-banner__body{color:var(--muted)}
 .install-banner__actions{flex:0 0 auto;display:flex;gap:8px;align-items:center}
 @media(max-width:420px){ .install-banner__actions .btn{ padding:8px 10px; font-size:14px; } }
+
+/* Próximos passos (vídeo + sinal Pix) */
+.steps{ margin:0; padding-left:1.3em; display:grid; gap:10px; }
+.steps li{ line-height:1.45; }
+.pix-box{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px; padding:10px 12px; border:1px dashed var(--brand, #029935); border-radius:10px; background:rgba(2,153,53,.06); }
+.pix-box code{ font-size:1rem; font-weight:700; word-break:break-all; }
+.pix-box__label{ font-weight:600; }

@@ -51,6 +51,38 @@
   const fmtAcc = (n)=> typeof n==='number' ? Math.round(n) : '';
   const text = (el, v)=>{ if(el) el.textContent = v; };
 
+  // ===== Regras do agendamento (dias fechados, horários de chegada) =====
+  const Booking = {
+    cfg(){
+      return Object.assign({
+        closedWeekdays:[0],
+        arrivalTimes:['13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'],
+        minLeadMinutes:30, askForVideo:true
+      }, (window.CONFIG && window.CONFIG.booking) || {});
+    },
+    ymd(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; },
+    parse(ymd){ const m = String(ymd||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? new Date(+m[1], +m[2]-1, +m[3]) : null; },
+    isClosed(ymd){ const d = this.parse(ymd); return !d || this.cfg().closedWeekdays.includes(d.getDay()); },
+    timesFor(ymd, ref){
+      ref = ref || now();
+      if(this.isClosed(ymd)) return [];
+      const c = this.cfg();
+      const all = c.arrivalTimes.slice();
+      if(ymd !== this.ymd(ref)) return all;
+      const limit = ref.getHours()*60 + ref.getMinutes() + (Number(c.minLeadMinutes)||0);
+      return all.filter(t=>{ const [h,m] = t.split(':').map(Number); return h*60+m >= limit; });
+    },
+    nextOpenYMD(ref){
+      ref = ref || now();
+      for(let i=0;i<21;i++){
+        const d = new Date(ref.getFullYear(), ref.getMonth(), ref.getDate()+i);
+        const y = this.ymd(d);
+        if(this.timesFor(y, ref).length) return y;
+      }
+      return this.ymd(ref);
+    }
+  };
+
   // ===== Cart storage & operations =====
   function getCartFromStorage(){
     try{ const raw = localStorage.getItem('focinhos:cart'); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
@@ -233,9 +265,14 @@
   }
   function addVS16IfNeeded(s){
     if(!s) return s; const VS16='\uFE0F';
-    // Apply to a small set that benefits from emoji presentation on some platforms
-    return s
-      .replace(/⏰(?!\uFE0F)/g, '⏰\uFE0F');
+    // Apply VS16 (emoji variation selector) to known emoji glyphs so platforms
+    // that require explicit emoji presentation render them correctly in WhatsApp.
+    try{
+      EMOJI_MAP.forEach((rep, emo)=>{
+        try{ s = s.replace(new RegExp(emo + '(?!\\uFE0F)','g'), emo + VS16); }catch(_){ /* noop on invalid regex */ }
+      });
+    }catch(_){ }
+    return s;
   }
   function processMessageForPlatform(s){
     try{ return shouldUsePlainText() ? stripEmojis(s) : addVS16IfNeeded(s); }catch(_){ return s; }
@@ -531,7 +568,7 @@
         const dot = byId('status-dot');
         const txt = byId('status-text');
         if(dot && txt){
-          const hours = C.business?.hours || { mon_sat:'10:00–20:00', sun:'10:00–13:00' };
+          const hours = C.business?.hours || { mon_sat:'13:30–20:00', sun:'Fechado' };
           function parseRange(range){
             if(!range) return null;
             const m = String(range).match(/^(\d{1,2}):(\d{2})\s*[–-]\s*(\d{1,2}):(\d{2})$/);
@@ -546,7 +583,16 @@
             const r = parseRange(rangeStr);
             // Helper to build label HH:MM
             const hhmm = (h,m)=> `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-            if(!r){ return { open:false, label:'' }; }
+            const DIAS = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+            function nextFrom(base, startOffset){
+              for(let i=startOffset;i<8;i++){
+                const nd = new Date(base.getFullYear(), base.getMonth(), base.getDate()+i);
+                const nr = parseRange(nd.getDay()===0 ? hours.sun : hours.mon_sat);
+                if(nr){ const when = i===1 ? 'amanhã' : DIAS[nd.getDay()]; return { open:false, label:`Fechado • Abre ${when} às ${hhmm(nr.fromH, nr.fromM)}` }; }
+              }
+              return { open:false, label:'Fechado' };
+            }
+            if(!r){ return nextFrom(d, 1); }
             const curMin = d.getHours()*60 + d.getMinutes();
             const fromMin = r.fromH*60 + r.fromM;
             const toMin = r.toH*60 + r.toM;
@@ -554,15 +600,11 @@
         return { open:true, closesAt: hhmm(r.toH, r.toM) };
             }
             if(curMin < fromMin){
-              return { open:false, label: `Abre às ${hhmm(r.fromH, r.fromM)}` };
+              return { open:false, label: `Fechado • Abre hoje às ${hhmm(r.fromH, r.fromM)}` };
             }
             // After closing today: compute next open
             // Next day open is Monday-Saturday or Sunday accordingly
-            const nextDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1, 0, 0, 0);
-            const nextIsSun = nextDay.getDay() === 0;
-            const nr = parseRange(nextIsSun ? hours.sun : hours.mon_sat);
-            if(nr){ return { open:false, label:`Abre às ${hhmm(nr.fromH, nr.fromM)}` }; }
-            return { open:false, label:'' };
+            return nextFrom(d, 1);
           }
       function updateStatus(){
             const info = nextOpenInfo(new Date());
@@ -689,9 +731,56 @@
         const todayYMD = `${y}-${m}-${d}`;
         f.dataPreferida.setAttribute('min', todayYMD);
         const cur = (f.dataPreferida.value||'').trim();
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(cur) || cur < todayYMD){ f.dataPreferida.value = todayYMD; }
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(cur) || cur < todayYMD || !Booking.timesFor(cur).length){ f.dataPreferida.value = Booking.nextOpenYMD(); }
       }
     }catch(_){ }
+
+    // Horários de chegada: só dias abertos e só horários que ainda dão tempo
+    function refreshSlots(){
+      try{
+        const sel = f.janela; const dateEl = f.dataPreferida;
+        if(!sel || !dateEl) return;
+        const ymd = (dateEl.value||'').trim();
+        const errD = byId('err-dataPreferida');
+        const prev = sel.value;
+        const times = Booking.timesFor(ymd);
+        sel.innerHTML = '<option value="">Selecione…</option>' + times.map(t=>`<option>${t}</option>`).join('');
+        if(times.includes(prev)) sel.value = prev;
+        sel.disabled = times.length === 0;
+        if(errD){
+          let msg = '';
+          if(ymd && Booking.isClosed(ymd)) msg = 'Não atendemos aos domingos. Escolha outro dia.';
+          else if(ymd && !times.length) msg = 'Hoje não dá mais tempo. Escolha a partir de amanhã.';
+          errD.textContent = msg; errD.hidden = !msg;
+          if(msg) dateEl.setAttribute('aria-invalid','true'); else dateEl.removeAttribute('aria-invalid');
+        }
+      }catch(e){ console.warn('refreshSlots failed', e); }
+    }
+    window.__focinhosRefreshSlots = refreshSlots;
+    on(f.dataPreferida, 'change', refreshSlots);
+    on(f.dataPreferida, 'input', refreshSlots);
+    refreshSlots();
+
+    // Próximos passos: vídeo e sinal Pix (chave vem do config.json)
+    try{
+      const pay = (window.CONFIG && window.CONFIG.payments) || {};
+      const key = String(pay.pixKey||'').trim();
+      const stepPix = byId('step-pix');
+      if(stepPix && key){
+        stepPix.hidden = false;
+        text(byId('pix-key'), key);
+        text(byId('pix-type'), pay.pixKeyType ? ` (${pay.pixKeyType})` : '');
+        text(byId('pix-holder'), pay.pixHolder ? `Titular: ${pay.pixHolder}` : '');
+        text(byId('pix-note'), pay.depositNote || '');
+        on(byId('btn-copy-pix'), 'click', async ()=>{
+          const b = byId('btn-copy-pix');
+          try{ await navigator.clipboard.writeText(key); b.textContent = 'Chave copiada ✓'; }
+          catch(_){ b.textContent = 'Copie a chave acima'; }
+          setTimeout(()=>{ b.textContent = 'Copiar chave'; }, 2500);
+        });
+      }
+      if(byId('step-video') && Booking.cfg().askForVideo === false) byId('step-video').hidden = true;
+    }catch(e){ console.warn('next steps init failed', e); }
   // geolocalização inicia automaticamente; sem botões na UI
     const btnResumo = byId('btn-ver-resumo');
     const preResumo = byId('agendar-resumo');
@@ -864,6 +953,62 @@
     modalidadeEls.forEach(r=> on(r,'change', updateLocalizacaoFields));
     updateLocalizacaoFields();
 
+  // Botões de "Usar minha localização" (agendar)
+  // Bind em botões com atributo data-geo (data-geo="origem" | "destino")
+  try{
+    const geoButtons = Array.from(document.querySelectorAll('button[data-geo]'));
+    geoButtons.forEach(btn=>{
+      const key = btn.getAttribute('data-geo');
+      on(btn,'click', (e)=>{
+        e.preventDefault();
+        try{
+          btn.textContent = '⏳ Capturando...';
+          // Start a dedicated watch for this key and pass the button as badge so Geo can update label
+          Geo.start(key, btn);
+          // one-time listener to apply resolved address/coords to the corresponding fields
+          const handler = (ev)=>{
+            try{
+              const k = ev?.detail?.key;
+              if(k !== key) return;
+              const addrObj = ev?.detail?.address;
+              const best = Geo.get(key);
+              const prefix = (k === 'default') ? 'end' : k; // map key to form prefix
+              const ruaEl = byId(prefix + '-rua');
+              const cepEl = byId(prefix + '-cep');
+              if(addrObj && ruaEl && (ruaEl.value||'').trim() === ''){
+                // prefer structured parts when available, fallback to display
+                const d = addrObj.details || {};
+                const road = d.road || d.pedestrian || d.cycleway || '';
+                const housen = d.house_number || '';
+                const display = addrObj.display || '';
+                ruaEl.value = (road ? (road + (housen ? (', ' + housen) : '')) : display) || '';
+                try{ ruaEl.dispatchEvent(new Event('input',{bubbles:true})); ruaEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
+              }
+              if(addrObj && cepEl && (cepEl.value||'').trim() === '' && addrObj.details && addrObj.details.postcode){ cepEl.value = addrObj.details.postcode; try{ cepEl.dispatchEvent(new Event('input',{bubbles:true})); cepEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
+              // store coords on the rua element for later use
+              if(best && ruaEl){ ruaEl.dataset.geoLat = String(best.lat); ruaEl.dataset.geoLng = String(best.lng); ruaEl.dataset.geoAcc = String(best.accuracy || ''); }
+              // restore button label to a short form
+              try{
+                if(addrObj && addrObj.display){ const short = String(addrObj.display).split(',').slice(0,3).join(', '); btn.textContent = '📍 ' + short; }
+                else btn.textContent = '📍 Usar minha localização';
+              }catch(_){ btn.textContent = '📍 Usar minha localização'; }
+            }catch(e){ console.warn('apply geo (agendar) failed', e); }
+            // remove listener after first call
+            try{ window.removeEventListener('focinhos:geo:address:resolved', handler); }catch(_){ }
+          };
+          window.addEventListener('focinhos:geo:address:resolved', handler);
+          // also set a fallback timeout in case reverseGeocode didn't resolve
+          setTimeout(()=>{
+            try{
+              const best = Geo.get(key);
+              if(!best){ /* still no position */ btn.textContent = '📍 Captura falhou'; setTimeout(()=> btn.textContent = '📍 Usar minha localização', 1800); }
+            }catch(_){}
+          }, (window.CONFIG?.geoloc?.waitMs || 40000) + 1200);
+        }catch(err){ console.warn('geo btn click failed', err); btn.textContent = '📍 Usar minha localização'; }
+      });
+    });
+  }catch(e){ console.warn('bind geo buttons (agendar) failed', e); }
+
   function getServicosGlobaisLista(){
       // Mantido apenas para compat; hoje não há serviços globais.
       const list = [];
@@ -939,7 +1084,8 @@
         destinoAccuracy: geoDefault? fmtAcc(geoDefault.accuracy) : '',
         origemTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
         destinoTimestamp: geoDefault? fmtDT(geoDefault.timestamp) : '',
-        observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || ''
+        observacoes: pets.map(p=>p.observacoes).filter(Boolean).join(' \n') || '',
+        videoNota: Booking.cfg().askForVideo === false ? '' : `\n\n🎥 *Vídeo*\nVou enviar agora um vídeo curto ${pets.length>1 ? 'dos pets' : 'do pet'} para vocês avaliarem o pelo e passarem o valor.`
       };
       const tpl = window.CONFIG.waTemplates.agendar;
   console.debug('[agendar] resumoTexto result preview', { petsLista: map.petsLista && map.petsLista.slice(0,80) });
@@ -955,7 +1101,7 @@
           map.petsLista,
           '',
           '⏰ *Quando*',
-          `${map.dataPreferida}${map.janela ? ' • Janela: ' + map.janela : ''}`,
+          `${map.dataPreferida}${map.janela ? ' • Chegada: ' + map.janela : ''}`,
           '',
           '👤 *Tutor*',
           `${map.tutorNome}${map.tutorTelefone ? ' • 📞 ' + map.tutorTelefone : ''}`,
@@ -970,7 +1116,7 @@
           '',
           '🏪 *Loja física*',
           map.enderecoLoja
-        ].join('\n');
+        ].join('\n') + (map.videoNota || '');
         try{
           const trackTpl = window.CONFIG?.waTemplates?.agendarTracking || '';
           if(trackTpl){ rawLoja += interpolate(trackTpl, map); }
@@ -1093,7 +1239,12 @@
       ok &= required(f.tutorTelefone,'Informe um telefone válido.');
       if(ok && !isTelBR(f.tutorTelefone.value)) { setErr(f.tutorTelefone,'Informe um telefone válido.'); ok=false; }
       ok &= required(f.dataPreferida,'Escolha a data.');
-      ok &= required(f.janela,'Selecione a janela.');
+      ok &= required(f.janela,'Escolha o horário de chegada.');
+      try{
+        const ymd = (f.dataPreferida.value||'').trim();
+        if(ymd && Booking.isClosed(ymd)){ setErr(f.dataPreferida,'Não atendemos aos domingos. Escolha outro dia.'); ok = false; }
+        else if(f.janela.value && !Booking.timesFor(ymd).includes(f.janela.value)){ setErr(f.janela,'Esse horário não está disponível. Escolha outro.'); ok = false; }
+      }catch(_){ }
       // Pelo menos 1 serviço (qualquer um: Banho, Tosa, Ozônio, Higienização bucal, Hidratação, Corte de unhas, Limpeza de ouvido)
       const hasAnyService = pets.some(p=> p && (p.srvBanho || p.srvTosa || p.ozonio || p.escovacao || p.hidratacao || p.corteUnhas || p.limpezaOuvido));
       if(!hasAnyService){
@@ -1150,18 +1301,6 @@
       // manter href atualizado por acessibilidade
       try{ btnWA.href = url; }catch(e){}
     });
-
-  // Show delivery guidance note under actions (no add-delivery button)
-  const summaryActions = (btnWA && btnWA.parentNode) || null;
-  if(summaryActions && !byId('__agendar-delivery-note')){
-      const note = document.createElement('p');
-      note.id = '__agendar-delivery-note';
-      note.className = 'muted';
-  // spacing handled by CSS (.actions .muted)
-  try{ note.style.removeProperty('margin-top'); }catch(_){ note.style.marginTop = ''; }
-      note.textContent = 'Se precisar de delivery, conclua este agendamento e depois volte ao site para combinar pelo Delivery.';
-      summaryActions.appendChild(note);
-    }
 
   try{ attachCopyButton(btnWA && btnWA.parentNode || document.body, 'btn-copy-msg-agendar', resumoTexto); }catch(e){ console.warn('attach copy (agendar) failed', e); }
 
@@ -1283,11 +1422,13 @@
           const y = t.getFullYear(); const m = String(t.getMonth()+1).padStart(2,'0'); const dd = String(t.getDate()).padStart(2,'0');
           const todayYMD = `${y}-${m}-${dd}`;
           const v = (d.dataPreferida||'').trim();
-          const val = (/^\d{4}-\d{2}-\d{2}$/.test(v) && v >= todayYMD) ? v : todayYMD;
+          const val = (/^\d{4}-\d{2}-\d{2}$/.test(v) && v >= todayYMD && Booking.timesFor(v).length) ? v : Booking.nextOpenYMD();
           el.setAttribute('min', todayYMD);
           el.value = val;
         }
+        try{ if(window.__focinhosRefreshSlots) window.__focinhosRefreshSlots(); }catch(_){ }
         if(byId('janela')) byId('janela').value = d.janela||'';
+        if(byId('janela') && byId('janela').value !== (d.janela||'')) byId('janela').value = '';
         if(typeof d.modalidade === 'string'){
           const r = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']")).find(x=> x.value === d.modalidade);
           if(r){ r.checked = true; updateLocalizacaoFields(); }
@@ -1434,7 +1575,47 @@
       renderCart();
     });
 
-  // Sem botão de geo; geoloc inicia globalmente no boot
+  // Botão de "Usar minha localização" (delivery)
+  try{
+    const btnUseGeo = byId('btn-use-geo');
+    if(btnUseGeo){
+      on(btnUseGeo,'click', (e)=>{
+        e.preventDefault();
+        try{
+          btnUseGeo.textContent = '⏳ Capturando...';
+          // start a dedicated watch keyed as 'default' and pass button as badge so Geo can update it
+          Geo.start('default', btnUseGeo);
+          // one-time listener to apply resolved address
+          const handler = (ev)=>{
+            try{
+              const k = ev?.detail?.key || 'default';
+              if(k !== 'default') return;
+              const addrObj = ev?.detail?.address;
+              const best = Geo.get('default');
+              const ruaEl = byId('end-rua');
+              const cepEl = byId('end-cep');
+              if(addrObj && ruaEl && (ruaEl.value||'').trim() === ''){
+                const d = addrObj.details || {};
+                const road = d.road || d.pedestrian || d.cycleway || '';
+                const housen = d.house_number || '';
+                const display = addrObj.display || '';
+                ruaEl.value = (road ? (road + (housen ? (', ' + housen) : '')) : display) || '';
+                try{ ruaEl.dispatchEvent(new Event('input',{bubbles:true})); ruaEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){}
+              }
+              if(addrObj && cepEl && (cepEl.value||'').trim() === '' && addrObj.details && addrObj.details.postcode){ cepEl.value = addrObj.details.postcode; try{ cepEl.dispatchEvent(new Event('input',{bubbles:true})); cepEl.dispatchEvent(new Event('change',{bubbles:true})); }catch(_){} }
+              if(best && ruaEl){ ruaEl.dataset.geoLat = String(best.lat); ruaEl.dataset.geoLng = String(best.lng); ruaEl.dataset.geoAcc = String(best.accuracy || ''); }
+              try{ if(addrObj && addrObj.display){ const short = String(addrObj.display).split(',').slice(0,3).join(', '); btnUseGeo.textContent = '📍 ' + short; } else btnUseGeo.textContent = '📍 Usar minha localização'; }catch(_){ btnUseGeo.textContent = '📍 Usar minha localização'; }
+            }catch(e){ console.warn('apply geo (delivery) failed', e); }
+            try{ window.removeEventListener('focinhos:geo:address:resolved', handler); }catch(_){ }
+          };
+          window.addEventListener('focinhos:geo:address:resolved', handler);
+          setTimeout(()=>{
+            try{ const best = Geo.get('default'); if(!best){ btnUseGeo.textContent = '📍 Captura falhou'; setTimeout(()=> btnUseGeo.textContent = '📍 Usar minha localização', 1800); } }catch(_){}
+          }, (window.CONFIG?.geoloc?.waitMs || 40000) + 1200);
+        }catch(err){ console.warn('btn-use-geo click failed', err); btnUseGeo.textContent = '📍 Usar minha localização'; }
+      });
+    }
+  }catch(e){ console.warn('bind btn-use-geo failed', e); }
 
     function resumoTexto(){
       const geo = Geo.get('default');

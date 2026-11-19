@@ -78,7 +78,7 @@ function change(p, ok){ if(ok) changes.push(path.relative(repo, p)); }
 
 // 5) HTML fallbacks -> <span data-bind="version">vX.Y.Z</span>
 {
-  const htmlFiles = ['index.html','404.html','agendar.html','delivery.html','sobre.html','taxi.html']
+  const htmlFiles = ['index.html','404.html','agendar.html','sobre.html','taxi.html']
     .map(f=> path.join(repo, f)).filter(f=> fs.existsSync(f));
   for(const f of htmlFiles){
     change(f, upd(f, /(<span\s+data-bind=\"version\">)v?\d+\.\d+\.\d+(<\/span>)/g, `$1${DISP}$2`));

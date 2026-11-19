@@ -2,8 +2,8 @@
    Editável pelo cliente. Disponível em window.CONFIG */
 
 window.CONFIG = {
-  appVersion: "v0.1.20",
-  appVersion: "v0.1.20",
+  appVersion: "v0.2.0",
+  appVersion: "v0.2.0",
 
   business: {
     name: "Focinhos Amados",
@@ -15,8 +15,8 @@ window.CONFIG = {
       whatsappHuman: "+55 31 98233-9672"
     },
     hours: {
-      mon_sat: "10:00–20:00",
-      sun: "10:00–13:00",
+      mon_sat: "13:30–20:00",
+      sun: "Fechado",
       holidays_note: "Feriados e outras datas: confirme pelo Status do WhatsApp."
     },
     shopCoords: { lat: -19.953147097101922, lng: -43.993680031948806 }, // coordinates for Av. Padre José Maurício, 572 - Nova Cintra
@@ -30,6 +30,17 @@ window.CONFIG = {
   preferPlainTextMessages: false
   },
 
+  booking: {
+    closedWeekdays: [0],               // 0 = domingo
+    arrivalTimes: ["13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00"],
+    minLeadMinutes: 30,
+    petsAtSameTime: 2,
+    askForVideo: true,
+    temperamentOptions: ["Manso","Bravo"]
+  },
+
+  payments: { pixKey: "", pixKeyType: "", pixHolder: "", depositNote: "" },
+
   geoloc: {
     enabled: true,
     enableHighAccuracy: true,
@@ -38,13 +49,6 @@ window.CONFIG = {
   },
 
   suggestions: {
-    // usado no delivery com <datalist> (top-sellers, editável)
-    products: [
-      "QUATREE GOURMET ADULTOS 1kg",
-      "PIPICAT CLASSIC 4kg",
-      "GOLDEN GATOS CASTRADOS 1kg",
-      "SPECIAL DOG PRIME BIONATURAL 1kg"
-    ],
     upsellServices: [
       "Hidratação de pelagem",
       "Corte de unhas",
@@ -60,7 +64,7 @@ window.CONFIG = {
 {petsLista}
 
 ⏰ *Quando*
-{dataPreferida} • Janela: {janela}
+{dataPreferida} • Chegada: {janela}
 
 👤 *Tutor*
 {tutorNome} • 📞 {tutorTelefone}
@@ -78,33 +82,11 @@ window.CONFIG = {
 {observacoes}
 
 🏪 *Loja física*
-{enderecoLoja}`,
+{enderecoLoja}{videoNota}`,
 
   // Tracking técnico (apêndice) para o template Agendar
   agendarTracking:
 `\n—\nTracking\nOrigem: {origemLat},{origemLng} • ±{origemAccuracy}m @ {origemTimestamp}\nDestino: {destinoLat},{destinoLng} • ±{destinoAccuracy}m @ {destinoTimestamp}`,
-
-    delivery:
-`📦 *DELIVERY* — FOCINHOS AMADOS (BH)
-
-📋 *Itens*  
-{itensLista}
-
-👤 *Recebedor*  
-{nome} • 📞 {telefone}
-
-📍 *Endereço*  
-{enderecoCompleto}  
-
-📝 *Observações*  
-{observacoes}
-
-🏪 *Loja física*
-{enderecoLoja}`,
-
-  // Tracking técnico (apêndice) para o template Delivery
-  deliveryTracking:
-`\n—\nTracking\nEntrega: {lat},{lng} • ±{accuracy}m @ {timestamp}`,
 
     taxiBanho:
 `🚕 *TÁXI DOG — BANHO/TOSA* (BH)
@@ -179,7 +161,8 @@ Detalhes e confirmações serão combinados via WhatsApp.`,
 window.CONFIG.__format = {
   hoursLabel(){
     const h = window.CONFIG.business.hours;
-    return `Seg–Sáb ${h.mon_sat} • Dom ${h.sun}`;
+    const sun = (!h.sun || /fechad/i.test(h.sun)) ? 'Dom fechado' : `Dom ${h.sun}`;
+    return `Seg–Sáb ${h.mon_sat} • ${sun}`;
   },
   routeUrl(){
     const c = window.CONFIG.business.shopCoords;

@@ -1,5 +1,20 @@
 # Changelog
 #
+## [0.2.0] - 2026-11-19 (branch redesign/agendamento-v2, em teste)
+### Removed
+- Delivery saiu do site (página, menu, home, mensagens e testes). Delivery é da loja do 1º piso.
+### Changed
+- Horário: seg–sáb 13:30–20:00, domingo fechado. Sem horários de manhã.
+- Agendamento: "Janela" virou "Horário de chegada" (13:30 a 17:00, de 30 em 30 min). Domingo bloqueado; hoje só mostra horários com 30 min de antecedência.
+- Temperamento: só Manso ou Bravo, com explicação curta.
+- Status aberto/fechado da home considera domingo fechado e mostra quando abre.
+- Botões "Ver rota" funcionam mesmo antes do JavaScript carregar.
+### Added
+- Card "Como confirmar seu horário": pede vídeo do pet e mostra a chave Pix do sinal com botão copiar.
+- `config.json`: blocos `booking` (regras de horário) e `payments` (chave Pix; vazio = escondido).
+- Mensagem do WhatsApp avisa que o tutor vai mandar um vídeo do pet.
+- Testes de domingo, horários, Manso/Bravo e pedido de vídeo.
+
 ## [0.1.11] - 2025-09-01
 ### Changed
 - Atualização forçada de versão para 0.1.10 em todos os arquivos críticos do app (package.json, dist/package.json, config.json, manifest, service worker, .do/app.yaml).

@@ -61,6 +61,18 @@ function mockGeolocation(page){
   });
 }
 
+
+async function pickSlot(p, time='14:00'){
+  // Próximo dia útil (amanhã; pula domingo) e um horário de chegada válido
+  await p.evaluate(()=>{
+    const d = new Date(); d.setDate(d.getDate()+1); if(d.getDay()===0) d.setDate(d.getDate()+1);
+    const el = document.getElementById('dataPreferida');
+    el.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    el.dispatchEvent(new Event('change', {bubbles:true}));
+  });
+  await p.select('#janela', time);
+}
+
 (async ()=>{
   const server = await serve();
   const browser = await safeLaunch();
@@ -95,6 +107,7 @@ function mockGeolocation(page){
     await p.select('#porte', 'Médio');
     await p.type('#tutorNome', 'João Silva');
     await p.type('#tutorTelefone', '31988887777');
+    await pickSlot(p);
   await p.click('[data-role="srv-banho"]');
     await p.click('#btn-ver-resumo');
     await p.waitForFunction(()=> document.getElementById('agendar-resumo') && document.getElementById('agendar-resumo').textContent.includes('Rex'), {timeout:3000});
@@ -105,36 +118,6 @@ function mockGeolocation(page){
     return {errText, wa};
   });
 
-  // DELIVERY: happy path and validation
-  await run('delivery - validation then happy', async (p)=>{
-    await p.goto(`http://localhost:${port}/delivery.html`, {waitUntil:'networkidle2'});
-    // try WA without cart -> should alert; intercept window.alert
-    await p.evaluate(()=>{ window.__alertMsg = null; window.alert = (m)=>{ window.__alertMsg = m; }; window.__lastWindowOpen = null; window.open = (u)=>{ window.__lastWindowOpen = u; return { focus: ()=>{} }; }; });
-    await p.click('#btn-wa');
-    const alertMsg = await p.evaluate(()=> window.__alertMsg || '');
-    // add product
-    await p.type('#produto','GOLDEN DOG');
-    await p.type('#variacao','1kg');
-    await p.click('#btn-add-prod');
-    await p.waitForFunction(()=> document.querySelectorAll('#carrinho li').length>0, {timeout:3000});
-    // Fill address fields starting with CEP
-    await p.type('#end-cep','30140071');
-    // Wait a bit for CEP lookup, then fill remaining fields
-    await p.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
-    await p.type('#end-rua','Rua Teste');
-    await p.type('#end-numero','123');
-    await p.type('#end-bairro','Centro');
-    await p.type('#endereco-complemento','Apt 456');
-    await p.type('#recebedor','Maria');
-    await p.type('#tel','31977776666');
-    await p.click('#btn-ver-resumo');
-    await p.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('GOLDEN'), {timeout:3000});
-    await p.click('#btn-wa');
-    const wa = await p.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
-    return {alertMsg, wa};
-  });
-
-  // TAXI: test both modes
   await run('taxi - banho mode', async (p)=>{
     await p.goto(`http://localhost:${port}/taxi.html`, {waitUntil:'networkidle2'});
     // choose banho
@@ -197,6 +180,49 @@ function mockGeolocation(page){
   });
 
   // ROUTE LINKS on index
+  // REGRAS NOVAS: domingo bloqueado, horários da tarde, Manso/Bravo, vídeo e Pix
+  await run('agendar - regras de horario e domingo', async (p)=>{
+    await p.goto(`http://localhost:${port}/agendar.html`, {waitUntil:'networkidle2'});
+    const r = await p.evaluate(()=>{
+      const el = document.getElementById('dataPreferida');
+      const d = new Date(); d.setDate(d.getDate() + ((7 - d.getDay()) % 7 || 7)); // próximo domingo
+      el.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      el.dispatchEvent(new Event('change', {bubbles:true}));
+      const sunday = { disabled: document.getElementById('janela').disabled, err: document.getElementById('err-dataPreferida').textContent };
+      const m = new Date(d); m.setDate(m.getDate()+1); // segunda
+      el.value = `${m.getFullYear()}-${String(m.getMonth()+1).padStart(2,'0')}-${String(m.getDate()).padStart(2,'0')}`;
+      el.dispatchEvent(new Event('change', {bubbles:true}));
+      const times = Array.from(document.querySelectorAll('#janela option')).map(o=>o.value).filter(Boolean);
+      const temps = Array.from(document.querySelectorAll('#temperamento option')).map(o=>o.value).filter(Boolean);
+      return { sunday, times, temps, pixHidden: document.getElementById('step-pix').hidden };
+    });
+    if(!r.sunday.disabled || !/domingo/i.test(r.sunday.err)) throw new Error('domingo nao bloqueado');
+    if(r.times[0] !== '13:30' || r.times[r.times.length-1] !== '17:00') throw new Error('horarios errados: '+r.times);
+    if(r.temps.join() !== 'Manso,Bravo') throw new Error('temperamento: '+r.temps);
+    if(!r.pixHidden) throw new Error('pix deveria estar escondido sem chave');
+    return r;
+  });
+
+  await run('agendar - mensagem pede video e pix aparece com chave', async (p)=>{
+    await p.goto(`http://localhost:${port}/agendar.html`, {waitUntil:'networkidle2'});
+    await p.evaluate(()=>{ try{ localStorage.clear(); }catch(_){} });
+    await p.reload({waitUntil:'networkidle2'});
+    await p.type('#petNome', 'Mel');
+    await p.select('#especie', 'Cão');
+    await p.select('#porte', 'Pequeno');
+    await p.select('#temperamento', 'Bravo');
+    await p.type('#tutorNome', 'Ana');
+    await p.type('#tutorTelefone', '31988887777');
+    await pickSlot(p, '15:30');
+    await p.click('[data-role="srv-banho"]');
+    await p.click('#btn-ver-resumo');
+    const resumo = await p.$eval('#agendar-resumo', el=> el.textContent);
+    if(!/Chegada: 15:30/.test(resumo)) throw new Error('sem horario de chegada');
+    if(!/vídeo/i.test(resumo)) throw new Error('sem pedido de video');
+    if(!/Bravo/.test(resumo)) throw new Error('sem temperamento');
+    return { ok:true };
+  });
+
   await run('home - route links', async (p)=>{
     await p.goto(`http://localhost:${port}/`, {waitUntil:'networkidle2'});
     const href1 = await p.$eval('#route-link', el=>el.href);

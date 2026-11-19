@@ -45,7 +45,6 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
         <button class="nav__btn" aria-expanded="false" aria-controls="drawer"><svg aria-hidden="true" class="icon"><use href="#i-menu"></use></svg><span>Menu</span></button>
         <ul id="drawer" class="nav__drawer" role="menu" aria-hidden="true">
           <li role="none"><a role="menuitem" href="agendar.html" aria-current="page">Agendar</a></li>
-          <li role="none"><a role="menuitem" href="delivery.html">Delivery</a></li>
           <li role="none"><a role="menuitem" href="taxi.html">Táxi Dog</a></li>
           <li role="none"><a role="menuitem" href="sobre.html">Sobre</a></li>
         </ul>
@@ -105,10 +104,10 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
                 <label for="temperamento">Temperamento</label>
                 <select id="temperamento" class="select" data-role="temperamento">
                   <option value="">Selecione…</option>
-                  <option>Calmo</option>
-                  <option>Ativo</option>
-                  <option>Reativo</option>
+                  <option>Manso</option>
+                  <option>Bravo</option>
                 </select>
+                <small class="help">Bravo = rosna, morde ou não deixa mexer. Tudo bem, só precisamos saber antes.</small>
               </div>
               <div class="field">
                 <label for="observacoes">Condições de saúde / observações</label>
@@ -209,10 +208,10 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
                 <label for="temperamento__IDX__">Temperamento</label>
                 <select id="temperamento__IDX__" name="temperamento__IDX__" class="select" data-role="temperamento">
                   <option value="">Selecione…</option>
-                  <option>Calmo</option>
-                  <option>Ativo</option>
-                  <option>Reativo</option>
+                  <option>Manso</option>
+                  <option>Bravo</option>
                 </select>
+                <small class="help">Bravo = rosna, morde ou não deixa mexer. Tudo bem, só precisamos saber antes.</small>
               </div>
               <div class="field">
                 <label for="observacoes__IDX__">Condições de saúde / observações</label>
@@ -295,16 +294,16 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
             <small id="err-dataPreferida" class="help" hidden></small>
           </div>
           <div class="field">
-            <label for="janela">Janela de horário <span class="req">*</span></label>
+            <label for="janela">Horário de chegada <span class="req">*</span></label>
             <select id="janela" class="select" required>
               <option value="">Selecione…</option>
-              <option>Manhã</option>
-              <option>Tarde</option>
-              <option>Outro</option>
+              <option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option>
+              <option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option>
             </select>
             <small id="err-janela" class="help" hidden></small>
           </div>
         </div>
+        <p class="muted" id="hint-horarios">Atendemos de segunda a sábado, à tarde. O pet chega entre 13h30 e 17h.</p>
       </section>
 
       <section class="card">
@@ -358,13 +357,29 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
         </div>
       </section>
 
+      <section class="card card--next" id="proximos-passos">
+        <h2 class="card__title">🐾 Como confirmar seu horário</h2>
+        <ol class="steps">
+          <li><strong>Envie a ficha pelo WhatsApp</strong> no botão abaixo. Ela já vai pronta.</li>
+          <li id="step-video"><strong>Grave um vídeo curto do seu pet</strong> (uns 20 segundos, mostrando o pelo de perto) e mande na mesma conversa. Com ele a gente vê o estado do pelo, calcula o tempo e passa o valor certinho.</li>
+          <li id="step-pix" hidden><strong>Pague o sinal no Pix</strong> para garantir o horário. <span id="pix-note"></span>
+            <span class="pix-box">
+              <span class="pix-box__label">Chave Pix<span id="pix-type"></span>:</span>
+              <code id="pix-key"></code>
+              <button type="button" class="btn btn--small" id="btn-copy-pix">Copiar chave</button>
+              <span class="muted" id="pix-holder"></span>
+            </span>
+          </li>
+        </ol>
+      </section>
+
       <section class="card card--summary">
         <h2 class="card__title">📄 Resumo</h2>
         <pre id="agendar-resumo" class="note" aria-live="polite">Nada por aqui ainda. Adicione um serviço para continuar.</pre>
         <div class="actions">
           <button class="btn" type="button" id="btn-ver-resumo">📄 Ver resumo</button>
           <a class="btn btn--primary" id="btn-wa" href="#" target="_blank" rel="noopener">✅ Prosseguir para WhatsApp</a>
-          <a class="btn btn--ghost" id="btn-rotas" href="#" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
+          <a class="btn btn--ghost" id="btn-rotas" href="https://www.google.com/maps/dir/?api=1&amp;destination=-19.953147097101922,-43.993680031948806" target="_blank" rel="noopener">🗺️ Ver rota no Google Maps</a>
         </div>
         <p class="muted">LGPD: Usamos seus dados apenas para atender seu pedido e combinar detalhes pelo WhatsApp.</p>
         <div id="agendar-err" class="toast" role="status" aria-live="polite"></div>
@@ -374,7 +389,7 @@ src="https://www.facebook.com/tr?id=2740457159685941&ev=PageView&noscript=1"
 
   <footer class="footer">
     <div class="container footer__inner">
-  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.1.20</span></span></p>
+  <p><strong>Focinhos Amados</strong> — <span data-bind="city">Belo Horizonte/MG</span> <span class="muted" style="margin-left:8px">Versão <span data-bind="version">v0.2.0</span></span></p>
       <a href="sobre.html">Sobre</a>
     </div>
   </footer>

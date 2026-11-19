@@ -64,6 +64,18 @@ async function ensureWaIntercept(page){
   await page.evaluate(()=>{ window.__lastWindowOpen = null; window.open = (u)=>{ window.__lastWindowOpen = u; return { focus: ()=>{} }; }; });
 }
 
+
+async function pickSlot(p, time='14:00'){
+  // Próximo dia útil (amanhã; pula domingo) e um horário de chegada válido
+  await p.evaluate(()=>{
+    const d = new Date(); d.setDate(d.getDate()+1); if(d.getDay()===0) d.setDate(d.getDate()+1);
+    const el = document.getElementById('dataPreferida');
+    el.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    el.dispatchEvent(new Event('change', {bubbles:true}));
+  });
+  await p.select('#janela', time);
+}
+
 (async ()=>{
   const server = await serve();
   const browser = await safeLaunch();
@@ -90,84 +102,6 @@ async function ensureWaIntercept(page){
     return { hrefs };
   });
 
-  // Delivery matrices
-  await record('delivery:empty-cart validation', async ()=>{
-    await page.goto(`http://localhost:${port}/delivery.html`, {waitUntil:'networkidle2'});
-    await page.evaluate(()=>{ window.__alertMsg = null; window.alert = (m)=> window.__alertMsg=m; });
-    await page.click('#btn-wa');
-    const alertMsg = await page.evaluate(()=> window.__alertMsg);
-    if(!alertMsg || !/Adicione pelo menos um produto/.test(alertMsg)) throw new Error('no empty-cart alert');
-    return { alertMsg };
-  });
-
-  await record('delivery:geo happy (no address number)', async ()=>{
-    await page.goto(`http://localhost:${port}/delivery.html`, {waitUntil:'networkidle2'});
-    // add item
-    await page.type('#produto','QUATREE GOURMET ADULTOS 1kg');
-    await page.click('#btn-add-prod');
-    await page.waitForFunction(()=> document.querySelectorAll('#carrinho li').length>0, {timeout:3000});
-    // share geo
-    await page.click('#btn-use-geo');
-    await page.type('#recebedor','Maria');
-    await page.type('#tel','31988887777');
-    // fill all required address fields starting with CEP
-    await page.type('#end-cep','30140071');
-    // Brief delay to allow CEP lookup and auto-fill
-    await page.evaluate(()=> new Promise(r=> setTimeout(r, 600)));
-    await page.type('#end-rua','Rua Teste');
-    await page.type('#end-numero','123');
-    await page.type('#end-bairro','Centro');
-    await page.type('#endereco-complemento','Apt 456');
-    await page.click('#btn-ver-resumo');
-    await page.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('QUATREE'), {timeout:3000});
-    await ensureWaIntercept(page);
-    await page.click('#btn-wa');
-    const wa = await page.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
-    if(!(wa && wa.startsWith('https://wa.me/'))) throw new Error('no wa link');
-    return { wa };
-  });
-
-  await record('delivery:address+number happy (no geo)', async ()=>{
-    // Create fresh page and immediately clear localStorage
-    const freshPage = await browser.newPage();
-    await freshPage.evaluateOnNewDocument(()=> localStorage.clear());
-    mockGeolocation(freshPage);
-    
-    await freshPage.goto(`http://localhost:${port}/delivery.html`, {waitUntil:'networkidle2'});
-    await freshPage.type('#produto','PIPICAT CLASSIC 4kg');
-    await freshPage.click('#btn-add-prod');
-    await freshPage.type('#recebedor','Joana');
-    await freshPage.type('#tel','31977776666');
-    // fill all required address fields starting with CEP
-    await freshPage.type('#end-cep','30140072');
-    // Brief delay to allow CEP lookup and auto-fill
-    await freshPage.evaluate(()=> new Promise(r=> setTimeout(r, 800)));
-    await freshPage.type('#end-rua','Rua Teste');
-    await freshPage.type('#end-numero','456');
-    await freshPage.type('#end-bairro','Bairro Teste');
-    await freshPage.type('#endereco-complemento','Apt 789');
-    await freshPage.click('#btn-ver-resumo');
-    await freshPage.waitForFunction(()=> document.getElementById('delivery-resumo') && document.getElementById('delivery-resumo').textContent.includes('PIPICAT'), {timeout:3000});
-    await freshPage.evaluate(()=>{ window.__lastWindowOpen = null; window.open = (u)=>{ window.__lastWindowOpen = u; return { focus: ()=>{} }; }; });
-    await freshPage.click('#btn-wa');
-    const wa = await freshPage.evaluate(()=> window.__lastWindowOpen || document.getElementById('btn-wa')?.href);
-    await freshPage.close();
-    if(!(wa && wa.startsWith('https://wa.me/'))) throw new Error('no wa link');
-    return { wa };
-  });
-
-  await record('delivery:invalid phone flagged', async ()=>{
-    await page.goto(`http://localhost:${port}/delivery.html`, {waitUntil:'networkidle2'});
-    await page.type('#produto','GOLDEN GATOS CASTRADOS 1kg');
-    await page.click('#btn-add-prod');
-    await page.type('#recebedor','Ana');
-    await page.type('#tel','12345');
-    await page.click('#btn-wa');
-    const ariaInvalid = await page.$eval('#tel', el=> el.getAttribute('aria-invalid'));
-    if(ariaInvalid !== 'true') throw new Error('tel not flagged invalid');
-    return { ariaInvalid };
-  });
-
   // Agendar matrices
   await record('agendar:missing service validation', async ()=>{
     await page.goto(`http://localhost:${port}/agendar.html`, {waitUntil:'networkidle2'});
@@ -185,8 +119,7 @@ async function ensureWaIntercept(page){
     await page.select('#porte','Médio');
     await page.type('#tutorNome','João');
     await page.type('#tutorTelefone','31999998888');
-    await page.type('#dataPreferida', new Date(Date.now()+86400000).toISOString().slice(0,10));
-    await page.select('#janela','Tarde');
+    await pickSlot(page);
   await page.click('[data-role="srv-banho"]');
     await page.click('#btn-ver-resumo');
     await page.waitForFunction(()=> (document.getElementById('agendar-resumo')||{}).textContent.includes('Rex'), {timeout:3000});
@@ -204,8 +137,7 @@ async function ensureWaIntercept(page){
     await page.select('#porte','Pequeno');
     await page.type('#tutorNome','Bia');
     await page.type('#tutorTelefone','31988887777');
-    await page.type('#dataPreferida', new Date(Date.now()+86400000).toISOString().slice(0,10));
-    await page.select('#janela','Manhã');
+    await pickSlot(page);
   await page.click('[data-role="srv-banho"]');
     // click add another pet
     await page.click('#btn-add-pet');
@@ -225,8 +157,7 @@ async function ensureWaIntercept(page){
     await page.select('#porte','Grande');
     await page.type('#tutorNome','Leo');
     await page.type('#tutorTelefone','31977776666');
-    await page.type('#dataPreferida', new Date(Date.now()+86400000).toISOString().slice(0,10));
-    await page.select('#janela','Tarde');
+    await pickSlot(page);
     await page.click('[data-role="srv-banho"]');
     // switch to taxi-both
     await page.evaluate(()=>{ const r = Array.from(document.querySelectorAll("input[name='modalidadeLocalizacao']")).find(x=> x.value==='taxi-both'); if(r){ r.click(); }});
