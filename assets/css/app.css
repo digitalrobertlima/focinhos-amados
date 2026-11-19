@@ -360,3 +360,17 @@ textarea.entrada{ min-height: 120px; font-size: 1.1rem; font-weight: 600; resize
   .heroi .palco{ height: 280px; }
   .heroi .banheira{ width: 240px; height: 240px; margin-left: -120px; }
 }
+
+.nota-hora { font-size: .95rem; color: var(--muted); text-align: center; margin: 0 0 12px; }
+
+/* Trilha de fidelidade por níveis */
+.trilha{ list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 12px; }
+.nivel{ display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: start; padding: 12px; border: 2px solid var(--linha); border-radius: 16px; }
+.nivel h3{ font-size: 1rem; font-weight: 900; }
+.nivel-icone{ font-size: 1.6rem; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #f4f4f4; }
+.nivel.atual{ border-color: var(--verde); }
+.nivel.aberto{ border-color: var(--sol); background: #fffbe9; }
+.nivel.misterio{ opacity: .75; border-style: dashed; }
+.nivel-estado{ font-weight: 900; color: var(--muted); }
+.carimbos-linha{ display: flex; gap: 8px; margin-top: 8px; }
+.carimbos-linha .carimbo{ width: 30px; height: 30px; aspect-ratio: auto; }

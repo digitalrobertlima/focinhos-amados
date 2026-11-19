@@ -1,7 +1,7 @@
 /* Focinhos Amados — Service Worker
    HTML e config: rede primeiro (sempre atualizado). Estáticos: cache primeiro, atualizando em segundo plano. */
 const SW_URL = new URL(self.location.href);
-const V = SW_URL.searchParams.get('v') || '0.3.0';
+const V = SW_URL.searchParams.get('v') || '0.3.1';
 const CACHE = `fa-static-${V}`;
 const q = `?v=${V}`;
 const ESTATICOS = [

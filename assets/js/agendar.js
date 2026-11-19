@@ -37,15 +37,56 @@
   /* ---------------- Regras de horário ---------------- */
   function regras() {
     return Object.assign({
-      closedWeekdays: [0], arrivalTimes: ['13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'], minLeadMinutes: 30, askForVideo: true,
+      closedWeekdays: [0], arrivalTimes: ['13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'], minLeadMinutes: 30, askForVideo: true, petsAtSameTime: 2, tosasAtSameTime: 1, busy: {},
     }, (window.CONFIG && window.CONFIG.booking) || {});
+  }
+  /* Capacidade: no máximo `petsAtSameTime` cães por horário e `tosasAtSameTime` tosa por horário.
+     `booking.busy` ({ 'AAAA-MM-DD': { 'HH:MM': { caes, tosas } } }) será alimentado pela agenda do Google;
+     sem ele, só valem as regras dentro do próprio agendamento. */
+  const temTosa = (p) => p.servico === 'Banho e tosa';
+  function ocupado(dia, hora) {
+    const b = (regras().busy || {})[dia];
+    const o = (b && b[hora]) || {};
+    return { caes: Number(o.caes) || 0, tosas: Number(o.tosas) || 0 };
+  }
+  /* Distribui os pets a partir de `hora`: tosas primeiro, cada uma num horário diferente. */
+  function planejar(dia, hora, pets = S.pets) {
+    const r = regras(); const hs = r.arrivalTimes; const ini = hs.indexOf(hora);
+    if (ini < 0) return null;
+    const uso = {};
+    const livre = (h) => { const o = ocupado(dia, h); const u = uso[h] || { caes: 0, tosas: 0 }; return { caes: o.caes + u.caes, tosas: o.tosas + u.tosas }; };
+    const ordem = pets.map((p, i) => ({ p, i })).sort((a, b) => Number(temTosa(b.p)) - Number(temTosa(a.p)));
+    const plano = [];
+    for (const { p, i } of ordem) {
+      let achou = null;
+      for (let k = ini; k < hs.length && !achou; k++) {
+        const l = livre(hs[k]);
+        if (l.caes < (Number(r.petsAtSameTime) || 2) && (!temTosa(p) || l.tosas < (Number(r.tosasAtSameTime) || 1))) achou = hs[k];
+      }
+      if (!achou) return null;
+      const u = uso[achou] || (uso[achou] = { caes: 0, tosas: 0 });
+      u.caes += 1; if (temTosa(p)) u.tosas += 1;
+      plano[i] = achou;
+    }
+    return plano;
   }
   function horariosDo(dia, ref = new Date()) {
     const d = FA.lerYmd(dia); const r = regras();
     if (!d || r.closedWeekdays.includes(d.getDay())) return [];
-    if (dia !== FA.ymd(ref)) return r.arrivalTimes.slice();
-    const limite = ref.getHours() * 60 + ref.getMinutes() + (Number(r.minLeadMinutes) || 0);
-    return r.arrivalTimes.filter((t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m >= limite; });
+    let hs = r.arrivalTimes.slice();
+    if (dia === FA.ymd(ref)) {
+      const limite = ref.getHours() * 60 + ref.getMinutes() + (Number(r.minLeadMinutes) || 0);
+      hs = hs.filter((t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m >= limite; });
+    }
+    // só oferece o horário se todos os pets couberem (a partir dele) respeitando as regras de capacidade
+    return hs.filter((h) => { const pl = planejar(dia, h); return !!pl && pl.includes(h); });
+  }
+  /* Horário de cada pet (pode diferir quando há mais de uma tosa) */
+  function planoAtual() { return (S.dia && S.hora && planejar(S.dia, S.hora)) || S.pets.map(() => S.hora); }
+  function textoHora() {
+    const pl = planoAtual();
+    if (pl.every((h) => h === pl[0])) return pl[0];
+    return S.pets.map((p, i) => `${(p.nome || 'Pet').trim()} ${pl[i]}`).join(' • ');
   }
   function proximosDias(qtd = 6) {
     const out = []; const hoje = new Date();
@@ -286,9 +327,9 @@
         return {
           pergunta: `Que horas ${esc(S.pets.length > 1 ? 'eles chegam' : nomeDo(0) + ' chega')}?`,
           dica: FA.dataLonga(S.dia).replace(/^./, (c) => c.toUpperCase()),
-          corpo: hs.length ? `<div class="horas" role="radiogroup" aria-label="Horário de chegada">${hs.map((h) => `
+          corpo: (S.pets.filter(temTosa).length > 1 ? '<p class="nota-hora">Fazemos uma tosa por horário, então os pets com tosa chegam em horários seguidos.</p>' : '') + (hs.length ? `<div class="horas" role="radiogroup" aria-label="Horário de chegada">${hs.map((h) => `
             <button type="button" class="hora" role="radio" data-hora="${h}" aria-checked="${S.hora === h}">${h}</button>`).join('')}</div>`
-            : '<p class="vazio">Esse dia não tem mais horário. Volte e escolha outro dia.</p>',
+            : '<p class="vazio">Esse dia não tem mais horário. Volte e escolha outro dia.</p>'),
           ligar(tela) {
             tela.querySelectorAll('[data-hora]').forEach((b) => b.addEventListener('click', () => { marcar(b, 'aria-checked'); S.hora = b.dataset.hora; avancarLogo(); }));
           },
@@ -299,7 +340,7 @@
       etapa: 1, mostrar: () => true, pronto: () => !!S.vem,
       montar() {
         const quem = S.pets.length > 1 ? 'eles vêm' : `${esc(nomeDo(0))} vem`;
-        const op = [['loja', 'coleira', 'Eu levo até a loja', 'Av. Padre José Maurício, 572'], ['busca', 'carro', 'Táxi Dog busca', 'a gente busca, você pega depois'], ['buscaEntrega', 'carro:true', 'Táxi Dog busca e devolve', 'vai e volta sem você sair de casa']];
+        const op = [['loja', 'coleira', 'Eu levo até a loja', 'Av. Padre José Maurício, 572'], ['busca', 'carro', 'Táxi Dog só busca', 'a gente busca em casa, você pega na loja'], ['entrega', 'carro:true', 'Táxi Dog só entrega', 'você leva até a loja, a gente devolve em casa'], ['buscaEntrega', 'carro:true', 'Táxi Dog busca e devolve', 'vai e volta sem você sair de casa']];
         return {
           pergunta: `Como ${quem}?`,
           corpo: `<div class="opcoes" role="group">${op.map(([v, f, t, s]) => {
@@ -317,7 +358,7 @@
       montar() {
         const achado = S.end.rua && !S.end.manual ? `<div class="cep-achado" id="cep-achado">📍 ${esc(S.end.rua)} — ${esc(S.end.bairro)}</div>` : '<div id="cep-achado"></div>';
         return {
-          fig: 'carro', pergunta: 'Qual o CEP de casa?', dica: 'É onde o Táxi Dog vai buscar.',
+          fig: 'carro', pergunta: 'Qual o CEP de casa?', dica: S.vem === 'entrega' ? 'É onde o Táxi Dog vai entregar.' : S.vem === 'busca' ? 'É onde o Táxi Dog vai buscar.' : 'É onde o Táxi Dog busca e entrega.',
           corpo: `<div class="campo"><label class="sr-only" for="f-cep">CEP</label>
               <input id="f-cep" class="entrada" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000" value="${esc(S.end.cep)}"></div>
             <p class="erro" id="cep-erro" role="status"></p>${achado}
@@ -417,14 +458,14 @@
           corpo: `<div class="revisao">
             ${S.pets.map((p, k) => `<div class="cartao"><div class="rev-linha"><div><h3>🐾 ${esc(p.nome)}</h3><p>${esc(resumoPet(p))}</p></div>
               <button type="button" class="rev-editar" data-editar="servico" data-i="${k}" aria-label="Alterar ${esc(p.nome)}">Alterar</button></div></div>`).join('')}
-            <div class="cartao"><div class="rev-linha"><div><h3>🗓️ ${esc(FA.dataLonga(S.dia))}</h3><p>Chegada às ${esc(S.hora)}</p></div>
+            <div class="cartao"><div class="rev-linha"><div><h3>🗓️ ${esc(FA.dataLonga(S.dia))}</h3><p>Chegada às ${esc(textoHora())}</p></div>
               <button type="button" class="rev-editar" data-editar="dia" aria-label="Alterar dia e hora">Alterar</button></div></div>
             <div class="cartao"><div class="rev-linha"><div><h3>${S.vem === 'loja' ? '🚶 Você leva' : '🚕 Táxi Dog'}</h3><p>${esc(textoTransporte())}</p></div>
               <button type="button" class="rev-editar" data-editar="vem" aria-label="Alterar transporte">Alterar</button></div></div>
             <div class="cartao"><div class="rev-linha"><div><h3>👤 ${esc(S.tutor.nome)}</h3><p>${esc(S.tutor.tel)}</p></div>
               <button type="button" class="rev-editar" data-editar="tutorNome" aria-label="Alterar seus dados">Alterar</button></div></div>
           </div>
-          <p class="compromisso">Eu confirmo: <strong>${quem}</strong> ${S.pets.length > 1 ? 'chegam' : 'chega'} <strong>${esc(FA.dataLonga(S.dia))}</strong> às <strong>${esc(S.hora)}</strong>.</p>`,
+          <p class="compromisso">Eu confirmo: <strong>${quem}</strong> ${S.pets.length > 1 ? 'chegam' : 'chega'} <strong>${esc(FA.dataLonga(S.dia))}</strong> às <strong>${esc(textoHora())}</strong>.</p>`,
           botao: () => 'Confirmo o horário',
           ligar(tela) {
             tela.querySelectorAll('[data-editar]').forEach((b) => b.addEventListener('click', () => {
@@ -457,7 +498,7 @@
   }
   function textoTransporte() {
     if (S.vem === 'loja') return 'Eu levo o pet até a loja';
-    const t = S.vem === 'busca' ? 'Buscar em casa (eu busco depois)' : 'Buscar e devolver em casa';
+    const t = { busca: 'Só buscar em casa (eu pego na loja depois)', entrega: 'Só entregar em casa (eu levo até a loja)', buscaEntrega: 'Buscar e devolver em casa' }[S.vem] || 'Táxi Dog';
     return `${t}. ${textoEndereco()}`;
   }
   function mensagemZap() {
@@ -473,12 +514,12 @@
     const map = {
       petsLista: linhasPet,
       dataPreferida: FA.dataLonga(S.dia).replace(/^./, (c) => c.toUpperCase()),
-      janela: S.hora,
+      janela: textoHora(),
       transporte: textoTransporte(),
       tutorNome: S.tutor.nome.trim(),
       tutorTelefone: S.tutor.tel,
       enderecoLoja: (window.CONFIG.business && window.CONFIG.business.addressLine) || '',
-      videoNota: r.askForVideo === false ? '' : `\n\n🎥 *Vídeo*\nVou mandar agora um vídeo ${S.pets.length > 1 ? 'dos pets' : 'do pet'} pra vocês verem o pelo e passarem o valor.`,
+      videoNota: r.askForVideo === false ? '' : `\n\n🎥 *Vídeo*\nVou mandar agora um vídeo de pelo menos 1 minuto ${S.pets.length > 1 ? 'dos pets' : 'do pet'} pra vocês verem o pelo e passarem o valor.`,
     };
     const tpl = (window.CONFIG.waTemplates && window.CONFIG.waTemplates.agendar) || '{petsLista}';
     return tpl.replace(/\{(\w+)\}/g, (_, k) => (map[k] != null ? map[k] : '')).replace(/\n{3,}/g, '\n\n').trim();
@@ -495,11 +536,11 @@
       corpo: `<div class="final">
         <div class="palco" aria-hidden="true"><div class="objeto cachorro">${D(fig)}</div></div>
         <h1 class="wz-pergunta" tabindex="-1">Agora é só confirmar no WhatsApp!</h1>
-        <span class="quando">${quem} · ${esc(FA.dataLonga(S.dia))} · ${esc(S.hora)}</span>
+        <span class="quando">${quem} · ${esc(FA.dataLonga(S.dia))} · ${esc(textoHora())}</span>
         <ol class="passos">
           <li id="passo-zap"><h3>Envie a ficha no WhatsApp</h3><p>Ela já vai prontinha. É só tocar em enviar.</p>
             <a class="btn btn-zap" id="btn-zap" href="${esc(FA.linkZap(mensagemZap()))}" target="_blank" rel="noopener">Enviar no WhatsApp</a></li>
-          ${regras().askForVideo === false ? '' : `<li><h3>Mande um vídeo ${S.pets.length > 1 ? 'dos pets' : (ehGato(0) ? 'da ' : 'do ') + quem}</h3><p>Uns 20 segundos, mostrando o pelo de perto. Com ele a gente vê o tempo de banho e passa o valor certinho.</p></li>`}
+          ${regras().askForVideo === false ? '' : `<li><h3>Mande um vídeo ${S.pets.length > 1 ? 'dos pets' : (ehGato(0) ? 'da ' : 'do ') + quem}</h3><p>Pelo menos 1 minuto, mostrando o pelo de perto e o jeitinho no dia a dia. Com ele a gente vê o tempo de banho e passa o valor certinho.</p></li>`}
           ${chave ? `<li><h3>Garanta o horário com o sinal</h3><p>${esc(pay.depositNote || 'O sinal é descontado do valor final.')}</p>
             <div class="pix"><span class="pequeno muted">Chave Pix${pay.pixKeyType ? ' (' + esc(pay.pixKeyType) + ')' : ''}${pay.pixHolder ? ' · ' + esc(pay.pixHolder) : ''}</span>
             <code id="pix-chave">${esc(chave)}</code><button type="button" class="btn btn-claro" id="btn-pix">Copiar chave Pix</button></div></li>` : ''}
@@ -525,7 +566,7 @@
         });
         tela.querySelector('#btn-ics').addEventListener('click', () => FA.baixarIcs({
           dia: S.dia, hora: S.hora, titulo: `Banho: ${S.pets.map((p) => p.nome).join(' e ')} 🐾`,
-          descricao: `Focinhos Amados — chegada às ${S.hora}. ${textoTransporte()}`,
+          descricao: `Focinhos Amados — chegada às ${textoHora()}. ${textoTransporte()}`,
         }));
       },
     };
@@ -711,7 +752,7 @@
   }
 
   // Para testes automatizados
-  window.__faAgendar = { estado: () => S, tela: () => atual().id, mensagem: mensagemZap };
+  window.__faAgendar = { estado: () => S, tela: () => atual().id, mensagem: mensagemZap, horariosDo, planejar, textoHora };
 
   if (FA.pronto) iniciar(); else document.addEventListener('fa:pronto', iniciar, { once: true });
 })();

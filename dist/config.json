@@ -26,7 +26,7 @@
     "bg": "#FFFCFE"
   },
   "booking": {
-    "_comment": "Regras do agendamento. Horários de CHEGADA do pet; o último é 17:00 para dar tempo de terminar até 20:00.",
+    "_comment": "Regras do agendamento. Horários de CHEGADA do pet; o último é 18:00; no máximo 2 cães e 1 tosa por horário.",
     "closedWeekdays": [
       0
     ],
@@ -38,10 +38,13 @@
       "15:30",
       "16:00",
       "16:30",
-      "17:00"
+      "17:00",
+      "17:30",
+      "18:00"
     ],
     "minLeadMinutes": 30,
     "petsAtSameTime": 2,
+    "tosasAtSameTime": 1,
     "askForVideo": true
   },
   "payments": {
@@ -51,7 +54,7 @@
     "pixHolder": "",
     "depositNote": "Ele é descontado do valor final, que a gente passa no WhatsApp depois de ver o vídeo."
   },
-  "appVersion": "v0.3.0",
+  "appVersion": "v0.3.1",
   "waTemplates": {
     "agendar": "📅 *AGENDAMENTO* — FOCINHOS AMADOS (BH)\n\n🐾 *Pets*\n{petsLista}\n\n⏰ *Quando*\n{dataPreferida} • Chegada: {janela}\n\n🚕 *Como vem*\n{transporte}\n\n👤 *Tutor*\n{tutorNome} • 📞 {tutorTelefone}{videoNota}"
   }

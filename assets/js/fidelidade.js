@@ -2,7 +2,6 @@
 (function () {
   'use strict';
   const FA = window.FA;
-  const TOTAL = 10;
   function iniciar() {
     const cofre = document.getElementById('cofre');
     const dica = document.getElementById('cofre-dica');
@@ -21,19 +20,32 @@
     cofre.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternar(); } });
     if (!FA.reduzMovimento()) setTimeout(() => { if (!cofre.classList.contains('aberto')) alternar(); }, 900);
 
-    // Cartão: 1º carimbo de presente (progresso inicial), depois 1 por banho agendado pelo app
-    const feitos = Math.min(TOTAL - 1, FA.agenda.lista().length);
-    const cheios = 1 + feitos;
+    // Trilha de níveis: cada banho agendado pelo app vale 1 carimbo.
+    // Nível 1: 3 banhos = hidratação de brinde. Depois, uma trilha misteriosa (novos prêmios em breve).
+    const feitos = FA.agenda.lista().length;
     const pata = window.FA3D.desenho('pata', '#ffffff');
-    const el = document.getElementById('carimbos');
-    el.innerHTML = Array.from({ length: TOTAL }, (_, k) => {
-      if (k === TOTAL - 1) return `<span class="carimbo presente" aria-label="Prêmio">🎁</span>`;
-      return k < cheios ? `<span class="carimbo cheio" aria-label="Carimbo ${k + 1}">${pata}</span>` : `<span class="carimbo" aria-label="Vazio">${k + 1}</span>`;
+    const NIVEIS = [
+      { at: 3, icone: '💧', nome: 'Hidratação de brinde', desc: 'Complete 3 banhos e ganhe uma hidratação.' },
+      { at: 6, misterio: true }, { at: 9, misterio: true }, { at: 12, misterio: true },
+    ];
+    const el = document.getElementById('trilha');
+    el.innerHTML = NIVEIS.map((n, k) => {
+      const ini = k === 0 ? 0 : NIVEIS[k - 1].at;
+      const ok = feitos >= n.at; const atual = !ok && feitos >= ini;
+      const passos = n.at - ini;
+      const cheios = Math.max(0, Math.min(passos, feitos - ini));
+      const marcas = Array.from({ length: passos }, (_, j) => `<span class="carimbo ${j < cheios ? 'cheio' : ''}" aria-hidden="true">${j < cheios ? pata : ''}</span>`).join('');
+      const titulo = n.misterio ? `Nível ${k + 1} · ???` : `Nível ${k + 1} · ${n.nome}`;
+      const sub = n.misterio ? 'Prêmio misterioso. Em breve.' : (ok ? 'Desbloqueado! Avise a gente no próximo banho.' : n.desc);
+      return `<li class="nivel ${ok ? 'aberto' : ''} ${atual ? 'atual' : ''} ${n.misterio ? 'misterio' : ''}">
+        <span class="nivel-icone" aria-hidden="true">${n.misterio ? '❓' : n.icone}</span>
+        <div><h3>${titulo}</h3><p class="muted pequeno">${sub}</p><div class="carimbos-linha">${marcas}</div></div>
+        <span class="nivel-estado">${ok ? '✓' : n.misterio ? '🔒' : `${cheios}/${passos}`}</span></li>`;
     }).join('');
-    el.setAttribute('aria-label', `Cartão fidelidade: ${cheios} de ${TOTAL} carimbos`);
+    el.setAttribute('aria-label', `Trilha de fidelidade: ${feitos} ${feitos === 1 ? 'banho' : 'banhos'}`);
     document.getElementById('cartao-texto').textContent = feitos
-      ? `Você já tem ${cheios} carimbos: o de boas-vindas e ${feitos} ${feitos > 1 ? 'banhos agendados' : 'banho agendado'} pelo app.`
-      : 'O primeiro carimbo é presente de boas-vindas. Cada banho agendado pelo app ganha outro.';
+      ? `Você tem ${feitos} ${feitos > 1 ? 'banhos' : 'banho'} na trilha.`
+      : 'Cada banho vira um carimbo. Com 3, você ganha uma hidratação de brinde.';
 
     const btn = document.getElementById('btn-instalar');
     if (FA.instalado()) { btn.hidden = true; document.getElementById('ja-instalado').hidden = false; }

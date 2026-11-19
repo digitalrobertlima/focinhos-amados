@@ -2,7 +2,7 @@
   "name": "Focinhos Amados • Banho e tosa",
   "short_name": "Focinhos",
   "description": "Agende banho e tosa em 1 minuto. Táxi Dog busca e leva.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "id": "./",
   "start_url": "./?origem=app",
   "scope": "./",

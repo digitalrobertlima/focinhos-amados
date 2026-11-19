@@ -1,3 +1,10 @@
+## 0.3.1
+- Vídeo: pedimos pelo menos 1 minuto.
+- Horários de chegada agora vão até 18:00 (novos: 17:30 e 18:00).
+- Capacidade: no máximo 2 cães e 1 tosa por horário; duas tosas no mesmo agendamento chegam em horários seguidos. A estrutura `booking.busy` está pronta para receber a ocupação da Agenda Google.
+- Táxi Dog: novas opções "só busca" e "só entrega" além de "busca e devolve".
+- Fidelidade: trilha por níveis (3 banhos = hidratação de brinde) + níveis misteriosos.
+
 # Changelog
 #
 ## [0.3.0] - 2026-11-19 (branch redesign/agendamento-v2, em teste)

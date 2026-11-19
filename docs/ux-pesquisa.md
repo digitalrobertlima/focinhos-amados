@@ -53,7 +53,7 @@ Encher a agenda de banho e tosa e reduzir faltas, sem perder a ficha completa qu
 | 8 | Alguma alergia ou problema de saúde? | Não / Sim → texto | |
 | 9 | Vai trazer outro pet junto? | Não / Sim → volta ao 1 | |
 | 10 | Que dia fica bom? | cartões dos próximos dias úteis | Domingo não aparece |
-| 11 | Que horas {pet} chega? | grade de horários | 13:30 a 17:00. Futuramente, só os livres |
+| 11 | Que horas {pet} chega? | grade de horários | 13:30 a 18:00. Máx. 2 cães e 1 tosa por horário. Futuramente, só os livres |
 | 12 | Como {pet} vem? | Eu levo / Táxi busca / Táxi busca e entrega | |
 | 12b | Endereço | CEP → número/complemento | Só se for Táxi Dog |
 | 13 | Seu nome | texto | |

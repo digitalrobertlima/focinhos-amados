@@ -134,9 +134,11 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     await page.click('[data-dia]');
     await esperaTela('hora');
     const horas = await page.$$eval('[data-hora]', (bs) => bs.map((b) => b.dataset.hora));
-    certo(horas.every((h) => h >= '13:30' && h <= '17:00'), 'hora fora da regra: ' + horas);
+    certo(horas.every((h) => h >= '13:30' && h <= '18:00'), 'hora fora da regra: ' + horas);
     await page.click('[data-hora]');
-    await esperaTela('vem'); await tocar('busca e devolve');
+    await esperaTela('vem');
+    certo(await page.evaluate(() => /só entrega/.test(document.body.textContent) && /só busca/.test(document.body.textContent)), 'faltam opções só busca/só entrega');
+    await tocar('busca e devolve');
     await esperaTela('cep'); await page.type('#f-cep', '30140071');
     await page.waitForFunction(() => (document.getElementById('cep-achado') || {}).textContent.includes('Rua da Bahia'), { timeout: 4000 });
     await continuar();
@@ -217,7 +219,7 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     await esperaTela('hora'); await page.click('[data-hora]:last-child');
     await esperaTela('revisao');
     const r = await page.evaluate(() => window.__faAgendar.estado());
-    certo(r.hora === '17:00', 'hora editada: ' + r.hora);
+    certo(r.hora === '18:00', 'hora editada: ' + r.hora);
   });
 
   await caso('segurança: nome com código não executa', async () => {
@@ -239,8 +241,40 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     await page.click('#cofre');
     await page.waitForFunction(() => document.getElementById('cofre').classList.contains('aberto'), { timeout: 3000 });
     const r = await page.evaluate(() => ({ cheios: document.querySelectorAll('.carimbo.cheio').length, breve: document.querySelector('.em-breve').textContent, cripto: /criptomoedas/.test(document.body.textContent) }));
-    certo(r.cheios === 3, 'carimbos: ' + r.cheios);
+    certo(r.cheios === 2, 'carimbos: ' + r.cheios);
+    certo(await page.evaluate(() => /3 banhos|Hidratação/i.test(document.body.textContent) && document.querySelectorAll('.nivel.misterio').length >= 1), 'trilha: hidratação + misteriosa');
     certo(/breve/i.test(r.breve) && r.cripto, 'texto em breve/cripto');
+    return r;
+  });
+
+
+  await caso('capacidade: 17:30 e 18:00, 1 tosa por horário, vídeo de 1 minuto, táxi só entrega', async () => {
+    await page.goto(BASE + '/agendar.html?novo=1', { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => window.__faAgendar);
+    const r = await page.evaluate(() => {
+      const A = window.__faAgendar; const S = A.estado();
+      const dia = (() => { const d = new Date(); do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0); return FA.ymd(d); })();
+      const mk = (servico) => ({ nome: 'X', servico, extras: [], tosa: servico === 'Banho e tosa' ? 'Higiênica' : '' });
+      const base = A.horariosDo(dia);
+      S.pets = [mk('Banho e tosa'), mk('Banho e tosa')];
+      const duas = A.planejar(dia, '14:00');
+      const ultima = A.horariosDo(dia);
+      S.pets = [mk('Banho e tosa'), mk('Banho')];
+      const mista = A.planejar(dia, '14:00');
+      // horário já com 1 tosa e 1 cão: só cabe banho
+      window.CONFIG.booking.busy = { [dia]: { '15:00': { caes: 1, tosas: 1 } } };
+      S.pets = [mk('Banho e tosa')]; const tosaOcupada = A.horariosDo(dia).includes('15:00');
+      S.pets = [mk('Banho')]; const banhoOk = A.horariosDo(dia).includes('15:00');
+      S.pets = [mk('Banho'), mk('Banho')]; const doisBanhos = A.planejar(dia, '15:00');
+      return { base, duas, ultima, mista, tosaOcupada, banhoOk, doisBanhos };
+    });
+    certo(r.base.includes('17:30') && r.base.includes('18:00'), 'faltam 17:30/18:00: ' + r.base);
+    certo(r.duas[0] === '14:00' && r.duas[1] === '14:30', 'duas tosas deveriam ficar em horários seguidos: ' + r.duas);
+    certo(!r.ultima.includes('18:00'), 'duas tosas não cabem às 18:00');
+    certo(r.mista[0] === '14:00' && r.mista[1] === '14:00', 'tosa + banho juntos: ' + r.mista);
+    certo(!r.tosaOcupada && r.banhoOk && r.doisBanhos[0] === '15:00' && r.doisBanhos[1] === '15:30', 'horário com tosa só aceita 1 banho: ' + JSON.stringify(r));
+    const html = await page.evaluate(() => window.__faAgendar.mensagem.toString());
+    certo(/1 minuto/.test(html) && !/20 segundos/.test(html), 'vídeo de 1 minuto');
     return r;
   });
 
