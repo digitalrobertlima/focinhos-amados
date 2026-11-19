@@ -8,6 +8,7 @@
 - Imagens otimizadas: de ~10 MB para ~380 KB (home carrega com ~310 KB).
 - `delivery.html` antigo agora leva ao início (links antigos não quebram).
 - Ajustes para celulares de 320px (cabeçalho e depoimentos).
+- Fotos de pets de banco de imagem removidas; a home fica só com os depoimentos reais.
 - `package.json` com as mesmas devDependencies do `package-lock.json` (o `npm ci` da DigitalOcean exige).
 
 ## 0.3.1

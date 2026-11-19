@@ -10,7 +10,6 @@ const ESTATICOS = [
   './assets/js/ilustracoes.js' + q, './assets/js/config.js' + q, './assets/js/core.js' + q,
   './assets/js/agendar.js' + q, './assets/js/inicio.js' + q, './assets/js/fidelidade.js' + q, './assets/js/sobre.js' + q, './assets/js/selo.js' + q, './assets/js/painel.js' + q,
   './assets/img/logo.png', './assets/img/pwa-192.png', './assets/img/pwa-512.png',
-  './assets/img/gallery-pet-1.webp', './assets/img/gallery-pet-2.webp', './assets/img/gallery-pet-3.webp', './assets/img/gallery-pet-4.webp',
   './manifest.webmanifest',
 ];
 
