@@ -152,7 +152,7 @@ p{ margin: 0; }
 .galeria{ display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 18px 10px; margin: 0 -18px; scrollbar-width: none; }
 .galeria::-webkit-scrollbar{ display: none; }
 .galeria img{ width: 72%; max-width: 280px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 18px; flex: none; scroll-snap-align: center; box-shadow: var(--sombra); }
-.depo{ position: relative; padding-top: 22px; }
+.depo{ position: relative; padding-top: 22px; margin: 0 0 12px; }
 .depo::before{ content: "“"; position: absolute; top: -8px; left: 14px; font-size: 4rem; color: var(--menta-2); font-weight: 900; line-height: 1; }
 .depo p{ position: relative; }
 .depo footer{ margin-top: 10px; font-weight: 800; color: var(--verde-escuro); }
@@ -396,3 +396,12 @@ textarea.entrada{ min-height: 120px; font-size: 1.1rem; font-weight: 600; resize
 .painel-lista button{ width: 100%; min-height: 56px; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border: 2px solid var(--linha); border-radius: 14px; background: #fff; font: inherit; text-align: left; }
 .painel-lista small{ display: block; color: var(--muted); }
 .painel-chave{ display: block; word-break: break-all; font-size: .75rem; background: #f4f4f4; padding: 8px; border-radius: 8px; margin-top: 6px; }
+
+/* Celulares bem pequenos (320px) */
+@media (max-width: 359px){
+  .marca{ gap: 8px; }
+  .marca img{ width: 34px; height: 34px; }
+  .marca strong{ font-size: .92rem; }
+  .marca small{ display: none; }
+  .status{ font-size: .72rem; padding: 6px 9px; }
+}

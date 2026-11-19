@@ -5,6 +5,10 @@
   - O app confere a assinatura com `config.json → loyalty.publicKey`. Selos adulterados ou de outro número são recusados.
   - Agendar não dá mais selo: o selo só vem depois do banho feito.
 - Vibração só depois de um toque (evita aviso do navegador).
+- Imagens otimizadas: de ~10 MB para ~380 KB (home carrega com ~310 KB).
+- `delivery.html` antigo agora leva ao início (links antigos não quebram).
+- Ajustes para celulares de 320px (cabeçalho e depoimentos).
+- `package.json` com as mesmas devDependencies do `package-lock.json` (o `npm ci` da DigitalOcean exige).
 
 ## 0.3.1
 - Vídeo: pedimos pelo menos 1 minuto.

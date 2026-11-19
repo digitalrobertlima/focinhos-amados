@@ -334,6 +334,11 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     certo((await page.evaluate(() => window.__faAgendar.estado().vem)) === 'buscaEntrega', 'táxi não pré-selecionado');
   });
 
+  await caso('link antigo delivery.html leva ao início', async () => {
+    await page.goto(BASE + '/delivery.html', { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => document.body.dataset.page === 'inicio', { timeout: 4000 });
+  });
+
   await caso('sem erros de JavaScript em nenhuma página', async () => {
     certo(errosConsole.length === 0, errosConsole.join('\n'));
   });
