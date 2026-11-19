@@ -11,6 +11,7 @@
     "scan:unused": "node tools/find-unreferenced.js"
   },
   "devDependencies": {
-    "puppeteer": "^24.16.2"
+    "puppeteer": "^24.16.2",
+    "cross-env": "^7.0.3"
   }
 }
