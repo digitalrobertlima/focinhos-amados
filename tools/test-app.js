@@ -361,6 +361,53 @@ const certo = (c, msg) => { if (!c) throw new Error(msg); };
     return r;
   });
 
+
+  await caso('só cortar unha: pula extras/perfume/laço, não ocupa vaga, sem pedido de vídeo', async () => {
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(BASE + '/agendar.html?novo=1', { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => window.__faAgendar);
+    if ((await tela()) === 'quem') await tocar('Novo');
+    await esperaTela('nome'); await digitar('#f-nome', 'Bidu'); await continuar();
+    await esperaTela('especie'); await tocar('Cachorro');
+    await esperaTela('porte'); await tocar('Pequeno');
+    await esperaTela('pelo'); await tocar('Curto');
+    await esperaTela('temperamento'); await tocar('Manso');
+    await esperaTela('servico'); await tocar('Só cortar a unha');
+    await esperaTela('saude');
+    const r = await page.evaluate(() => {
+      const A = window.__faAgendar; const S = A.estado();
+      const d = new Date(); do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0); const dia = FA.ymd(d);
+      window.CONFIG.booking.busy = { [dia]: { '14:00': { caes: 2, tosas: 1 } } };
+      const cabe = A.horariosDo(dia).includes('14:00');
+      window.CONFIG.booking.busy = {};
+      S.dia = dia; S.hora = '14:00'; S.tutor = { nome: 'Ana', tel: '31999990000' }; S.vem = 'loja';
+      return { cabe, video: A.pedeVideo(), msg: A.mensagem() };
+    });
+    certo(r.cabe, 'unha deveria caber em horário cheio');
+    certo(!r.video && !/Vídeo/.test(r.msg) && /Só corte de unha/.test(r.msg) && !/Perfume/.test(r.msg), 'mensagem: ' + r.msg);
+    return { ok: true };
+  });
+
+
+  await caso('seus pets: tirar um pet do app com confirmação (some da home e dos próximos horários)', async () => {
+    await page.goto(BASE + '/', { waitUntil: 'networkidle0' });
+    await page.evaluate(() => {
+      localStorage.clear();
+      localStorage.setItem('fa:perfil:v1', JSON.stringify({ tutor: { nome: 'Ana', tel: '31999990000' }, pets: [{ nome: 'Mel', especie: 'Cachorro' }, { nome: 'Thor', especie: 'Cachorro' }] }));
+      localStorage.setItem('fa:agendamentos:v1', JSON.stringify([{ dia: '2099-01-02', hora: '14:00', pets: ['Thor'] }, { dia: '2099-01-03', hora: '14:00', pets: ['Mel', 'Thor'] }]));
+    });
+    await page.reload({ waitUntil: 'networkidle0' });
+    certo(/Thor de novo/.test(await page.$eval('#cta-agendar', (e) => e.textContent)), 'cta inicial');
+    await page.evaluate(() => [...document.querySelectorAll('#lista-pets li')].find((li) => li.textContent.includes('Thor')).querySelector('.mp-tirar').click());
+    certo(await page.evaluate(() => !!document.querySelector('.mp-confirma:not([hidden])')), 'deveria pedir confirmação');
+    certo((await page.evaluate(() => FA.perfil.obter().pets.length)) === 2, 'tirou sem confirmar');
+    await page.click('.mp-confirma:not([hidden]) .mp-sim');
+    const r = await page.evaluate(() => ({ cta: document.getElementById('cta-agendar').textContent, pets: FA.perfil.obter().pets.map((p) => p.nome), agenda: FA.agenda.lista(), lista: document.getElementById('lista-pets').textContent }));
+    certo(r.pets.join() === 'Mel' && /Mel de novo/.test(r.cta) && !/Thor/.test(r.lista), 'home: ' + JSON.stringify(r));
+    certo(r.agenda.length === 1 && r.agenda[0].pets.join() === 'Mel', 'agenda: ' + JSON.stringify(r.agenda));
+    return { cta: r.cta };
+  });
+
   await caso('sobre: apagar meus dados', async () => {
     await page.goto(BASE + '/sobre.html', { waitUntil: 'networkidle0' });
     await page.click('#btn-esquecer');

@@ -44,6 +44,15 @@
      `booking.busy` ({ 'AAAA-MM-DD': { 'HH:MM': { caes, tosas } } }) será alimentado pela agenda do Google;
      sem ele, só valem as regras dentro do próprio agendamento. */
   const temTosa = (p) => p.servico === 'Banho e tosa';
+  const SO_UNHA = 'Só unha';
+  const soUnha = (p) => p.servico === SO_UNHA;
+  /* Corte de unha é rápido: não ocupa vaga de banho no horário. */
+  const pedeVideo = () => regras().askForVideo !== false && S.pets.some((p) => !soUnha(p));
+  function servicoTxt(p, curto) {
+    if (soUnha(p)) return 'Só corte de unha';
+    if (p.servico === 'Banho e tosa') return `Banho e tosa (${curto ? (p.tosa || '').toLowerCase() : p.tosa})`;
+    return 'Banho';
+  }
   function ocupado(dia, hora) {
     const b = (regras().busy || {})[dia];
     const o = (b && b[hora]) || {};
@@ -58,6 +67,7 @@
     const ordem = pets.map((p, i) => ({ p, i })).sort((a, b) => Number(temTosa(b.p)) - Number(temTosa(a.p)));
     const plano = [];
     for (const { p, i } of ordem) {
+      if (soUnha(p)) { plano[i] = hora; continue; }
       let achou = null;
       for (let k = ini; k < hs.length && !achou; k++) {
         const l = livre(hs[k]);
@@ -139,7 +149,7 @@
         const lista = salvosDisponiveis(i);
         return {
           fig: 'pata',
-          pergunta: i === 0 ? 'Quem vem tomar banho?' : 'Quem mais vem junto?',
+          pergunta: i === 0 ? 'Pra quem é o agendamento?' : 'Quem mais vem junto?',
           corpo: `<div class="opcoes" role="group" aria-label="Escolha o pet">
             ${lista.map((p, k) => `<button type="button" class="opcao linha pet-salvo" data-salvo="${k}">
               <span class="fig">${D(p.especie === 'Gato' ? 'gato' : p.especie === 'Outro' ? 'outro' : 'cachorro')}</span>
@@ -227,6 +237,9 @@
           corpo: `<div class="opcoes duas" role="group">
             <button type="button" class="opcao" data-campo="servico" data-valor="Banho" aria-pressed="${pet(i).servico === 'Banho'}"><span class="fig">${D('banheira')}</span>Banho</button>
             <button type="button" class="opcao" data-campo="servico" data-valor="Banho e tosa" aria-pressed="${pet(i).servico === 'Banho e tosa'}"><span class="fig">${D('tesoura')}</span>Banho e tosa</button>
+          </div>
+          <div class="opcoes" role="group" style="margin-top:12px">
+            <button type="button" class="opcao linha" data-campo="servico" data-valor="${SO_UNHA}" aria-pressed="${soUnha(pet(i))}"><span class="fig">${D('pata')}</span><span>Só cortar a unha<small>sem banho, rapidinho</small></span></button>
           </div>`,
         };
       },
@@ -242,7 +255,7 @@
       },
     },
     extras: {
-      etapa: 0, mostrar: () => true, pronto: () => true,
+      etapa: 0, mostrar: (i) => !soUnha(pet(i)), pronto: () => true,
       montar(i) {
         const lista = ['Hidratação', 'Banho de ozônio', 'Corte de unhas', 'Limpeza de ouvido', 'Higienização bucal'];
         return {
@@ -260,7 +273,7 @@
       },
     },
     perfume: {
-      etapa: 0, mostrar: () => true, pronto: (i) => !!pet(i).perfume,
+      etapa: 0, mostrar: (i) => !soUnha(pet(i)), pronto: (i) => !!pet(i).perfume,
       montar(i) {
         return {
           pergunta: 'Perfume no final?',
@@ -269,7 +282,7 @@
       },
     },
     acessorio: {
-      etapa: 0, mostrar: () => true, pronto: (i) => !!pet(i).acessorio,
+      etapa: 0, mostrar: (i) => !soUnha(pet(i)), pronto: (i) => !!pet(i).acessorio,
       montar(i) {
         return {
           pergunta: `${esc(nomeDo(i))} sai com laço ou gravata?`,
@@ -550,7 +563,7 @@
   /* ---------------- Textos ---------------- */
   function resumoPet(p) {
     const partes = [p.especie, p.porte, p.pelo && `pelo ${p.pelo.toLowerCase()}`, p.temperamento].filter(Boolean).join(' · ');
-    const serv = p.servico === 'Banho e tosa' ? `Banho e tosa (${(p.tosa || '').toLowerCase()})` : 'Banho';
+    const serv = servicoTxt(p, true);
     const extras = p.extras.length ? ` + ${p.extras.join(', ')}` : '';
     return `${partes}. ${serv}${extras}.`;
   }
@@ -566,9 +579,9 @@
   function mensagemZap() {
     const linhasPet = S.pets.map((p, k) => {
       const l = [`*${k + 1}. ${p.nome}* — ${[p.especie, p.porte, p.pelo && 'pelo ' + p.pelo.toLowerCase(), p.temperamento === 'Bravo' ? '⚠️ BRAVO' : 'Manso'].filter(Boolean).join(' • ')}`];
-      l.push(`   ✂️ ${p.servico === 'Banho e tosa' ? `Banho e tosa (${p.tosa})` : 'Banho'}`);
+      l.push(`   ✂️ ${servicoTxt(p)}`);
       if (p.extras.length) l.push(`   ✨ Extras: ${p.extras.join(', ')}`);
-      l.push(`   🌸 Perfume: ${p.perfume} • 🎀 ${p.acessorio === 'Nenhum' ? 'Sem acessório' : p.acessorio}`);
+      if (!soUnha(p)) l.push(`   🌸 Perfume: ${p.perfume} • 🎀 ${p.acessorio === 'Nenhum' ? 'Sem acessório' : p.acessorio}`);
       if (p.temSaude && p.saude.trim()) l.push(`   ⚠️ Saúde: ${p.saude.trim()}`);
       return l.join('\n');
     }).join('\n\n');
@@ -581,7 +594,7 @@
       tutorNome: S.tutor.nome.trim(),
       tutorTelefone: S.tutor.tel,
       enderecoLoja: (window.CONFIG.business && window.CONFIG.business.addressLine) || '',
-      videoNota: r.askForVideo === false ? '' : `\n\n🎥 *Vídeo*\nVou mandar agora um vídeo de pelo menos 1 minuto ${S.pets.length > 1 ? 'dos pets' : 'do pet'} pra vocês verem o pelo e passarem o valor.`,
+      videoNota: !pedeVideo() ? '' : `\n\n🎥 *Vídeo*\nVou mandar agora um vídeo de pelo menos 1 minuto ${S.pets.length > 1 ? 'dos pets' : 'do pet'} pra vocês verem o pelo e passarem o valor.`,
     };
     const tpl = (window.CONFIG.waTemplates && window.CONFIG.waTemplates.agendar) || '{petsLista}';
     return tpl.replace(/\{(\w+)\}/g, (_, k) => (map[k] != null ? map[k] : '')).replace(/\n{3,}/g, '\n\n').trim();
@@ -602,7 +615,7 @@
         <ol class="passos">
           <li id="passo-zap"><h3>Envie a ficha no WhatsApp</h3><p>Ela já vai prontinha. É só tocar em enviar.</p>
             <a class="btn btn-zap" id="btn-zap" href="${esc(FA.linkZap(mensagemZap()))}" target="_blank" rel="noopener">Enviar no WhatsApp</a></li>
-          ${regras().askForVideo === false ? '' : `<li><h3>Mande um vídeo ${S.pets.length > 1 ? 'dos pets' : (ehGato(0) ? 'da ' : 'do ') + quem}</h3><p>Pelo menos 1 minuto, mostrando o pelo de perto e o jeitinho no dia a dia. Com ele a gente vê o tempo de banho e passa o valor certinho.</p></li>`}
+          ${!pedeVideo() ? '' : `<li><h3>Mande um vídeo ${S.pets.length > 1 ? 'dos pets' : (ehGato(0) ? 'da ' : 'do ') + quem}</h3><p>Pelo menos 1 minuto, mostrando o pelo de perto e o jeitinho no dia a dia. Com ele a gente vê o tempo de banho e passa o valor certinho.</p></li>`}
           ${chave ? `<li><h3>Garanta o horário com o sinal</h3><p>${esc(pay.depositNote || 'O sinal é descontado do valor final.')}</p>
             <div class="pix"><span class="pequeno muted">Chave Pix${pay.pixKeyType ? ' (' + esc(pay.pixKeyType) + ')' : ''}${pay.pixHolder ? ' · ' + esc(pay.pixHolder) : ''}</span>
             <code id="pix-chave">${esc(chave)}</code><button type="button" class="btn btn-claro" id="btn-pix">Copiar chave Pix</button></div></li>` : ''}
@@ -627,7 +640,7 @@
           FA.vibrar(15); setTimeout(() => { pix.textContent = 'Copiar chave Pix'; }, 2500);
         });
         tela.querySelector('#btn-ics').addEventListener('click', () => FA.baixarIcs({
-          dia: S.dia, hora: S.hora, titulo: `Banho: ${S.pets.map((p) => p.nome).join(' e ')} 🐾`,
+          dia: S.dia, hora: S.hora, titulo: `${S.pets.every(soUnha) ? 'Unha' : 'Banho'}: ${S.pets.map((p) => p.nome).join(' e ')} 🐾`,
           descricao: `Focinhos Amados — chegada às ${textoHora()}. ${textoTransporte()}`,
         }));
       },
@@ -692,7 +705,8 @@
     // Opções simples (data-campo) avançam sozinhas
     tela.querySelectorAll('[data-campo]').forEach((b) => b.addEventListener('click', () => {
       marcar(b); pet(a.i)[b.dataset.campo] = b.dataset.valor;
-      if (b.dataset.campo === 'servico' && b.dataset.valor === 'Banho') pet(a.i).tosa = '';
+      if (b.dataset.campo === 'servico' && b.dataset.valor !== 'Banho e tosa') pet(a.i).tosa = '';
+      if (b.dataset.campo === 'servico' && b.dataset.valor === SO_UNHA) Object.assign(pet(a.i), { extras: [], perfume: '', acessorio: '' });
       avancarLogo();
     }));
     if (m.ligar) m.ligar(tela);
@@ -814,7 +828,7 @@
   }
 
   // Para testes automatizados
-  window.__faAgendar = { estado: () => S, tela: () => atual().id, mensagem: mensagemZap, horariosDo, planejar, textoHora, campanhaAtiva };
+  window.__faAgendar = { estado: () => S, tela: () => atual().id, mensagem: mensagemZap, horariosDo, planejar, textoHora, campanhaAtiva, pedeVideo };
 
   if (FA.pronto) iniciar(); else document.addEventListener('fa:pronto', iniciar, { once: true });
 })();

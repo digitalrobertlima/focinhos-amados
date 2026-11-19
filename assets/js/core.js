@@ -64,6 +64,16 @@
       });
       return gravar(CHAVE_PERFIL, { tutor, pets: Array.from(porNome.values()).slice(-8) });
     },
+    /* Tira um pet do app (sem perguntar motivo): some das sugestões e dos próximos horários. */
+    removerPet(nome) {
+      const n = String(nome || '').toLowerCase();
+      const atual = perfil.obter();
+      gravar(CHAVE_PERFIL, Object.assign(atual, { pets: (atual.pets || []).filter((p) => String(p.nome).toLowerCase() !== n) }));
+      const hoje = ymd(new Date());
+      const l = ler(CHAVE_AGENDA, []).map((a) => (a.dia >= hoje ? Object.assign({}, a, { pets: (a.pets || []).filter((x) => String(x).toLowerCase() !== n) }) : a))
+        .filter((a) => a.dia < hoje || (a.pets || []).length);
+      gravar(CHAVE_AGENDA, l);
+    },
     esquecer() { try { localStorage.removeItem(CHAVE_PERFIL); localStorage.removeItem(CHAVE_AGENDA); } catch (_) { /* ok */ } },
   };
   const agenda = {

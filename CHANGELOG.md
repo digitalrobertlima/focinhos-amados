@@ -1,3 +1,8 @@
+## 0.4.2
+- Novo serviço "Só cortar a unha": pula extras, perfume e laço; não ocupa vaga de banho no horário; não pede vídeo.
+- "Seus pets" no início: tirar um pet do app com confirmação delicada, sem perguntar motivo. Some das sugestões e dos próximos horários.
+- Primeira pergunta agora é "Pra quem é o agendamento?" (vale para unha também).
+
 ## 0.4.1
 - Tela de data: botão "Escolher outra data" (calendário do celular, até 90 dias), recusando domingos, dias fechados e datas passadas.
 - Botões sazonais configuráveis (`booking.seasonal` no config.json). Primeiro: "🎄 Banho de Natal" com os dias de dezembro até a véspera. Some sozinho depois da data ou com `"ativo": false`.
